@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ee">
+  <meta name="description" content="Zhaoyuan Sun — Computer Science student at CUHK, interested in machine learning and agent systems.">
+  <title>Zhaoyuan Sun — Personal Homepage</title>
+  <style>
+    :root{--paper:#f3f0e8;--ink:#24231f;--muted:#706e67;--line:#d8d4ca;--accent:#4d4a43;--white:#fbfaf6;--serif:Georgia,'Times New Roman',serif;--sans:Arial,'Helvetica Neue',sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.7 var(--sans)}a{color:inherit;text-decoration-thickness:1px;text-underline-offset:4px}a:hover{color:var(--accent)}.wrap{width:min(1080px,calc(100% - 48px));margin:auto}
+    .topbar{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{font:600 15px var(--serif);letter-spacing:.02em}.nav{display:flex;gap:27px;font-size:13px;color:var(--muted)}.nav a{text-decoration:none}.nav a:hover{color:var(--ink)}
+    .hero{position:relative;isolation:isolate;overflow:hidden;padding:96px 0 82px;display:grid;grid-template-columns:1.35fr .65fr;gap:55px;align-items:end}.hero:before{content:'π';position:absolute;z-index:-1;right:3%;top:-.32em;font:500 clamp(330px,52vw,610px)/1 var(--serif);color:transparent;-webkit-text-stroke:1px rgba(54,51,44,.23);filter:blur(3px);transform:rotate(-7deg);pointer-events:none}.hero:after{content:'';position:absolute;z-index:-1;inset:0 0 0 34%;background:repeating-linear-gradient(118deg,transparent 0 25px,rgba(54,51,44,.06) 26px,transparent 27px 43px);mask-image:radial-gradient(ellipse at 66% 42%,#000 0%,transparent 68%);filter:blur(2px);pointer-events:none}.hero>*{position:relative}.eyebrow,.label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}.hero h1{font:500 clamp(56px,9vw,104px)/.98 var(--serif);letter-spacing:-.065em;margin:19px 0 25px;text-wrap:balance}.hero h1 span{color:var(--accent)}.intro{max-width:600px;color:#4e4c46;font-size:18px;line-height:1.65}.hero-aside{border-left:1px solid var(--line);padding:8px 0 8px 25px;color:var(--muted);font-size:13px}.hero-aside strong{display:block;color:var(--ink);font:21px var(--serif);margin:10px 0 7px}.availability{display:inline-flex;align-items:center;gap:8px}.dot{width:8px;height:8px;border-radius:50%;background:#77736b;box-shadow:0 0 0 4px #77736b22}
+    .actions{display:flex;gap:12px;margin-top:27px}.button{display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid var(--ink);text-decoration:none;font-size:13px}.button.primary{background:var(--ink);color:var(--white)}.button:hover{transform:translateY(-1px)}
+    .section{border-top:1px solid var(--line);padding:45px 0 55px;display:grid;grid-template-columns:190px 1fr;gap:45px}.section-title{font:23px var(--serif);margin:0}.section-content{max-width:760px}.section-content>p{margin:0 0 18px;color:#4e4c46}.cards{display:grid;grid-template-columns:1fr;gap:14px;margin-top:25px}.card{background:var(--white);border:1px solid var(--line);padding:22px 23px;min-height:210px;display:flex;flex-direction:column}.card-top{display:flex;justify-content:space-between;align-items:center;gap:12px}.card h3{font:21px var(--serif);margin:17px 0 8px}.card p{font-size:13px;color:var(--muted);margin:0}.card .meta{margin-top:auto;padding-top:19px;color:var(--accent);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.arrow{font-size:18px;color:var(--accent)}.collection-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}.collection-card{min-height:185px;background:var(--white);border:1px solid var(--line);padding:18px;display:flex;flex-direction:column;text-decoration:none}.collection-card:hover{border-color:#8f8b82;transform:translateY(-2px)}.collection-card .label{font-size:9px}.collection-card h3{font:19px/1.2 var(--serif);margin:18px 0 8px}.collection-card p{font-size:12px;line-height:1.55;color:var(--muted);margin:0}.collection-card .meta{margin-top:auto;padding-top:15px;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+    .interests{display:flex;flex-wrap:wrap;gap:9px;margin-top:21px}.chip{border:1px solid #cfcbc1;padding:7px 11px;border-radius:99px;font-size:12px;color:#4e4b45}.timeline{display:grid;gap:0}.item{display:grid;grid-template-columns:142px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}.item:first-child{padding-top:0}.date{font:12px var(--sans);color:var(--muted)}.item h3{font:18px var(--serif);margin:0 0 4px}.item p{font-size:13px;color:var(--muted);margin:0}.footer{padding:28px 0 42px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:12px}.footer a{color:var(--ink)}
+    @media(max-width:720px){.wrap{width:min(100% - 36px,600px)}.topbar{height:66px}.nav{gap:14px;font-size:12px}.hero{padding:68px 0 52px;grid-template-columns:1fr;gap:30px}.hero:before{right:-12%;top:4%;font-size:370px;opacity:.72}.hero:after{inset:0 0 0 10%}.hero-aside{border-left:0;border-top:1px solid var(--line);padding:20px 0 0}.section{grid-template-columns:1fr;gap:20px;padding:34px 0 40px}.card{min-height:175px}.collection-grid{grid-template-columns:1fr}.collection-card{min-height:145px}.item{grid-template-columns:1fr;gap:4px}.footer{gap:20px;flex-wrap:wrap}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar wrap">
+    <a class="brand" href="#top" aria-label="Zhaoyuan Sun, home">ZS<span style="color:var(--accent)">.</span></a>
+    <nav class="nav" aria-label="Main navigation"><a href="#work">Work</a><a href="#collections">Collections</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+  </header>
+  <main id="top" class="wrap">
+    <section class="hero" aria-labelledby="intro-title">
+      <div>
+        <div class="eyebrow">Computer Science · CUHK</div>
+        <h1 id="intro-title">Zhaoyuan<br><span>Sun.</span></h1>
+        <p class="intro">I am a Computer Science student at The Chinese University of Hong Kong. I enjoy building intelligent systems, and I am especially interested in machine learning and agent development.</p>
+        <div class="actions"><a class="button primary" href="https://github.com/JoeSun-421">Explore my GitHub <span aria-hidden="true">↗</span></a><a class="button" href="#work">Selected work <span aria-hidden="true">↓</span></a></div>
+      </div>
+      <aside class="hero-aside"><span class="label">Currently</span><strong>Learning by building.</strong><span>Studying Computer Science at CUHK, exploring AI through research and personal projects.</span><p class="availability"><i class="dot" aria-hidden="true"></i> Open to thoughtful collaborations</p></aside>
+    </section>
+    <section id="work" class="section">
+      <h2 class="section-title">Selected work</h2>
+      <div class="section-content"><p>A research direction I am currently exploring.</p>
+        <div class="cards">
+          <article class="card"><div class="card-top"><span class="label">Research proposal</span><span class="arrow" aria-hidden="true">↗</span></div><h3>Verified RSI</h3><p>Exploring whether an embodied agent can use grounded imagination and environment feedback to recover from failure and improve its learning process.</p><a class="meta" href="proposal/verified-rsi.html">Read the proposal</a></article>
+        </div>
+      </div>
+    </section>
+    <section id="research" class="section">
+      <h2 class="section-title">What I am curious about</h2>
+      <div class="section-content"><p>I am drawn to intelligent systems that learn from data and interact with the physical world. My current interests include:</p><div class="interests"><span class="chip">Machine learning</span><span class="chip">Deep learning</span><span class="chip">AI agents</span><span class="chip">Embodied intelligence</span></div></div>
+    </section>
+    <section id="collections" class="section">
+      <h2 class="section-title">Collections</h2>
+      <div class="section-content"><p>Notes, practical guides, and work I want to keep close.</p><div class="collection-grid">
+        <a class="collection-card" href="ideas.html"><span class="label">Research notebook</span><h3>Ideas</h3><p>Questions and directions I am exploring across AI and embodied learning.</p><span class="meta">Browse ideas ↗</span></a>
+        <a class="collection-card" href="mmlab-intern-guide.html"><span class="label">Practical guide</span><h3>MMLab Intern Guide</h3><p>A growing guide to preparing for research internships and making the most of them.</p><span class="meta">Open guide ↗</span></a>
+        <a class="collection-card" href="favorite-works.html"><span class="label">Reading shelf</span><h3>Favorite Works</h3><p>Papers, projects, and other work that I find especially memorable.</p><span class="meta">See the collection ↗</span></a>
+      </div></div>
+    </section>
+    <section id="about" class="section">
+      <h2 class="section-title">A little about me</h2>
+      <div class="section-content"><div class="timeline">
+        <article class="item"><div class="date">2025 — present</div><div><h3>The Chinese University of Hong Kong</h3><p>BEng in Computer Science · ELITE Stream</p></div></article>
+        <article class="item"><div class="date">Jun — Jul 2026</div><div><h3>Yao Class AI+X Computing Acceleration</h3><p>Joint CUHK–Tsinghua University programme</p></div></article>
+        <article class="item"><div class="date">2025</div><div><h3>CUHK Admission Scholarship</h3><p>Recognized on admission to CUHK.</p></div></article>
+      </div></div>
+    </section>
+    <section id="contact" class="section">
+      <h2 class="section-title">Say hello</h2>
+      <div class="section-content"><p>I am always happy to meet people who are building useful things with AI. The best place to find my recent work is GitHub.</p><a class="button" href="https://github.com/JoeSun-421">github.com/JoeSun-421 <span aria-hidden="true">↗</span></a></div>
+    </section>
+  </main>
+  <footer class="footer wrap"><span>© 2026 Zhaoyuan Sun</span><span>Built with curiosity. <a href="#top">Back to top ↑</a></span></footer>
+</body>
+</html>
