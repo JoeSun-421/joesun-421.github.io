@@ -44,25 +44,30 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-07/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-08/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-07">2026-11-07</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/proposal4rsi/rsi-briefs/2026-11-07/">发布 Robotic RSI 晨间简报</a></strong>。筛选并整理 5 篇研究，核对了当天网页和归档。</li><li><strong><a href="https://joesun-421.github.io/proposal4rsi/vla-editing-briefs/2026-11-07/">发布 VLA 模型编辑晨间简报</a></strong>。整理 1 篇符合主题的研究，核对了当天网页和归档。</li><li><strong>归档机器人研究资料</strong>。整理了 7 篇论文 PDF 和 4 篇网页文章，并建立文献清单。</li><li><strong>发布个人主页</strong>。完成视觉调整并上线 GitHub Pages 根站，新增 Ideas、MMLab Intern Guide 和 Favorite Works 三个栏目。</li></ul></section>
-<section aria-labelledby="reading"><h2 id="reading">机器人研究选读</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">Agentic VLA</p>
-<div class="entry-head"><h3>Gemini 4 Argon for Robotics</h3>
-<time class="meta" datetime="2026-10-13">2026-10-13</time></div><p class="meta">Google · 官方技术博客</p>
-<p><strong>方法与结果</strong>　Argon 从一张工作台照片构建 MuJoCo 场景，编写闭环运动生成器，采集超过 4,500 条域随机化轨迹用于微调 VLA。官方报告实机成功率由 56% 升至 75%，完成时间由 35 秒降至 24 秒。</p>
-<p><strong>证据范围</strong>　数字来自博客中的工作台实验。机器人代理在这个案例中承担场景构建、任务设计和数据生成，跨平台泛化仍需独立评测。</p>
-<p><a href="https://developers.googleblog.com/gemini-4-argon-for-robotics/">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">语言指令遵循</p>
-<div class="entry-head"><h3>VLA Policies Do Not Know When Not to Act</h3>
-<time class="meta" datetime="2026-10-30">2026-10-30</time></div><p class="meta">ETRI / UST · 研究预印本</p>
-<p><strong>方法与结果</strong>　作者在 LIBERO-Goal 固定初始状态，只替换指令。空指令下，6 个策略检查点在所有测试回合都启动了动作。比较有指令与空指令的首个动作块作为门控，可在 6 个检查点中的 5 个抑制非任务输入触发的动作。</p>
-<p><strong>证据范围</strong>　实验限于 LIBERO-Goal 仿真。评测指令遵循时，可以把是否启动、选中什么任务、能否完成任务分开记录。</p>
-<p><a href="https://arxiv.org/abs/2610.41609v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">Robotic RSI</p>
-<div class="entry-head"><h3>AdaRSI: On-Demand Recursive Self-Improvement for Embodied Agents</h3>
-<time class="meta" datetime="2026-10-14">2026-10-14</time></div><p class="meta">Peidong Wang 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　编码代理先调整技能和执行框架，再从保存的状态重试失败子步骤，只对持续失败的子步骤采集示范并微调。在 RoboCasa365 上，GR00T N1.5 的未见组合任务成功率由 4.6% 升至 13.8%。相比逐步微调，仅用 28% 的 GPU 时间。</p>
-<p><strong>证据范围</strong>　实验依赖可回滚的仿真状态及特权信息来生成和标记示范。实机应用还要验证成功检测、复位和训练触发是否可靠。</p>
-<p><a href="https://arxiv.org/abs/2610.20474v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-08">2026-11-08</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>更新个人主页样式并修复提案链接</strong>。将主页改为与日报一致的米白底、等宽正文和时间轴布局，并验证 Selected work 中的提案链接可以打开。</li><li><strong>更新日报定时任务的主提示词</strong>。将新版自然语言提示词接入定时任务，保留 GitHub Pages 发布和按日期归档流程，并核对北京时间 20:00 的调度。</li><li><strong>完成机器人恢复策略的文献对照</strong>。对照公开研究中的偏离检测、恢复交接、预演选择和反馈更新，整理了实验设计备忘录及已有工作覆盖的边界。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">机器人研究选读</h2><p>11 月 8 日手动版。收录近期研究与一篇 CoRL 会前回顾。</p>
+<div class="timeline reading"><article class="entry"><p class="topic">智能体记忆</p>
+<div class="entry-head"><h3>The components of agent memory</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Anthropic Engineering · 官方技术博客</p>
+<p><strong>方法与结果</strong>　将跨会话笔记与离线复盘分开，离线阶段可用原始会话核对和重整笔记。在 CL-Bench 的一个数据库任务上，Sonnet 4.6 的平均奖励从 0.330 到仅加记忆时的 0.364，再到明确提示读取和检验记忆时的 0.641。</p>
+<p><strong>证据范围</strong>　这组数字来自单个数据库任务。效果取决于模型能否主动读笔记、检验假设以及纠正过时记忆，跨任务增益需要单独测量。</p>
+<p><a href="https://www.anthropic.com/research/components-of-agent-memory">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 空间学习</p>
+<div class="entry-head"><h3>SLA: Scaling Spatial-Language-Action Model via Continual Pre-training</h3>
+<time class="meta" datetime="2026-11-05">2026-11-05</time></div><p class="meta">Fuhao Li 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　以 π0.5 初始化，在持续预训练和下游训练中用冻结的 3D 感知模型监督 VLA 的中间视觉表示。RoboDojo-Real 上，联合适配三个机器人平台后的平均任务成功率为 33.9%，π0.5 对照为 12.8%。</p>
+<p><strong>证据范围</strong>　结果是下游适配后的基准成绩。3D 教师只在训练中使用，论文在 RoboDojo-Real 的适配中还保留了历史图像输入。</p>
+<p><a href="https://arxiv.org/html/2611.08373v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">世界动作模型</p>
+<div class="entry-head"><h3>Seeing Through the Illusion: Test-Time Scaling for World Action Models</h3>
+<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">Cheikh Ahmed 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　WISE 用动作有效性、逆动力学一致性和任务进度为候选排序。在每次决策采样四个候选时，RoboLab 闭环成功率由 6.0% 升至 24.0%，LIBERO 平均成功率由 75.1% 升至 78.3%。</p>
+<p><strong>证据范围</strong>　两个结果都来自仿真。逆动力学模型需按机器人本体训练，多候选采样也带来推理开销。</p>
+<p><a href="https://arxiv.org/html/2611.03585v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">语言指令遵循 · 会前回顾</p>
+<div class="entry-head"><h3>See Less, Specify More: Visual Evidence Budgets for Generalizable VLAs</h3>
+<time class="meta" datetime="2026-06-08">2026-06-08</time></div><p class="meta">Yueh-Hua Wu、Tatsuya Matsushima、Kei Ota · CoRL 2026 主会 · 已核对官方录用名单</p>
+<p><strong>方法与结果</strong>　S2 保留原始高层指令，由 VLM 补充当前步骤的局部指导，同时限制底层策略使用的视觉证据。在 TX-G2 和 HSR 的八项实机任务上，相比 π0.5，平均子任务成功率由 54.2% 升至 79.0%。</p>
+<p><strong>证据范围</strong>　这里衡量的是两种机器人上的子任务成功率。评估长任务时还需看局部指令的质量和错误累积，以及最终整任务成功率。</p>
+<p><a href="https://arxiv.org/html/2606.02735v2">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
 </main></body></html>

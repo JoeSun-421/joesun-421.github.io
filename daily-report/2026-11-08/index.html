@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-08">2026-11-08</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>更新个人主页样式并修复提案链接</strong>。将主页改为与日报一致的米白底、等宽正文和时间轴布局，并验证 Selected work 中的提案链接可以打开。</li><li><strong>更新日报定时任务的主提示词</strong>。将新版自然语言提示词接入定时任务，保留 GitHub Pages 发布和按日期归档流程，并核对北京时间 20:00 的调度。</li><li><strong>完成机器人恢复策略的文献对照</strong>。对照公开研究中的偏离检测、恢复交接、预演选择和反馈更新，整理了实验设计备忘录及已有工作覆盖的边界。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">机器人研究选读</h2><p>11 月 8 日手动版。收录近期研究与一篇 CoRL 会前回顾。</p>
+<div class="timeline reading"><article class="entry"><p class="topic">智能体记忆</p>
+<div class="entry-head"><h3>The components of agent memory</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Anthropic Engineering · 官方技术博客</p>
+<p><strong>方法与结果</strong>　将跨会话笔记与离线复盘分开，离线阶段可用原始会话核对和重整笔记。在 CL-Bench 的一个数据库任务上，Sonnet 4.6 的平均奖励从 0.330 到仅加记忆时的 0.364，再到明确提示读取和检验记忆时的 0.641。</p>
+<p><strong>证据范围</strong>　这组数字来自单个数据库任务。效果取决于模型能否主动读笔记、检验假设以及纠正过时记忆，跨任务增益需要单独测量。</p>
+<p><a href="https://www.anthropic.com/research/components-of-agent-memory">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 空间学习</p>
+<div class="entry-head"><h3>SLA: Scaling Spatial-Language-Action Model via Continual Pre-training</h3>
+<time class="meta" datetime="2026-11-05">2026-11-05</time></div><p class="meta">Fuhao Li 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　以 π0.5 初始化，在持续预训练和下游训练中用冻结的 3D 感知模型监督 VLA 的中间视觉表示。RoboDojo-Real 上，联合适配三个机器人平台后的平均任务成功率为 33.9%，π0.5 对照为 12.8%。</p>
+<p><strong>证据范围</strong>　结果是下游适配后的基准成绩。3D 教师只在训练中使用，论文在 RoboDojo-Real 的适配中还保留了历史图像输入。</p>
+<p><a href="https://arxiv.org/html/2611.08373v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">世界动作模型</p>
+<div class="entry-head"><h3>Seeing Through the Illusion: Test-Time Scaling for World Action Models</h3>
+<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">Cheikh Ahmed 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　WISE 用动作有效性、逆动力学一致性和任务进度为候选排序。在每次决策采样四个候选时，RoboLab 闭环成功率由 6.0% 升至 24.0%，LIBERO 平均成功率由 75.1% 升至 78.3%。</p>
+<p><strong>证据范围</strong>　两个结果都来自仿真。逆动力学模型需按机器人本体训练，多候选采样也带来推理开销。</p>
+<p><a href="https://arxiv.org/html/2611.03585v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">语言指令遵循 · 会前回顾</p>
+<div class="entry-head"><h3>See Less, Specify More: Visual Evidence Budgets for Generalizable VLAs</h3>
+<time class="meta" datetime="2026-06-08">2026-06-08</time></div><p class="meta">Yueh-Hua Wu、Tatsuya Matsushima、Kei Ota · CoRL 2026 主会 · 已核对官方录用名单</p>
+<p><strong>方法与结果</strong>　S2 保留原始高层指令，由 VLM 补充当前步骤的局部指导，同时限制底层策略使用的视觉证据。在 TX-G2 和 HSR 的八项实机任务上，相比 π0.5，平均子任务成功率由 54.2% 升至 79.0%。</p>
+<p><strong>证据范围</strong>　这里衡量的是两种机器人上的子任务成功率。评估长任务时还需看局部指令的质量和错误累积，以及最终整任务成功率。</p>
+<p><a href="https://arxiv.org/html/2606.02735v2">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+</main></body></html>
