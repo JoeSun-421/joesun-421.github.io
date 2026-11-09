@@ -44,30 +44,30 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-08/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-09/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-08">2026-11-08</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成机器人恢复策略的文献对照</strong>。对照公开研究中的偏离检测、恢复交接、预演选择和反馈更新，整理了实验设计备忘录及已有工作覆盖的边界。</li><li><strong>编写 LIBERO 场景与任务构建指南</strong>。梳理 MuJoCo、robosuite、BDDL、初始状态和 VLA 观测之间的关系，并整理从已有房间与物体构建、运行和验证新任务的步骤。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-09">2026-11-09</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成 Verified RSI 提案的相关工作与可行性审查</strong>。逐项对照了恢复路由、反事实预测、停滞触发和真实反馈更新等近邻，梳理已覆盖的主张、候选 A 的留出实验、判停条件及本机视频模型和实机限制。调研结论认为，提案全栈尚未被单篇论文原样实现，但多个核心组件已有直接近邻，因此建议先验证冻结 π0.5 停滞状态上的候选动作是否存在留出净收益。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">智能体记忆</p>
-<div class="entry-head"><h3>The components of agent memory</h3>
-<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Anthropic Engineering · 官方技术博客</p>
-<p><strong>方法与结果</strong>　将跨会话笔记与离线复盘分开，离线阶段可用原始会话核对和重整笔记。在 CL-Bench 的一个数据库任务上，Sonnet 4.6 的平均奖励从 0.330 到仅加记忆时的 0.364，再到明确提示读取和检验记忆时的 0.641。</p>
-<p><strong>证据范围</strong>　这组数字来自单个数据库任务。效果取决于模型能否主动读笔记、检验假设以及纠正过时记忆，跨任务增益需要单独测量。</p>
-<p><a href="https://www.anthropic.com/research/components-of-agent-memory">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 空间学习</p>
-<div class="entry-head"><h3>SLA: Scaling Spatial-Language-Action Model via Continual Pre-training</h3>
-<time class="meta" datetime="2026-11-05">2026-11-05</time></div><p class="meta">Fuhao Li 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　以 π0.5 初始化，在持续预训练和下游训练中用冻结的 3D 感知模型监督 VLA 的中间视觉表示。RoboDojo-Real 上，联合适配三个机器人平台后的平均任务成功率为 33.9%，π0.5 对照为 12.8%。</p>
-<p><strong>证据范围</strong>　结果是下游适配后的基准成绩。3D 教师只在训练中使用，论文在 RoboDojo-Real 的适配中还保留了历史图像输入。</p>
-<p><a href="https://arxiv.org/html/2611.08373v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">世界动作模型</p>
-<div class="entry-head"><h3>Seeing Through the Illusion: Test-Time Scaling for World Action Models</h3>
-<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">Cheikh Ahmed 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　WISE 用动作有效性、逆动力学一致性和任务进度为候选排序。在每次决策采样四个候选时，RoboLab 闭环成功率由 6.0% 升至 24.0%，LIBERO 平均成功率由 75.1% 升至 78.3%。</p>
-<p><strong>证据范围</strong>　两个结果都来自仿真。逆动力学模型需按机器人本体训练，多候选采样也带来推理开销。</p>
-<p><a href="https://arxiv.org/html/2611.03585v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">语言指令遵循 · 会前回顾</p>
-<div class="entry-head"><h3>See Less, Specify More: Visual Evidence Budgets for Generalizable VLAs</h3>
-<time class="meta" datetime="2026-06-08">2026-06-08</time></div><p class="meta">Yueh-Hua Wu、Tatsuya Matsushima、Kei Ota · CoRL 2026 主会 · 已核对官方录用名单</p>
-<p><strong>方法与结果</strong>　S2 保留原始高层指令，由 VLM 补充当前步骤的局部指导，同时限制底层策略使用的视觉证据。在 TX-G2 和 HSR 的八项实机任务上，相比 π0.5，平均子任务成功率由 54.2% 升至 79.0%。</p>
-<p><strong>证据范围</strong>　这里衡量的是两种机器人上的子任务成功率。评估长任务时还需看局部指令的质量和错误累积，以及最终整任务成功率。</p>
-<p><a href="https://arxiv.org/html/2606.02735v2">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">机器人策略选择</p>
+<div class="entry-head"><h3>How Much Can Best-of-N Help a World Action Model? Measuring Selectable Headroom and Realizing It in Closed Loop</h3>
+<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Haojia Gao 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　以可复现分支、重复续跑和留出 oracle 估计真实可选择收益。作者报告，传统一次续跑会高估原生采样收益；结构化动作扰动最多创造 16 个百分点的可选空间，失败门控在 LIBERO-Plus 上把成功率由 76.9% 提到 81.6%，未见任务由 62.6% 提到 69.8%。</p>
+<p><strong>证据范围</strong>　这是世界动作模型和 LIBERO-Plus 的作者报告，不能直接证明 π0.5 的重复停滞候选有收益；该提案仍需在自己的任务和独立续跑种子上测量。</p>
+<p><a href="https://arxiv.org/abs/2610.37196">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 预测式恢复</p>
+<div class="entry-head"><h3>ForkCast: Predictive Recovery for Vision-Language-Action Policies via Counterfactual Futures</h3>
+<time class="meta" datetime="2026-10-13">2026-10-13</time></div><p class="meta">Chenru Wen 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　在冻结 π0.5 的基础上比较原动作、重新观察和轨迹重规划三种未来，用共同的任务进度分数决定是否以及如何干预。五项 RoboTwin 2.0 仿真任务中的汇总成功率由 13.3% 提到 30.0%，作者另报告以真机候选轨迹适配后的改善。</p>
+<p><strong>证据范围</strong>　主要定量增益来自注入遮挡和物体滑移的仿真任务，在线比较每次都要预测候选结果，和低成本停滞路由的代价不同。</p>
+<p><a href="https://arxiv.org/abs/2610.18650">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">预测信用与拒绝</p>
+<div class="entry-head"><h3>DreamLedger: Where to Refuse World-Model Imagination Using Execution-Settled Credit</h3>
+<time class="meta" datetime="2026-09-07">2026-09-07</time></div><p class="meta">Xianyao Li 等 · 研究预印本</p>
+<p><strong>方法与结果</strong>　把已使用的世界模型预测作为记录，并用后续执行结果结算信用，让系统按相似条件的历史决定是否继续依赖预测。作者在匹配拒绝比例的独立操作复现中报告，相比随机拒绝，失败率每次使用预测降低 4.8 个百分点。</p>
+<p><strong>证据范围</strong>　它估计的是预测可信度，不是卡住状态中调用预演相对于直接恢复的净成功收益。</p>
+<p><a href="https://arxiv.org/abs/2608.23863">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">世界模型调度</p>
+<div class="entry-head"><h3>WISE: World-model-guided Imagination Scheduling for Efficient Post-training of Vision-Language-Action Models</h3>
+<time class="meta" datetime="2026-09-03">2026-09-03</time></div><p class="meta">清华大学与 BAAI · 研究预印本</p>
+<p><strong>方法与结果</strong>　在 VLA 后训练中按交互相关状态选择是否调用有界多视角想象，并依据进度与完成信号优化策略。作者报告在 π0、π0.5 的操作任务中改善表现，相比全程想象约减少 80% GPU 计算时间。</p>
+<p><strong>证据范围</strong>　它研究训练时调度，目标信号是代理进度和完成反馈，问题设定与部署时以真实恢复净收益路由不同。</p>
+<p><a href="https://arxiv.org/html/2609.03681v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
 </main></body></html>
