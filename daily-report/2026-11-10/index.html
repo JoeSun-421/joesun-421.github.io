@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-10">2026-11-10</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><p>今天没有可公开核验的已完成任务。</p></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">语言条件与 VLA</p>
+<div class="entry-head"><h3>CLAP: Direct VLM-to-VLA Adaptation via Language-Action Grounding</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">Yuri Ishitoya 等 · OMRON SINIC X · CoRL 2026 主会 · 已录用</p>
+<p><strong>方法与结果</strong>　CLAP 在数值动作 token 前生成自然语言动作描述，用语言计划保持 VLM 输出分布与动作控制的联系。作者报告，2B 版本仅用 4–5 小时微调即在 LIBERO 达到 90.8%，比 VLA-0 高 14.9 个百分点；匹配基线下 UR5e 实机抓放成功率为 60%，基线为 15%。</p>
+<p><strong>证据范围</strong>　结果来自预印本报告，实机任务仅为抓放；需要更丰富任务与更多机器人验证语言动作描述带来的收益是否稳定。</p>
+<p><a href="https://arxiv.org/abs/2607.08974">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">科技公司技术报告 · 通用机器人策略</p>
+<div class="entry-head"><h3>Meituan-Robotics-0: A Vision-Language-Action Foundation Model for Desktop Manipulation</h3>
+<time class="meta" datetime="2026-11-05">2026-11-05</time></div><p class="meta">Meituan Robotics Team · 公司技术报告 / 研究预印本</p>
+<p><strong>方法与结果</strong>　MR0 报告了涵盖 12 种机器人本体的三阶段训练流程，并提出 Rollback，把策略替换的动作段与人工修正配对，用于 CFG-DAgger。作者报告 RoboTwin 2.0 成功率为 93.6%，三项实机任务中优于采用匹配 HG-DAgger 微调的 π0.5。</p>
+<p><strong>证据范围</strong>　结果由模型开发团队报告。桌面操作基准与三项实机任务的覆盖范围有限，跨任务事件记忆部分主要展示定性案例。</p>
+<p><a href="https://arxiv.org/abs/2611.08577">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 失败路由</p>
+<div class="entry-head"><h3>VLA Handover: Failure-Prediction-Based Switching from On-Robot to Server VLA Models</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Takayuki Nishio · 研究预印本 · 投稿 IEEE ICC 2027</p>
+<p><strong>方法与结果</strong>　让轻量本机 VLA 常态运行，只在失败预测器认为可能失败时切换到服务器大模型。在三套 LIBERO 仿真任务中，相比仅运行小模型，成功率提高 11–22 个百分点；相比全程使用服务器模型，请求量减少 49–77%，成功率低 2–4 个百分点。</p>
+<p><strong>证据范围</strong>　目前是仿真预印本，取舍结果依赖作者的请求成本目标和启发式路由；真实网络及机器人部署仍需验证。</p>
+<p><a href="https://arxiv.org/abs/2611.08987">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 实时执行</p>
+<div class="entry-head"><h3>Asynchronous Robot Policies</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">Sombit Dey、Luc Van Gool、Danda Pani Paudel · 研究预印本</p>
+<p><strong>方法与结果</strong>　ARP 把低频 VLM 语义更新与高频视觉动作专家分成异步进程，并训练动作专家处理过期语义记忆。在 Franka 操作中，作者报告静态任务成功率提高 18%、执行时间减少 20%；动态仿真达到基线的 3–5 倍，VLM 更新频率降至原来的十分之一时性能变化不明显。</p>
+<p><strong>证据范围</strong>　实机研究规模为 3 个任务、每任务 10 次、单台机器人和单一实验室；论文也指出在动态干扰评测中异步方案的停滞比例没有显著改善。</p>
+<p><a href="https://arxiv.org/abs/2611.05155">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 动作表示</p>
+<div class="entry-head"><h3>ODEAction: From Predicting Chunks to Evolving Actions</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Qishen Wang 等 · 研究技术报告</p>
+<p><strong>方法与结果</strong>　ODEAction 将离散动作块改成在动作空间学习连续演化场，并用常微分方程从当前动作递归生成后续控制，目标是降低动作块边界的不连续。作者报告其在 LIBERO、EBench、RoboTwin 和实机任务上的任务表现与轨迹质量优于匹配动作块基线，精细操作收益更突出。</p>
+<p><strong>证据范围</strong>　目前是技术报告，摘要未给出可直接比较的具体增益数值；还需检查不同积分步数和计算成本下的实机延迟。</p>
+<p><a href="https://arxiv.org/abs/2611.09672">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+</main></body></html>

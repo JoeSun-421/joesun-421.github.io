@@ -44,30 +44,35 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-09/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-10/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-09">2026-11-09</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成 Verified RSI 提案的相关工作与可行性审查</strong>。逐项对照了恢复路由、反事实预测、停滞触发和真实反馈更新等近邻，梳理已覆盖的主张、候选 A 的留出实验、判停条件及本机视频模型和实机限制。调研结论认为，提案全栈尚未被单篇论文原样实现，但多个核心组件已有直接近邻，因此建议先验证冻结 π0.5 停滞状态上的候选动作是否存在留出净收益。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-10">2026-11-10</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><p>今天没有可公开核验的已完成任务。</p></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">机器人策略选择</p>
-<div class="entry-head"><h3>How Much Can Best-of-N Help a World Action Model? Measuring Selectable Headroom and Realizing It in Closed Loop</h3>
-<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Haojia Gao 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　以可复现分支、重复续跑和留出 oracle 估计真实可选择收益。作者报告，传统一次续跑会高估原生采样收益；结构化动作扰动最多创造 16 个百分点的可选空间，失败门控在 LIBERO-Plus 上把成功率由 76.9% 提到 81.6%，未见任务由 62.6% 提到 69.8%。</p>
-<p><strong>证据范围</strong>　这是世界动作模型和 LIBERO-Plus 的作者报告，不能直接证明 π0.5 的重复停滞候选有收益；该提案仍需在自己的任务和独立续跑种子上测量。</p>
-<p><a href="https://arxiv.org/abs/2610.37196">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 预测式恢复</p>
-<div class="entry-head"><h3>ForkCast: Predictive Recovery for Vision-Language-Action Policies via Counterfactual Futures</h3>
-<time class="meta" datetime="2026-10-13">2026-10-13</time></div><p class="meta">Chenru Wen 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　在冻结 π0.5 的基础上比较原动作、重新观察和轨迹重规划三种未来，用共同的任务进度分数决定是否以及如何干预。五项 RoboTwin 2.0 仿真任务中的汇总成功率由 13.3% 提到 30.0%，作者另报告以真机候选轨迹适配后的改善。</p>
-<p><strong>证据范围</strong>　主要定量增益来自注入遮挡和物体滑移的仿真任务，在线比较每次都要预测候选结果，和低成本停滞路由的代价不同。</p>
-<p><a href="https://arxiv.org/abs/2610.18650">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">预测信用与拒绝</p>
-<div class="entry-head"><h3>DreamLedger: Where to Refuse World-Model Imagination Using Execution-Settled Credit</h3>
-<time class="meta" datetime="2026-09-07">2026-09-07</time></div><p class="meta">Xianyao Li 等 · 研究预印本</p>
-<p><strong>方法与结果</strong>　把已使用的世界模型预测作为记录，并用后续执行结果结算信用，让系统按相似条件的历史决定是否继续依赖预测。作者在匹配拒绝比例的独立操作复现中报告，相比随机拒绝，失败率每次使用预测降低 4.8 个百分点。</p>
-<p><strong>证据范围</strong>　它估计的是预测可信度，不是卡住状态中调用预演相对于直接恢复的净成功收益。</p>
-<p><a href="https://arxiv.org/abs/2608.23863">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">世界模型调度</p>
-<div class="entry-head"><h3>WISE: World-model-guided Imagination Scheduling for Efficient Post-training of Vision-Language-Action Models</h3>
-<time class="meta" datetime="2026-09-03">2026-09-03</time></div><p class="meta">清华大学与 BAAI · 研究预印本</p>
-<p><strong>方法与结果</strong>　在 VLA 后训练中按交互相关状态选择是否调用有界多视角想象，并依据进度与完成信号优化策略。作者报告在 π0、π0.5 的操作任务中改善表现，相比全程想象约减少 80% GPU 计算时间。</p>
-<p><strong>证据范围</strong>　它研究训练时调度，目标信号是代理进度和完成反馈，问题设定与部署时以真实恢复净收益路由不同。</p>
-<p><a href="https://arxiv.org/html/2609.03681v1">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">语言条件与 VLA</p>
+<div class="entry-head"><h3>CLAP: Direct VLM-to-VLA Adaptation via Language-Action Grounding</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">Yuri Ishitoya 等 · OMRON SINIC X · CoRL 2026 主会 · 已录用</p>
+<p><strong>方法与结果</strong>　CLAP 在数值动作 token 前生成自然语言动作描述，用语言计划保持 VLM 输出分布与动作控制的联系。作者报告，2B 版本仅用 4–5 小时微调即在 LIBERO 达到 90.8%，比 VLA-0 高 14.9 个百分点；匹配基线下 UR5e 实机抓放成功率为 60%，基线为 15%。</p>
+<p><strong>证据范围</strong>　结果来自预印本报告，实机任务仅为抓放；需要更丰富任务与更多机器人验证语言动作描述带来的收益是否稳定。</p>
+<p><a href="https://arxiv.org/abs/2607.08974">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">科技公司技术报告 · 通用机器人策略</p>
+<div class="entry-head"><h3>Meituan-Robotics-0: A Vision-Language-Action Foundation Model for Desktop Manipulation</h3>
+<time class="meta" datetime="2026-11-05">2026-11-05</time></div><p class="meta">Meituan Robotics Team · 公司技术报告 / 研究预印本</p>
+<p><strong>方法与结果</strong>　MR0 报告了涵盖 12 种机器人本体的三阶段训练流程，并提出 Rollback，把策略替换的动作段与人工修正配对，用于 CFG-DAgger。作者报告 RoboTwin 2.0 成功率为 93.6%，三项实机任务中优于采用匹配 HG-DAgger 微调的 π0.5。</p>
+<p><strong>证据范围</strong>　结果由模型开发团队报告。桌面操作基准与三项实机任务的覆盖范围有限，跨任务事件记忆部分主要展示定性案例。</p>
+<p><a href="https://arxiv.org/abs/2611.08577">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 失败路由</p>
+<div class="entry-head"><h3>VLA Handover: Failure-Prediction-Based Switching from On-Robot to Server VLA Models</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Takayuki Nishio · 研究预印本 · 投稿 IEEE ICC 2027</p>
+<p><strong>方法与结果</strong>　让轻量本机 VLA 常态运行，只在失败预测器认为可能失败时切换到服务器大模型。在三套 LIBERO 仿真任务中，相比仅运行小模型，成功率提高 11–22 个百分点；相比全程使用服务器模型，请求量减少 49–77%，成功率低 2–4 个百分点。</p>
+<p><strong>证据范围</strong>　目前是仿真预印本，取舍结果依赖作者的请求成本目标和启发式路由；真实网络及机器人部署仍需验证。</p>
+<p><a href="https://arxiv.org/abs/2611.08987">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 实时执行</p>
+<div class="entry-head"><h3>Asynchronous Robot Policies</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">Sombit Dey、Luc Van Gool、Danda Pani Paudel · 研究预印本</p>
+<p><strong>方法与结果</strong>　ARP 把低频 VLM 语义更新与高频视觉动作专家分成异步进程，并训练动作专家处理过期语义记忆。在 Franka 操作中，作者报告静态任务成功率提高 18%、执行时间减少 20%；动态仿真达到基线的 3–5 倍，VLM 更新频率降至原来的十分之一时性能变化不明显。</p>
+<p><strong>证据范围</strong>　实机研究规模为 3 个任务、每任务 10 次、单台机器人和单一实验室；论文也指出在动态干扰评测中异步方案的停滞比例没有显著改善。</p>
+<p><a href="https://arxiv.org/abs/2611.05155">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 动作表示</p>
+<div class="entry-head"><h3>ODEAction: From Predicting Chunks to Evolving Actions</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">Qishen Wang 等 · 研究技术报告</p>
+<p><strong>方法与结果</strong>　ODEAction 将离散动作块改成在动作空间学习连续演化场，并用常微分方程从当前动作递归生成后续控制，目标是降低动作块边界的不连续。作者报告其在 LIBERO、EBench、RoboTwin 和实机任务上的任务表现与轨迹质量优于匹配动作块基线，精细操作收益更突出。</p>
+<p><strong>证据范围</strong>　目前是技术报告，摘要未给出可直接比较的具体增益数值；还需检查不同积分步数和计算成本下的实机延迟。</p>
+<p><a href="https://arxiv.org/abs/2611.09672">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
 </main></body></html>
