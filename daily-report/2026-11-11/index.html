@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-11">2026-11-11</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><p>今天没有可公开核验的已完成任务。</p></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">前沿实验室 · 通用机器人</p>
+<div class="entry-head"><h3>Gemini Robotics 2.5 accelerates real-world general dexterity</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Google DeepMind · 官方研究博客</p>
+<p><strong>方法与结果</strong>　Google 报告在超过 200 种任务上测试 Gemini Robotics 2.5，结合具身推理和 VLA 控制处理更复杂的操作。Apollo 2 在汽车工厂的零件配料试点达到 96% 成功率；Gemini 4 Argon 用仿真练习、数字孪生和失败诊断加速技能开发。</p>
+<p><strong>证据范围</strong>　96% 来自特定工业配料试点，尚不能推广为开放环境中的整体可靠性。博客属于开发团队的研究发布，完整复现实验、跨任务统计和可用模型条件仍需结合后续技术资料核对。</p>
+<p><a href="https://deepmind.google/blog/gemini-robotics-2-5-accelerates-real-world-physical-intelligence/">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">多任务技能整合</p>
+<div class="entry-head"><h3>VLA-MOPD: On-Policy Distillation for Multi-Task VLA Policy Consolidation</h3>
+<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">中国科学技术大学、ACE Robotics、Central South University · 研究预印本</p>
+<p><strong>方法与结果</strong>　学生 VLA 按自己的策略采样状态，再从相应的冻结任务教师获取动作生成中间 ODE 步的监督。作者报告 LIBERO 平均 success-once 从 75.4% 到 98.9%，末端动作蒸馏对照为 98.15%；Piper 的三项实机任务中，两轮整合使平均成功率从 70% 到 90%。</p>
+<p><strong>证据范围</strong>　整合前需要先训练和存储专项教师，教师覆盖决定可整合的能力，前期成本也需计入。LIBERO 上相对末端动作蒸馏的差距较小；实机评估仅覆盖三项任务、每项 30 次试验。</p>
+<p><a href="https://arxiv.org/abs/2611.12286">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">仿真到实机 · 负结果</p>
+<div class="entry-head"><h3>VLA Adaptation with Real and Simulated Data: A Case Study on Robotic Chess</h3>
+<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Matěj Kripner、Milan Straka · Charles University · CoRL 2026 Pretrain to Adapt Workshop · 已核对录用名单</p>
+<p><strong>方法与结果</strong>　作者微调 π0.5，让 SO-101 按 e4、a5 等棋盘格名移动棋子，比较真实与脚本仿真示范的样本规模和训练预算。短学习率冷却最多带来 31 个百分点提升；验证损失与动作误差不能可靠选择检查点。在该设置下，过滤自采轨迹、RECAP 式条件训练、自动教练和残差 RL 都没有测得优于普通行为克隆的提升。</p>
+<p><strong>证据范围</strong>　结论来自特定棋子移动任务和 SO-101 平台。实机部分最多使用 256 条示范，十个策略各评估 25 次；仿真预训练收益是阶段性结果，自我改进方法的负结果也受该任务和预算约束。</p>
+<p><a href="https://arxiv.org/abs/2611.12676">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">CoRL 主会回顾 · 多模态控制频率</p>
+<div class="entry-head"><h3>DAM-VLA: Decoupled Asynchronous Multimodal Vision Language Action model</h3>
+<time class="meta" datetime="2026-06-10">2026-06-10</time></div><p class="meta">Pankhuri Vanjani 等 · KIT、NVIDIA 等 · CoRL 2026 主会 · 已核对官方录用名单</p>
+<p><strong>方法与结果</strong>　为不同传感模态维护独立更新的潜变量缓冲区，由动作头持续读取，缓解语言、视觉与高频传感器共用时钟造成的频率瓶颈。作者在七项接触密集实机操作中报告平均成功率 95.2%，最强同步对照为 40.95%，同时维持 100 Hz 控制。</p>
+<p><strong>证据范围</strong>　这是本次 CoRL 会议回顾，原始预印本发表于六月。结果针对具备相应传感输入的接触密集任务，不能直接视为仅有 RGB 与本体输入的 LIBERO 策略改进。</p>
+<p><a href="https://arxiv.org/abs/2606.12105">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+</main></body></html>
