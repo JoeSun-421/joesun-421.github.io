@@ -44,30 +44,30 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-11/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-13/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-11">2026-11-11</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><p>今天没有可公开核验的已完成任务。</p></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-13">2026-11-13</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成 SimFoundry 视频预处理与 π0.5-DROID 推理基础验证</strong>。处理了官方示例视频，并用真实 π0.5-DROID 权重完成有效动作输出的推理检查。完整场景重建、渲染和物理仿真闭环仍在推进中。</li><li><strong>完善机器人任务切换文献笔记</strong>。围绕 SwitchVLA、ReSteer 和 Causeway，整理方法主图、训练监督、公式与局限，并核对 ReSteer 的 CMI 实现，补明该代理指标与实际切换成功率的区别。</li><li><strong>归档 SimEX 原文与中文译稿</strong>。保存 SimEX 原始 PDF、中文译稿和文献索引，梳理仿真对齐与机器人自动研究流程。</li><li><strong>清理未使用的 Docker 镜像</strong>。清理了 8 个未使用的无标签镜像，并核对清理结果。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">前沿实验室 · 通用机器人</p>
-<div class="entry-head"><h3>Gemini Robotics 2.5 accelerates real-world general dexterity</h3>
-<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Google DeepMind · 官方研究博客</p>
-<p><strong>方法与结果</strong>　Google 报告在超过 200 种任务上测试 Gemini Robotics 2.5，结合具身推理和 VLA 控制处理更复杂的操作。Apollo 2 在汽车工厂的零件配料试点达到 96% 成功率；Gemini 4 Argon 用仿真练习、数字孪生和失败诊断加速技能开发。</p>
-<p><strong>证据范围</strong>　96% 来自特定工业配料试点，尚不能推广为开放环境中的整体可靠性。博客属于开发团队的研究发布，完整复现实验、跨任务统计和可用模型条件仍需结合后续技术资料核对。</p>
-<p><a href="https://deepmind.google/blog/gemini-robotics-2-5-accelerates-real-world-physical-intelligence/">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">多任务技能整合</p>
-<div class="entry-head"><h3>VLA-MOPD: On-Policy Distillation for Multi-Task VLA Policy Consolidation</h3>
-<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">中国科学技术大学、ACE Robotics、Central South University · 研究预印本</p>
-<p><strong>方法与结果</strong>　学生 VLA 按自己的策略采样状态，再从相应的冻结任务教师获取动作生成中间 ODE 步的监督。作者报告 LIBERO 平均 success-once 从 75.4% 到 98.9%，末端动作蒸馏对照为 98.15%；Piper 的三项实机任务中，两轮整合使平均成功率从 70% 到 90%。</p>
-<p><strong>证据范围</strong>　整合前需要先训练和存储专项教师，教师覆盖决定可整合的能力，前期成本也需计入。LIBERO 上相对末端动作蒸馏的差距较小；实机评估仅覆盖三项任务、每项 30 次试验。</p>
-<p><a href="https://arxiv.org/abs/2611.12286">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">仿真到实机 · 负结果</p>
-<div class="entry-head"><h3>VLA Adaptation with Real and Simulated Data: A Case Study on Robotic Chess</h3>
-<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Matěj Kripner、Milan Straka · Charles University · CoRL 2026 Pretrain to Adapt Workshop · 已核对录用名单</p>
-<p><strong>方法与结果</strong>　作者微调 π0.5，让 SO-101 按 e4、a5 等棋盘格名移动棋子，比较真实与脚本仿真示范的样本规模和训练预算。短学习率冷却最多带来 31 个百分点提升；验证损失与动作误差不能可靠选择检查点。在该设置下，过滤自采轨迹、RECAP 式条件训练、自动教练和残差 RL 都没有测得优于普通行为克隆的提升。</p>
-<p><strong>证据范围</strong>　结论来自特定棋子移动任务和 SO-101 平台。实机部分最多使用 256 条示范，十个策略各评估 25 次；仿真预训练收益是阶段性结果，自我改进方法的负结果也受该任务和预算约束。</p>
-<p><a href="https://arxiv.org/abs/2611.12676">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">CoRL 主会回顾 · 多模态控制频率</p>
-<div class="entry-head"><h3>DAM-VLA: Decoupled Asynchronous Multimodal Vision Language Action model</h3>
-<time class="meta" datetime="2026-06-10">2026-06-10</time></div><p class="meta">Pankhuri Vanjani 等 · KIT、NVIDIA 等 · CoRL 2026 主会 · 已核对官方录用名单</p>
-<p><strong>方法与结果</strong>　为不同传感模态维护独立更新的潜变量缓冲区，由动作头持续读取，缓解语言、视觉与高频传感器共用时钟造成的频率瓶颈。作者在七项接触密集实机操作中报告平均成功率 95.2%，最强同步对照为 40.95%，同时维持 100 Hz 控制。</p>
-<p><strong>证据范围</strong>　这是本次 CoRL 会议回顾，原始预印本发表于六月。结果针对具备相应传感输入的接触密集任务，不能直接视为仅有 RGB 与本体输入的 LIBERO 策略改进。</p>
-<p><a href="https://arxiv.org/abs/2606.12105">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">Agentic robotics · 长任务评测</p>
+<div class="entry-head"><h3>One Policy for 100 Household Tasks: Our Solution for the 2026 BEHAVIOR Challenge</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Ilia Larchenko、Gleb Zarin 等 · 竞赛技术报告 / 研究预印本</p>
+<p><strong>方法与结果</strong>　以 π0.5 为基础，用一个检查点覆盖 OmniGibson 中 100 项长时程家庭任务，并把其中 14 项任务交给使用观察与运动工具的编码代理。作者报告单策略在 100 项任务上的 Q 为 0.392；14 项任务上，代理平均 Q 为 0.639，学习策略为 0.108。包含部分代理结果的公开提交达到 27.3% 整任务成功率。</p>
+<p><strong>证据范围</strong>　Q 是任务进度评分，不能等同于整任务成功率。代理路线只覆盖指定的 14 项任务，改动包含更长训练、数据处理和工程调整，作者没有逐项隔离所有收益来源。</p>
+<p><a href="https://arxiv.org/abs/2611.14432">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 指令理解 · 模型编辑</p>
+<div class="entry-head"><h3>Distilling Instructions into Weights: Closed-Form Edits Fix a Robot Policy&#x27;s Misreading</h3>
+<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Ali-Adeeb Abbas、Esmaeil Seraj · 研究预印本</p>
+<p><strong>方法与结果</strong>　作者诊断 π0.5 在一项 RoboLab 任务中的语言绑定错误，把明确改写指令引起的内部表示变化以闭式更新写入 VLM 的 MLP 权重。128 个留出种子中，成功次数从 27 次升到 106 次，修复 81 次、破坏 2 次；同等大小的随机方向更新没有带来同类收益。</p>
+<p><strong>证据范围</strong>　主要证据来自单个零样本检查点和仿真中的语言误读案例，方法需要已知有效的改写。针对感知、缺失抓取能力和接触物理的编辑并未有效，不能推广成一般机器人故障修复。</p>
+<p><a href="https://arxiv.org/abs/2611.11894">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">CoRL 主会 · 语言反馈控制</p>
+<div class="entry-head"><h3>Learning What to Say to Your VLA: Mostly Harmless Vision Language Action Model Steering</h3>
+<time class="meta" datetime="2026-10-16">2026-10-16</time></div><p class="meta">Hyun Joe Jeong、Gokul Swamy、Andrea Bajcsy · CMU · CoRL 2026 主会 · 已核对官方录用名单</p>
+<p><strong>方法与结果</strong>　先通过闭环交互搜索有效语言序列，再蒸馏语言反馈策略，并训练、校准一个预测何时值得改写指令的改进头。基础 VLA 保持冻结。作者报告其在已见环境中的基线改善为仿真 24.7%、实机 65.0%，并展示比开放环改写更丰富的恢复行为。</p>
+<p><strong>证据范围</strong>　数值按作者汇总口径报告。无害性结论依赖校准样本和相应统计假设，主要针对任务性能下降风险，不能直接解释为对所有碰撞、掉物或指令切换延迟的安全保证。</p>
+<p><a href="https://arxiv.org/abs/2606.12299v2">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">NVIDIA 技术回顾 · Real2Sim2Real</p>
+<div class="entry-head"><h3>SimFoundry: Modular and Automated Scene Generation for Policy Learning and Evaluation</h3>
+<time class="meta" datetime="2026-08-05">2026-08-05</time></div><p class="meta">NVIDIA、Stanford、Georgia Tech、UT Austin 等 · 研究预印本与官方项目页 · 回顾</p>
+<p><strong>方法与结果</strong>　SimFoundry 从一段真实场景视频构建可交互数字孪生，再生成物体、场景和任务变体，用于策略训练与评测。在 7 项操作任务、5 种策略架构的比较中，作者报告仿真与真实表现的平均 Pearson 相关为 0.911，平均最大排序违背为 0.018。</p>
+<p><strong>证据范围</strong>　这里回顾的是八月修订的工作。高相关描述这组任务和策略的整体趋势，不保证每个具体任务的成功率校准准确；公开项目页也展示了部分仿真与实机成功率相差较大的案例。</p>
+<p><a href="https://arxiv.org/abs/2606.28276v4">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
 </main></body></html>

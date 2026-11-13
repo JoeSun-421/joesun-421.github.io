@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-13">2026-11-13</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成 SimFoundry 视频预处理与 π0.5-DROID 推理基础验证</strong>。处理了官方示例视频，并用真实 π0.5-DROID 权重完成有效动作输出的推理检查。完整场景重建、渲染和物理仿真闭环仍在推进中。</li><li><strong>完善机器人任务切换文献笔记</strong>。围绕 SwitchVLA、ReSteer 和 Causeway，整理方法主图、训练监督、公式与局限，并核对 ReSteer 的 CMI 实现，补明该代理指标与实际切换成功率的区别。</li><li><strong>归档 SimEX 原文与中文译稿</strong>。保存 SimEX 原始 PDF、中文译稿和文献索引，梳理仿真对齐与机器人自动研究流程。</li><li><strong>清理未使用的 Docker 镜像</strong>。清理了 8 个未使用的无标签镜像，并核对清理结果。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">Agentic robotics · 长任务评测</p>
+<div class="entry-head"><h3>One Policy for 100 Household Tasks: Our Solution for the 2026 BEHAVIOR Challenge</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Ilia Larchenko、Gleb Zarin 等 · 竞赛技术报告 / 研究预印本</p>
+<p><strong>方法与结果</strong>　以 π0.5 为基础，用一个检查点覆盖 OmniGibson 中 100 项长时程家庭任务，并把其中 14 项任务交给使用观察与运动工具的编码代理。作者报告单策略在 100 项任务上的 Q 为 0.392；14 项任务上，代理平均 Q 为 0.639，学习策略为 0.108。包含部分代理结果的公开提交达到 27.3% 整任务成功率。</p>
+<p><strong>证据范围</strong>　Q 是任务进度评分，不能等同于整任务成功率。代理路线只覆盖指定的 14 项任务，改动包含更长训练、数据处理和工程调整，作者没有逐项隔离所有收益来源。</p>
+<p><a href="https://arxiv.org/abs/2611.14432">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">VLA 指令理解 · 模型编辑</p>
+<div class="entry-head"><h3>Distilling Instructions into Weights: Closed-Form Edits Fix a Robot Policy&#x27;s Misreading</h3>
+<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Ali-Adeeb Abbas、Esmaeil Seraj · 研究预印本</p>
+<p><strong>方法与结果</strong>　作者诊断 π0.5 在一项 RoboLab 任务中的语言绑定错误，把明确改写指令引起的内部表示变化以闭式更新写入 VLM 的 MLP 权重。128 个留出种子中，成功次数从 27 次升到 106 次，修复 81 次、破坏 2 次；同等大小的随机方向更新没有带来同类收益。</p>
+<p><strong>证据范围</strong>　主要证据来自单个零样本检查点和仿真中的语言误读案例，方法需要已知有效的改写。针对感知、缺失抓取能力和接触物理的编辑并未有效，不能推广成一般机器人故障修复。</p>
+<p><a href="https://arxiv.org/abs/2611.11894">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">CoRL 主会 · 语言反馈控制</p>
+<div class="entry-head"><h3>Learning What to Say to Your VLA: Mostly Harmless Vision Language Action Model Steering</h3>
+<time class="meta" datetime="2026-10-16">2026-10-16</time></div><p class="meta">Hyun Joe Jeong、Gokul Swamy、Andrea Bajcsy · CMU · CoRL 2026 主会 · 已核对官方录用名单</p>
+<p><strong>方法与结果</strong>　先通过闭环交互搜索有效语言序列，再蒸馏语言反馈策略，并训练、校准一个预测何时值得改写指令的改进头。基础 VLA 保持冻结。作者报告其在已见环境中的基线改善为仿真 24.7%、实机 65.0%，并展示比开放环改写更丰富的恢复行为。</p>
+<p><strong>证据范围</strong>　数值按作者汇总口径报告。无害性结论依赖校准样本和相应统计假设，主要针对任务性能下降风险，不能直接解释为对所有碰撞、掉物或指令切换延迟的安全保证。</p>
+<p><a href="https://arxiv.org/abs/2606.12299v2">阅读原文</a> <span aria-hidden="true">↗</span></p></article><article class="entry"><p class="topic">NVIDIA 技术回顾 · Real2Sim2Real</p>
+<div class="entry-head"><h3>SimFoundry: Modular and Automated Scene Generation for Policy Learning and Evaluation</h3>
+<time class="meta" datetime="2026-08-05">2026-08-05</time></div><p class="meta">NVIDIA、Stanford、Georgia Tech、UT Austin 等 · 研究预印本与官方项目页 · 回顾</p>
+<p><strong>方法与结果</strong>　SimFoundry 从一段真实场景视频构建可交互数字孪生，再生成物体、场景和任务变体，用于策略训练与评测。在 7 项操作任务、5 种策略架构的比较中，作者报告仿真与真实表现的平均 Pearson 相关为 0.911，平均最大排序违背为 0.018。</p>
+<p><strong>证据范围</strong>　这里回顾的是八月修订的工作。高相关描述这组任务和策略的整体趋势，不保证每个具体任务的成功率校准准确；公开项目页也展示了部分仿真与实机成功率相差较大的案例。</p>
+<p><a href="https://arxiv.org/abs/2606.28276v4">阅读原文</a> <span aria-hidden="true">↗</span></p></article></div></section>
+</main></body></html>
