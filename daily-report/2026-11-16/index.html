@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-16">2026-11-16</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>整理 FrozenLake 项目的双语方案草稿</strong>。形成不同地图规模下 MDP 建模与 Q-learning 方案的中英文描述，明确随机转移、交互预算和独立策略评估的实验口径。</li><li><strong>完成本机网络代理状态排查</strong>。核对端口占用、服务日志和连通性，定位代理冲突并交付检查结论。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:08，本机 Codex 已结束轮次累计运行 0 小时 20 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 2 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">Google DeepMind · 交互世界模型</p>
+<div class="entry-head"><h3>Genie 4: A new generation of world simulation</h3>
+<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Google DeepMind · 官方研究博客</p>
+<p><strong>方法与结果</strong>　Genie 4 将视觉、音频和语言引导结合为实时交互式世界生成，并借助 Gemini 系列模型维持场景连贯。官方展示了用文本修改场景、键盘导航及同步生成声音的交互录屏，可用于思考智能体训练环境如何扩展。</p>
+<p><strong>证据范围</strong>　目前公开材料主要展示研究预览和交互案例，没有给出可直接对应机器人操作成功率的评测。官方承认物体持续性、空间精度、复杂物理交互与长时间一致性仍会漂移。</p>
+<p><a href="https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/">实验室官方来源</a></p></article><article class="entry"><p class="topic">ICML 主会回顾 · 机器人记忆</p>
+<div class="entry-head"><h3>RoboMME: Benchmarking and Understanding Memory for Robotic Generalist Policies</h3>
+<time class="meta" datetime="2026-05-26">2026-05-26</time></div><p class="meta">Yinpei Dai 等 · ICML 2026 正式论文 · 回顾</p>
+<p><strong>方法与结果</strong>　RoboMME 以十六项操作任务评测时间、空间、物体和过程记忆，并在 π0.5 上构建十四种记忆增强变体。实验表明记忆表示的收益强烈依赖任务，增加历史信息本身不足以保证长任务完成，适合用来区分记忆缺失和动作执行失败。</p>
+<p><strong>证据范围</strong>　这里回顾五月修订、发表于 ICML 的工作。基准任务与记忆集成方式有明确边界，不能将某一种表示在部分任务上的优势解释为长期部署中的通用记忆解决方案。</p>
+<p><a href="https://proceedings.mlr.press/v306/dai26c.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v306/dai26c.html">会议录用依据</a></p></article><article class="entry"><p class="topic">Google DeepMind 研究回顾 · 智能体自我改进</p>
+<div class="entry-head"><h3>SIMA 2: An Agent that Plays, Reasons, and Learns With You in Virtual 3D Worlds</h3>
+<time class="meta" datetime="2025-11-13">2025-11-13</time></div><p class="meta">Google DeepMind SIMA Team · 官方研究博客 · 回顾</p>
+<p><strong>方法与结果</strong>　SIMA 2 通过屏幕、键盘和鼠标在三维虚拟环境中行动，结合 Gemini 推理理解指令。官方报告它在未参与训练的 ASKA、MineDojo 中优于前代，并展示由 Gemini 提供任务和估计奖励、积累自主游戏经验、训练下一代代理的自我改进循环。</p>
+<p><strong>证据范围</strong>　这是 2025 年研究回顾，实验主要在虚拟世界中完成。很长任务、目标验证、有限记忆和精确低层操作仍是限制，不能将这些结果直接等同于真实机器人上的递归自我改进。</p>
+<p><a href="https://deepmind.google/blog/sima-2-an-agent-that-plays-reasons-and-learns-with-you-in-virtual-3d-worlds/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/sima-2-an-agent-that-plays-reasons-and-learns-with-you-in-virtual-3d-worlds/">实验室官方来源</a></p></article></div></section>
+</main></body></html>
