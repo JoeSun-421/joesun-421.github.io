@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-14">2026-11-14</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成已取消实验环境的清理</strong>。按确认的范围清理专用实验代码、环境、镜像、权重和测试产物，并完成清理记录。</li><li><strong>Agent 运行时长</strong>。按北京时间全天记录，本机 Codex 已结束轮次累计运行 0 小时 10 分钟，并行会话分别累计，包含轮次内工具执行时间。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">语言指令泛化</p>
+<div class="entry-head"><h3>APT: Action Expert Pretraining Improves Instruction Generalization of Vision-Language-Action Policies</h3>
+<time class="meta" datetime="2026-10-02">2026-10-02</time></div><p class="meta">Kechun Xu 等 · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　先在冻结 VLM 的视觉特征上预训练不依赖语言的动作专家，再通过门控注入语言条件。作者在论文设定的 LIBERO-PRO 位置与任务扰动测试中报告，微调 VLM 的 APT 汇总成功率为 27%，π0.5 对照为 11%；两阶段设计也改善未见物体和组合指令下的表现。</p>
+<p><strong>证据范围</strong>　这里回顾十月修订的 CoRL 论文。结果依赖数据、架构与微调设置，不能只从这组成功率将收益全部归因于预训练阶段；它也没有直接解决执行中临时更改指令的过渡安全。</p>
+<p><a href="https://arxiv.org/html/2606.12366v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">传感器鲁棒性与专家路由</p>
+<div class="entry-head"><h3>CoRE-VLA: Towards Scalable and Robust Vision-Language-Action Modeling via Conditional Routing of Experts</h3>
+<time class="meta" datetime="2026-10-09">2026-10-09</time></div><p class="meta">Haozhe Zhang 等 · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　用传感器可用性控制模态专家，再以任务意图路由动作侧专家。在 LIBERO-Long 的深度缺失测试中，作者报告 CoRE-VLA 成功率为 97.0%，密集 RGB-D 对照为 72.0%；深度全程可用时分别为 97.6% 和 94.6%。</p>
+<p><strong>证据范围</strong>　论文实证集中在可选深度输入。触觉、力反馈、更复杂传感器组合和跨本体泛化仍需单独验证，不能把深度缺失鲁棒性直接推广到所有传感故障。</p>
+<p><a href="https://arxiv.org/html/2607.03693v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article></div></section>
+</main></body></html>

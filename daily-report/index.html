@@ -44,30 +44,20 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-13/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-14/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-13">2026-11-13</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成 SimFoundry 视频预处理与 π0.5-DROID 推理基础验证</strong>。处理了官方示例视频，并用真实 π0.5-DROID 权重完成有效动作输出的推理检查。完整场景重建、渲染和物理仿真闭环仍在推进中。</li><li><strong>完善机器人任务切换文献笔记</strong>。围绕 SwitchVLA、ReSteer 和 Causeway，整理方法主图、训练监督、公式与局限，并核对 ReSteer 的 CMI 实现，补明该代理指标与实际切换成功率的区别。</li><li><strong>归档 SimEX 原文</strong>。保存 SimEX 原始 PDF 和文献索引，梳理仿真对齐与机器人自动研究流程。</li><li><strong>清理未使用的 Docker 镜像</strong>。清理了 8 个未使用的无标签镜像，并核对清理结果。</li><li><strong>Agent 运行时长</strong>。今日累计运行 8 小时（按用户记录）。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-14">2026-11-14</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成已取消实验环境的清理</strong>。按确认的范围清理专用实验代码、环境、镜像、权重和测试产物，并完成清理记录。</li><li><strong>Agent 运行时长</strong>。按北京时间全天记录，本机 Codex 已结束轮次累计运行 0 小时 10 分钟，并行会话分别累计，包含轮次内工具执行时间。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">RSS 主会回顾 · 执行中任务切换</p>
-<div class="entry-head"><h3>ReSteer: Quantifying and Refining the Steerability of Multitask Robot Policies</h3>
-<time class="meta" datetime="2026-03-18">2026-03-18</time></div><p class="meta">Zhenyang Chen 等 · Georgia Tech · RSS 2026 正式论文</p>
-<p><strong>方法与结果</strong>　ReSteer 从执行中间状态切换指令，测量策略能否转向新任务；用条件互信息代理定位低可切换性状态，再生成过渡示范并用成功切换轨迹自我精炼。RSS 正式论文摘要报告，在 LIBERO 的约 1.8 万次 rollout 中，可切换性提升 11%。</p>
-<p><strong>证据范围</strong>　这是三月公开、七月发表于 RSS 的工作。CMI 只反映动作分布对语言的依赖，不能替代任务正确性、安全性或响应延迟；语言对齐分析的场景覆盖也有限。</p>
-<p><a href="https://arxiv.org/abs/2603.17300">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.roboticsproceedings.org/rss22/p143.html">会议录用依据</a></p></article><article class="entry"><p class="topic">CoRL 主会 · 指令遵循评测</p>
-<div class="entry-head"><h3>RoboFollow: Unveiling the Instruction Following Mirage in Embodied Agents</h3>
-<time class="meta" datetime="2026-09-22">2026-09-22</time></div><p class="meta">Chang Guo 等 · CoRL 2026 主会 · 已核对录用名单</p>
-<p><strong>方法与结果</strong>　RoboFollow 在同一场景中设置多条动作分支，让模型必须依靠语言区分任务，并以 L0–L3 分开测试布局变化、语义重组及两者叠加。对九种 VLA/WAM 的评估显示，分布内表现较好也不保证跨布局和语义重组能力；更强 VLM、QA 联训、LangForce 和 CFG 均未消除差距。</p>
-<p><strong>证据范围</strong>　这是九月公开、当前 CoRL 会议录用的工作。结果来自基于 RoboTwin 的受控仿真与相应微调设置，Intent 与 Execution 分数有助于诊断，但不能单独证明开放实机环境中的泛化。</p>
-<p><a href="https://arxiv.org/abs/2609.25636">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">CoRL 主会 · 语言反馈控制</p>
-<div class="entry-head"><h3>Learning What to Say to Your VLA: Mostly Harmless Vision Language Action Model Steering</h3>
-<time class="meta" datetime="2026-10-16">2026-10-16</time></div><p class="meta">Hyun Joe Jeong、Gokul Swamy、Andrea Bajcsy · CMU · CoRL 2026 主会 · 已核对官方录用名单</p>
-<p><strong>方法与结果</strong>　先通过闭环交互搜索有效语言序列，再蒸馏语言反馈策略，并训练、校准一个预测何时值得改写指令的改进头。基础 VLA 保持冻结。作者报告其在已见环境中的基线改善为仿真 24.7%、实机 65.0%，并展示比开放环改写更丰富的恢复行为。</p>
-<p><strong>证据范围</strong>　数值按作者汇总口径报告。无害性结论依赖校准样本和相应统计假设，主要针对任务性能下降风险，不能直接解释为对所有碰撞、掉物或指令切换延迟的安全保证。</p>
-<p><a href="https://arxiv.org/abs/2606.12299v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">NVIDIA 技术回顾 · Real2Sim2Real</p>
-<div class="entry-head"><h3>SimFoundry: Modular and Automated Scene Generation for Policy Learning and Evaluation</h3>
-<time class="meta" datetime="2026-08-05">2026-08-05</time></div><p class="meta">NVIDIA、Stanford、Georgia Tech、UT Austin 等 · CoRL 2026 主会 · 回顾</p>
-<p><strong>方法与结果</strong>　SimFoundry 从一段真实场景视频构建可交互数字孪生，再生成物体、场景和任务变体，用于策略训练与评测。在 7 项操作任务、5 种策略架构的比较中，作者报告仿真与真实表现的平均 Pearson 相关为 0.911，平均最大排序违背为 0.018。</p>
-<p><strong>证据范围</strong>　这里回顾的是八月修订的工作。高相关描述这组任务和策略的整体趋势，不保证每个具体任务的成功率校准准确；公开项目页也展示了部分仿真与实机成功率相差较大的案例。</p>
-<p><a href="https://arxiv.org/abs/2606.28276v4">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">语言指令泛化</p>
+<div class="entry-head"><h3>APT: Action Expert Pretraining Improves Instruction Generalization of Vision-Language-Action Policies</h3>
+<time class="meta" datetime="2026-10-02">2026-10-02</time></div><p class="meta">Kechun Xu 等 · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　先在冻结 VLM 的视觉特征上预训练不依赖语言的动作专家，再通过门控注入语言条件。作者在论文设定的 LIBERO-PRO 位置与任务扰动测试中报告，微调 VLM 的 APT 汇总成功率为 27%，π0.5 对照为 11%；两阶段设计也改善未见物体和组合指令下的表现。</p>
+<p><strong>证据范围</strong>　这里回顾十月修订的 CoRL 论文。结果依赖数据、架构与微调设置，不能只从这组成功率将收益全部归因于预训练阶段；它也没有直接解决执行中临时更改指令的过渡安全。</p>
+<p><a href="https://arxiv.org/html/2606.12366v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">传感器鲁棒性与专家路由</p>
+<div class="entry-head"><h3>CoRE-VLA: Towards Scalable and Robust Vision-Language-Action Modeling via Conditional Routing of Experts</h3>
+<time class="meta" datetime="2026-10-09">2026-10-09</time></div><p class="meta">Haozhe Zhang 等 · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　用传感器可用性控制模态专家，再以任务意图路由动作侧专家。在 LIBERO-Long 的深度缺失测试中，作者报告 CoRE-VLA 成功率为 97.0%，密集 RGB-D 对照为 72.0%；深度全程可用时分别为 97.6% 和 94.6%。</p>
+<p><strong>证据范围</strong>　论文实证集中在可选深度输入。触觉、力反馈、更复杂传感器组合和跨本体泛化仍需单独验证，不能把深度缺失鲁棒性直接推广到所有传感故障。</p>
+<p><a href="https://arxiv.org/html/2607.03693v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article></div></section>
 </main></body></html>
