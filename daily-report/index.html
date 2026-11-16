@@ -44,20 +44,20 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-14/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-15/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-14">2026-11-14</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完成已取消实验环境的清理</strong>。按确认的范围清理专用实验代码、环境、镜像、权重和测试产物，并完成清理记录。</li><li><strong>Agent 运行时长</strong>。按北京时间全天记录，本机 Codex 已结束轮次累计运行 0 小时 10 分钟，并行会话分别累计，包含轮次内工具执行时间。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-15">2026-11-15</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。按北京时间全天记录，本机 Codex 已结束轮次累计运行 0 小时 14 分钟，并行会话分别累计，包含轮次内工具执行时间。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">语言指令泛化</p>
-<div class="entry-head"><h3>APT: Action Expert Pretraining Improves Instruction Generalization of Vision-Language-Action Policies</h3>
-<time class="meta" datetime="2026-10-02">2026-10-02</time></div><p class="meta">Kechun Xu 等 · CoRL 2026 主会 · 回顾</p>
-<p><strong>方法与结果</strong>　先在冻结 VLM 的视觉特征上预训练不依赖语言的动作专家，再通过门控注入语言条件。作者在论文设定的 LIBERO-PRO 位置与任务扰动测试中报告，微调 VLM 的 APT 汇总成功率为 27%，π0.5 对照为 11%；两阶段设计也改善未见物体和组合指令下的表现。</p>
-<p><strong>证据范围</strong>　这里回顾十月修订的 CoRL 论文。结果依赖数据、架构与微调设置，不能只从这组成功率将收益全部归因于预训练阶段；它也没有直接解决执行中临时更改指令的过渡安全。</p>
-<p><a href="https://arxiv.org/html/2606.12366v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">传感器鲁棒性与专家路由</p>
-<div class="entry-head"><h3>CoRE-VLA: Towards Scalable and Robust Vision-Language-Action Modeling via Conditional Routing of Experts</h3>
-<time class="meta" datetime="2026-10-09">2026-10-09</time></div><p class="meta">Haozhe Zhang 等 · CoRL 2026 主会 · 回顾</p>
-<p><strong>方法与结果</strong>　用传感器可用性控制模态专家，再以任务意图路由动作侧专家。在 LIBERO-Long 的深度缺失测试中，作者报告 CoRE-VLA 成功率为 97.0%，密集 RGB-D 对照为 72.0%；深度全程可用时分别为 97.6% 和 94.6%。</p>
-<p><strong>证据范围</strong>　论文实证集中在可选深度输入。触觉、力反馈、更复杂传感器组合和跨本体泛化仍需单独验证，不能把深度缺失鲁棒性直接推广到所有传感故障。</p>
-<p><a href="https://arxiv.org/html/2607.03693v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">动作编码与连续控制</p>
+<div class="entry-head"><h3>NAC: Neural Action Codec for Vision-Language-Action Models</h3>
+<time class="meta" datetime="2026-09-25">2026-09-25</time></div><p class="meta">Ahad Jawaid、Yu Xiang · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　将短动作轨迹视为多通道一维信号，使用改造的神经音频编解码器和残差向量量化生成紧凑动作 token。在 LIBERO-10、RoboMimic 和实机操作中，作者报告其在相近或更高压缩率下，比 binning、FAST 与先前 VQ 编码器获得更好的平均任务成功率。</p>
+<p><strong>证据范围</strong>　这是九月修订的会议论文回顾。重建误差、token 数和闭环成功率需要共同比较；编码器的优势不等于在任意策略骨干、动作频率或控制接口上都保持同样收益。</p>
+<p><a href="https://arxiv.org/abs/2606.21372v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">开放 VLA 与空间推理</p>
+<div class="entry-head"><h3>MolmoAct2: Action Reasoning Models for Real-world Deployment</h3>
+<time class="meta" datetime="2026-05-08">2026-05-08</time></div><p class="meta">Haoquan Fang 等 · Ai2 与合作团队 · CoRL 2026 主会 · 回顾</p>
+<p><strong>方法与结果</strong>　MolmoAct2 将空间推理 VLM、OpenFAST 编码与连续动作专家连接，并以自适应深度推理减少重复计算。作者开放了数据、代码和模型，包括 720 小时双臂示范；在七个仿真与实机基准中报告优于强基线，具身推理骨干另在十三个推理基准中评估。</p>
+<p><strong>证据范围</strong>　这是五月公开、CoRL 2026 主会录用工作的回顾。整体系统同时改变数据、骨干和动作架构，评测结果不单独证明某个机制的因果贡献；开放模型也仍需按具体机器人进行控制接口适配。</p>
+<p><a href="https://arxiv.org/abs/2605.02881v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article></div></section>
 </main></body></html>
