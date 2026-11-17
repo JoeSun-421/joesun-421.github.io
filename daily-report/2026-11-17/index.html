@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-17">2026-11-17</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://github.com/JoeSun-421/FrozenLake_ESTR2018">完成 FrozenLake 实验整理与代码发布</a></strong>。整理了 8×8、12×12 和 16×16 的 Q-learning 实验、独立策略评估、配图与双语汇报材料，补齐英文 README 和实验报告。统一依赖锁定与运行入口后，将代码和已核验的实验结果发布到独立仓库。</li><li><strong>完成旧机器人实验项目归档与环境清理</strong>。归档了旧项目的代码、文献与实验材料，并清理已停用的实验目录、容器和镜像。核对并保留当前 FrozenLake 项目及其运行环境，停用了旧论文检索定时器。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:05，本机 Codex 已结束轮次累计运行 2 小时 25 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">机器人闭环适应 · 回顾</p>
+<div class="entry-head"><h3>CLIFT: Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning</h3>
+<time class="meta" datetime="2026-07-31">2026-07-31</time></div><p class="meta">UC Berkeley / Google DeepMind / NVIDIA Research · CoRL 2026 主会论文 · 实机</p>
+<p><strong>方法与结果</strong>　研究只能调用监督微调 API、无法访问权重与梯度时，如何利用机器人自身执行反馈改进策略。CLIFT 用人类偏好校准的稠密奖励给动作片段打分，将优势标签写入监督数据并反复微调；在 Unitree G1 三项任务中，两轮后装箱、插杯和双手递盘的成功率分别从 93%、70%、53% 提升至 100%、98%、96%，每项测试 100 次。</p>
+<p><strong>证据范围</strong>　证据来自三个任务及同一实机控制栈；依赖初始演示、人类偏好和已有基础模型。该结果说明任务内闭环适应有效，未证明改进后的学习机制能在重置学习器、未见任务和匹配预算下继续带来增益，因此不能据此宣称严格的机器人 RSI。</p>
+<p><a href="https://arxiv.org/html/2607.29172v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 验证与可靠性</p>
+<div class="entry-head"><h3>Introducing AlphaProof Code: a breakthrough in verifying complex software at depth</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Google DeepMind · 官方研究博客 / 技术论文</p>
+<p><strong>方法与结果</strong>　将专家审核的形式化规格、多个证明 agent 与 Lean 检查器组合起来，验证 Signal 核心密码协议实现满足指定安全性质。官方报告称四周内生成逾 600 万行 Lean 证明，并在重新注入两个历史真实漏洞后，都生成了漏洞版本不安全的机器可检查证明；值得关注的是把生成端与可信验证端分开的工程路线。</p>
+<p><strong>证据范围</strong>　这是特定协议和指定安全性质的验证案例；规格仍须专家审查，结论受形式模型、假设与验证边界约束。不能外推为整个应用没有漏洞；四周与历史多年工程的比较也不是严格匹配人力、算力的对照实验。</p>
+<p><a href="https://deepmind.google/blog/introducing-alphaproof-code/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/introducing-alphaproof-code/">实验室官方来源</a></p></article><article class="entry"><p class="topic">模型自训练 · Agent 监控</p>
+<div class="entry-head"><h3>What affects chain-of-thought monitorability across the model lifecycle?</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">OpenAI · 官方研究博客</p>
+<p><strong>方法与结果</strong>　分析预训练、架构、强化学习及模型生成数据如何影响无思维链推理能力与思维链可控性。在仅约束长度并按最终答案评分的 RL 中，可控性仍会上升；教师能力相近、提示分布和 token 预算固定的蒸馏实验还发现，更可控教师生成的数据会得到更可控的学生。对自改进流水线的启示是，不能只追踪任务得分，也应检查监督信号是否仍可观测。</p>
+<p><strong>证据范围</strong>　两项指标是监控难度的代理，并非直接的恶意行为或监控逃逸概率；作者明确记录了代理与直接监控指标不一致的情况。部分实验来自内部模型与评测，工具监督实验也未完全隔离困惑度等因素，不能给出普适的部署风险数值。</p>
+<p><a href="https://alignment.openai.com/cot-monitorability-model-lifecycle/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.openai.com/cot-monitorability-model-lifecycle/">实验室官方来源</a></p></article></div></section>
+</main></body></html>

@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-16/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-17/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-16">2026-11-16</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>整理 FrozenLake 项目的双语方案草稿</strong>。形成不同地图规模下 MDP 建模与 Q-learning 方案的中英文描述，明确随机转移、交互预算和独立策略评估的实验口径。</li><li><strong>完成本机网络代理状态排查</strong>。核对端口占用、服务日志和连通性，定位代理冲突并交付检查结论。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:08，本机 Codex 已结束轮次累计运行 0 小时 20 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 2 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-17">2026-11-17</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://github.com/JoeSun-421/FrozenLake_ESTR2018">完成 FrozenLake 实验整理与代码发布</a></strong>。整理了 8×8、12×12 和 16×16 的 Q-learning 实验、独立策略评估、配图与双语汇报材料，补齐英文 README 和实验报告。统一依赖锁定与运行入口后，将代码和已核验的实验结果发布到独立仓库。</li><li><strong>完成旧机器人实验项目归档与环境清理</strong>。归档了旧项目的代码、文献与实验材料，并清理已停用的实验目录、容器和镜像。核对并保留当前 FrozenLake 项目及其运行环境，停用了旧论文检索定时器。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:05，本机 Codex 已结束轮次累计运行 2 小时 25 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">Google DeepMind · 交互世界模型</p>
-<div class="entry-head"><h3>Genie 4: A new generation of world simulation</h3>
-<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Google DeepMind · 官方研究博客</p>
-<p><strong>方法与结果</strong>　Genie 4 将视觉、音频和语言引导结合为实时交互式世界生成，并借助 Gemini 系列模型维持场景连贯。官方展示了用文本修改场景、键盘导航及同步生成声音的交互录屏，可用于思考智能体训练环境如何扩展。</p>
-<p><strong>证据范围</strong>　目前公开材料主要展示研究预览和交互案例，没有给出可直接对应机器人操作成功率的评测。官方承认物体持续性、空间精度、复杂物理交互与长时间一致性仍会漂移。</p>
-<p><a href="https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/genie-4-a-new-generation-of-world-simulation/">实验室官方来源</a></p></article><article class="entry"><p class="topic">ICML 主会回顾 · 机器人记忆</p>
-<div class="entry-head"><h3>RoboMME: Benchmarking and Understanding Memory for Robotic Generalist Policies</h3>
-<time class="meta" datetime="2026-05-26">2026-05-26</time></div><p class="meta">Yinpei Dai 等 · ICML 2026 正式论文 · 回顾</p>
-<p><strong>方法与结果</strong>　RoboMME 以十六项操作任务评测时间、空间、物体和过程记忆，并在 π0.5 上构建十四种记忆增强变体。实验表明记忆表示的收益强烈依赖任务，增加历史信息本身不足以保证长任务完成，适合用来区分记忆缺失和动作执行失败。</p>
-<p><strong>证据范围</strong>　这里回顾五月修订、发表于 ICML 的工作。基准任务与记忆集成方式有明确边界，不能将某一种表示在部分任务上的优势解释为长期部署中的通用记忆解决方案。</p>
-<p><a href="https://proceedings.mlr.press/v306/dai26c.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v306/dai26c.html">会议录用依据</a></p></article><article class="entry"><p class="topic">Google DeepMind 研究回顾 · 智能体自我改进</p>
-<div class="entry-head"><h3>SIMA 2: An Agent that Plays, Reasons, and Learns With You in Virtual 3D Worlds</h3>
-<time class="meta" datetime="2025-11-13">2025-11-13</time></div><p class="meta">Google DeepMind SIMA Team · 官方研究博客 · 回顾</p>
-<p><strong>方法与结果</strong>　SIMA 2 通过屏幕、键盘和鼠标在三维虚拟环境中行动，结合 Gemini 推理理解指令。官方报告它在未参与训练的 ASKA、MineDojo 中优于前代，并展示由 Gemini 提供任务和估计奖励、积累自主游戏经验、训练下一代代理的自我改进循环。</p>
-<p><strong>证据范围</strong>　这是 2025 年研究回顾，实验主要在虚拟世界中完成。很长任务、目标验证、有限记忆和精确低层操作仍是限制，不能将这些结果直接等同于真实机器人上的递归自我改进。</p>
-<p><a href="https://deepmind.google/blog/sima-2-an-agent-that-plays-reasons-and-learns-with-you-in-virtual-3d-worlds/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/sima-2-an-agent-that-plays-reasons-and-learns-with-you-in-virtual-3d-worlds/">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">机器人闭环适应 · 回顾</p>
+<div class="entry-head"><h3>CLIFT: Turning Gemini Robotics On-Device into Humanoid Specialists via Non-Invasive Closed-Loop Iterative Fine-Tuning</h3>
+<time class="meta" datetime="2026-07-31">2026-07-31</time></div><p class="meta">UC Berkeley / Google DeepMind / NVIDIA Research · CoRL 2026 主会论文 · 实机</p>
+<p><strong>方法与结果</strong>　研究只能调用监督微调 API、无法访问权重与梯度时，如何利用机器人自身执行反馈改进策略。CLIFT 用人类偏好校准的稠密奖励给动作片段打分，将优势标签写入监督数据并反复微调；在 Unitree G1 三项任务中，两轮后装箱、插杯和双手递盘的成功率分别从 93%、70%、53% 提升至 100%、98%、96%，每项测试 100 次。</p>
+<p><strong>证据范围</strong>　证据来自三个任务及同一实机控制栈；依赖初始演示、人类偏好和已有基础模型。该结果说明任务内闭环适应有效，未证明改进后的学习机制能在重置学习器、未见任务和匹配预算下继续带来增益，因此不能据此宣称严格的机器人 RSI。</p>
+<p><a href="https://arxiv.org/html/2607.29172v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 验证与可靠性</p>
+<div class="entry-head"><h3>Introducing AlphaProof Code: a breakthrough in verifying complex software at depth</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">Google DeepMind · 官方研究博客 / 技术论文</p>
+<p><strong>方法与结果</strong>　将专家审核的形式化规格、多个证明 agent 与 Lean 检查器组合起来，验证 Signal 核心密码协议实现满足指定安全性质。官方报告称四周内生成逾 600 万行 Lean 证明，并在重新注入两个历史真实漏洞后，都生成了漏洞版本不安全的机器可检查证明；值得关注的是把生成端与可信验证端分开的工程路线。</p>
+<p><strong>证据范围</strong>　这是特定协议和指定安全性质的验证案例；规格仍须专家审查，结论受形式模型、假设与验证边界约束。不能外推为整个应用没有漏洞；四周与历史多年工程的比较也不是严格匹配人力、算力的对照实验。</p>
+<p><a href="https://deepmind.google/blog/introducing-alphaproof-code/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/introducing-alphaproof-code/">实验室官方来源</a></p></article><article class="entry"><p class="topic">模型自训练 · Agent 监控</p>
+<div class="entry-head"><h3>What affects chain-of-thought monitorability across the model lifecycle?</h3>
+<time class="meta" datetime="2026-11-10">2026-11-10</time></div><p class="meta">OpenAI · 官方研究博客</p>
+<p><strong>方法与结果</strong>　分析预训练、架构、强化学习及模型生成数据如何影响无思维链推理能力与思维链可控性。在仅约束长度并按最终答案评分的 RL 中，可控性仍会上升；教师能力相近、提示分布和 token 预算固定的蒸馏实验还发现，更可控教师生成的数据会得到更可控的学生。对自改进流水线的启示是，不能只追踪任务得分，也应检查监督信号是否仍可观测。</p>
+<p><strong>证据范围</strong>　两项指标是监控难度的代理，并非直接的恶意行为或监控逃逸概率；作者明确记录了代理与直接监控指标不一致的情况。部分实验来自内部模型与评测，工具监督实验也未完全隔离困惑度等因素，不能给出普适的部署风险数值。</p>
+<p><a href="https://alignment.openai.com/cot-monitorability-model-lifecycle/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.openai.com/cot-monitorability-model-lifecycle/">实验室官方来源</a></p></article></div></section>
 </main></body></html>
