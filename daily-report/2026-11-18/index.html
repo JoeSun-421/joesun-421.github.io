@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-18">2026-11-18</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>修复本机 Codex 更新与模型可用性</strong>。统一了命令行入口、更新位置与共享后台版本，并完成新模型的实际调用验证。默认启动已能使用新模型，旧后台进程也已退出，修复和验证记录已保存在本地。</li><li><strong>核对并调整长任务运行环境</strong>。完成桌面会话与电源管理设置的检查和调整，并回读验证持久化配置。为本机长时间运行任务整理了已确认的配置状态。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 45 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">长任务 VLA · 多尺度记忆 · 回顾</p>
+<div class="entry-head"><h3>MEM: Multi-Scale Embodied Memory for Vision Language Action Models</h3>
+<time class="meta" datetime="2026-03-08">2026-03-08</time></div><p class="meta">Physical Intelligence / Stanford / UC Berkeley / MIT · CoRL 2026 主会论文 · 实机</p>
+<p><strong>方法与结果</strong>　将短期视频记忆与长期语言摘要结合：视频编码器压缩近期视觉变化，高层策略更新任务进度摘要并选择下一子任务。在备菜、清理厨房等需要最长约 15 分钟记忆的实机任务中，组合记忆优于无记忆及仅保留单一记忆的消融；还展示了利用过去失败调整抓取或开门策略。</p>
+<p><strong>证据范围</strong>　长任务实验每策略、任务或菜谱使用 10 次 rollout，并以分阶段任务进度等指标报告，不能把进度百分比读成完整任务成功率。纠错适应实验使用针对性的人类干预与纠正数据；结果不等于无需监督的在线学习，也未证明重置学习器后的递归自我改进。</p>
+<p><a href="https://arxiv.org/html/2603.03596v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 自动生成训练数据 · 鲁棒性</p>
+<div class="entry-head"><h3>Improving Fuzzy Robustness in LLM Safety with Automated Red Teaming</h3>
+<time class="meta" datetime="2026-11-12">2026-11-12</time></div><p class="meta">OpenAI · 官方研究博客 / 技术论文</p>
+<p><strong>方法与结果</strong>　让自动攻击者增加测试时搜索预算，并用 worst@n 筛选多次复测仍稳定奏效的对抗样本，再用于防御模型的 RL 训练。受控实验中，用这些样本训练的模型，在未见攻击者生成的固定测试集和可继续调整策略的多轮攻击评测上，都比原始种子提示训练基线更鲁棒，显示收益不只局限于记住训练攻击。</p>
+<p><strong>证据范围</strong>　评测围绕特定安全边界、攻击者和评分器，不能推出对任意新攻击都安全。博客还报告不同代模型的部署前分数，但跨代差异同时包含模型与训练变化，不能全部归因于这一数据生成方法；文中模型层测试也不代表完整产品防护系统。</p>
+<p><a href="https://alignment.openai.com/fuzzy-robustness/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.openai.com/fuzzy-robustness/">实验室官方来源</a></p></article><article class="entry"><p class="topic">多模态推理 · 工具使用 · 实物验证</p>
+<div class="entry-head"><h3>Testing Claude on real-world electronics design</h3>
+<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Anthropic / Diode Computers · 官方研究博客 · 电子硬件设计实验</p>
+<p><strong>方法与结果</strong>　测试 Claude Fable 5.2 从简短需求出发完成原理图、PCB 布局布线、外壳设计和固件，再由工程师制造验证。团队报告三款设备的原型均可工作、无须修改电路；内部 PCB Gym 得分由 Fable 5 的 25% 提升到 69%，BenchCAD 2.1 得分为 83.5%。它把复杂设计约束最终落到了可制造的实物上，值得作为 agent 长流程评测案例。</p>
+<p><strong>证据范围</strong>　三款原型属于小规模案例，制造和装配由人类完成，并非机器人自主生产。PCB Gym 为内部基准，分数不能直接解释为整机端到端设计成功率；原型长期可靠性与商业认证尚未验证。</p>
+<p><a href="https://www.anthropic.com/research/claude-electronics-design">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/claude-electronics-design">实验室官方来源</a></p></article></div></section>
+</main></body></html>
