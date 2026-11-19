@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-19">2026-11-19</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>整理机器人长任务评测交付材料</strong>。生成任务结果汇总表，整理任务名称、已判定试次、成功统计和录像链接，并按评测环境归类核验了 7 段录像。运行中和中断记录单独标记，避免混入已完成试次的统计。</li><li><strong>完成强化学习项目英文演讲稿</strong>。撰写并扩展逐页英文讲稿与纯英文朗读版，补充 Q-table、Bellman 更新、探索策略以及训练和评估的区别。交付可用于约 7 分钟汇报的稿件与中文讲述提示。</li><li><strong>整理研究文献原文与索引</strong>。将相关研究资料整理为本地 Markdown 索引，核对 8 条论文引用并归档对应原文 PDF。记录版本与页数，完成文件格式检查和首页试渲染。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:07，本机 Codex 已结束轮次累计运行 1 小时 4 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">机器人策略 · 自适应推理算力 · 回顾</p>
+<div class="entry-head"><h3>ELASTIC: Efficiently Learning to Adaptively Scale Test-Time Compute for Generative Control Policies</h3>
+<time class="meta" datetime="2026-06-30">2026-06-30</time></div><p class="meta">Carnegie Mellon University · CoRL 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　将动作生成的算力分配建模为元 MDP：冻结基础策略，由强化学习训练的元策略按状态调整去噪步长、保留或剪除并行动作候选。在扩散策略仿真任务中优于固定分配与单轴扩展；在 π0.5 驱动的实机杯子入篮任务上，达到 best-of-10 的成功表现，同时将推理延迟降低 34%。</p>
+<p><strong>证据范围</strong>　34% 指单次推理的墙钟延迟，不是整项任务完成时间；实机每种方法使用 20 次试验。收益依赖学习到的验证器和额外交互，元策略目前按任务训练，尚未证明对未见任务或环境的迁移；这里调节的是动作生成算力，并非语言推理 token 长度。</p>
+<p><a href="https://arxiv.org/html/2606.31132v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 多用户协作 · 评测</p>
+<div class="entry-head"><h3>Worse Together: How Performance Breaks Down in Multi-User Multi-Agent Teams</h3>
+<time class="meta" datetime="2026-11-11">2026-11-11</time></div><p class="meta">Anthropic / Anthropic Fellows Program / independent collaborator · 官方研究博客 / 研究论文</p>
+<p><strong>方法与结果</strong>　构建共享 API 预算、诊所排期、团体订单与代码合并队列四个仿真环境，比较每用户一个 agent 与单个 agent 服务所有用户。两种 Claude 模型在四个环境中，单个协调者的归一化群体得分均高于点对点团队，差距约 10–45 个百分点；下单前强制读取待收消息，挽救了约 73% 和 62% 的失败团队订单试次。</p>
+<p><strong>证据范围</strong>　研究针对用户目标和偏好不同、且竞争共享资源的设置，不能外推为所有多 agent 系统都不如单 agent。结果来自仿真用户与特定工具环境，协调者与团队的信息组织也不同；得分差距和失败试次挽救比例均不是通用部署成功率。</p>
+<p><a href="https://alignment.anthropic.com/2026/worse-together/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.anthropic.com/2026/worse-together/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 评测 · 评分器校准 · 可复现性</p>
+<div class="entry-head"><h3>Building strong safety evaluations</h3>
+<time class="meta" datetime="2026-11-13">2026-11-13</time></div><p class="meta">Anthropic Engineering · 官方方法与评测经验博客</p>
+<p><strong>方法与结果</strong>　围绕设计、运行和报告评测，强调用多轮情景测试、人工校准评分器、匹配部署配置，并报告不确定性。一个实证例子是多轮评测中的 98% 与 94% 得分差异并不显著；同一模型的 API 与产品配置在部分评测上可相差最多 34 个百分点，说明配置差异和采样噪声足以改变结论。</p>
+<p><strong>证据范围</strong>　这是安全评测的方法经验总结，并非新的机器人算法或统一性能提升实验。文中数值来自不同内部评测与具体产品配置，不能跨设置直接比较；迁移到机器人实验时，仍需独立定义物理成功条件、人工干预口径与实际执行成本。</p>
+<p><a href="https://www.anthropic.com/research/building-strong-safety-evaluations">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/building-strong-safety-evaluations">实验室官方来源</a></p></article></div></section>
+</main></body></html>

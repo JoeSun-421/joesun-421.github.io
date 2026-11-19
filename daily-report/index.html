@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-18/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-19/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-18">2026-11-18</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>修复本机 Codex 更新与模型可用性</strong>。统一了命令行入口、更新位置与共享后台版本，并完成新模型的实际调用验证。默认启动已能使用新模型，旧后台进程也已退出，修复和验证记录已保存在本地。</li><li><strong>核对并调整长任务运行环境</strong>。完成桌面会话与电源管理设置的检查和调整，并回读验证持久化配置。为本机长时间运行任务整理了已确认的配置状态。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 45 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-19">2026-11-19</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>整理机器人长任务评测交付材料</strong>。生成任务结果汇总表，整理任务名称、已判定试次、成功统计和录像链接，并按评测环境归类核验了 7 段录像。运行中和中断记录单独标记，避免混入已完成试次的统计。</li><li><strong>完成强化学习项目英文演讲稿</strong>。撰写并扩展逐页英文讲稿与纯英文朗读版，补充 Q-table、Bellman 更新、探索策略以及训练和评估的区别。交付可用于约 7 分钟汇报的稿件与中文讲述提示。</li><li><strong>整理研究文献原文与索引</strong>。将相关研究资料整理为本地 Markdown 索引，核对 8 条论文引用并归档对应原文 PDF。记录版本与页数，完成文件格式检查和首页试渲染。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:07，本机 Codex 已结束轮次累计运行 1 小时 4 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">长任务 VLA · 多尺度记忆 · 回顾</p>
-<div class="entry-head"><h3>MEM: Multi-Scale Embodied Memory for Vision Language Action Models</h3>
-<time class="meta" datetime="2026-03-08">2026-03-08</time></div><p class="meta">Physical Intelligence / Stanford / UC Berkeley / MIT · CoRL 2026 主会论文 · 实机</p>
-<p><strong>方法与结果</strong>　将短期视频记忆与长期语言摘要结合：视频编码器压缩近期视觉变化，高层策略更新任务进度摘要并选择下一子任务。在备菜、清理厨房等需要最长约 15 分钟记忆的实机任务中，组合记忆优于无记忆及仅保留单一记忆的消融；还展示了利用过去失败调整抓取或开门策略。</p>
-<p><strong>证据范围</strong>　长任务实验每策略、任务或菜谱使用 10 次 rollout，并以分阶段任务进度等指标报告，不能把进度百分比读成完整任务成功率。纠错适应实验使用针对性的人类干预与纠正数据；结果不等于无需监督的在线学习，也未证明重置学习器后的递归自我改进。</p>
-<p><a href="https://arxiv.org/html/2603.03596v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 自动生成训练数据 · 鲁棒性</p>
-<div class="entry-head"><h3>Improving Fuzzy Robustness in LLM Safety with Automated Red Teaming</h3>
-<time class="meta" datetime="2026-11-12">2026-11-12</time></div><p class="meta">OpenAI · 官方研究博客 / 技术论文</p>
-<p><strong>方法与结果</strong>　让自动攻击者增加测试时搜索预算，并用 worst@n 筛选多次复测仍稳定奏效的对抗样本，再用于防御模型的 RL 训练。受控实验中，用这些样本训练的模型，在未见攻击者生成的固定测试集和可继续调整策略的多轮攻击评测上，都比原始种子提示训练基线更鲁棒，显示收益不只局限于记住训练攻击。</p>
-<p><strong>证据范围</strong>　评测围绕特定安全边界、攻击者和评分器，不能推出对任意新攻击都安全。博客还报告不同代模型的部署前分数，但跨代差异同时包含模型与训练变化，不能全部归因于这一数据生成方法；文中模型层测试也不代表完整产品防护系统。</p>
-<p><a href="https://alignment.openai.com/fuzzy-robustness/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.openai.com/fuzzy-robustness/">实验室官方来源</a></p></article><article class="entry"><p class="topic">多模态推理 · 工具使用 · 实物验证</p>
-<div class="entry-head"><h3>Testing Claude on real-world electronics design</h3>
-<time class="meta" datetime="2026-11-09">2026-11-09</time></div><p class="meta">Anthropic / Diode Computers · 官方研究博客 · 电子硬件设计实验</p>
-<p><strong>方法与结果</strong>　测试 Claude Fable 5.2 从简短需求出发完成原理图、PCB 布局布线、外壳设计和固件，再由工程师制造验证。团队报告三款设备的原型均可工作、无须修改电路；内部 PCB Gym 得分由 Fable 5 的 25% 提升到 69%，BenchCAD 2.1 得分为 83.5%。它把复杂设计约束最终落到了可制造的实物上，值得作为 agent 长流程评测案例。</p>
-<p><strong>证据范围</strong>　三款原型属于小规模案例，制造和装配由人类完成，并非机器人自主生产。PCB Gym 为内部基准，分数不能直接解释为整机端到端设计成功率；原型长期可靠性与商业认证尚未验证。</p>
-<p><a href="https://www.anthropic.com/research/claude-electronics-design">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/claude-electronics-design">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">机器人策略 · 自适应推理算力 · 回顾</p>
+<div class="entry-head"><h3>ELASTIC: Efficiently Learning to Adaptively Scale Test-Time Compute for Generative Control Policies</h3>
+<time class="meta" datetime="2026-06-30">2026-06-30</time></div><p class="meta">Carnegie Mellon University · CoRL 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　将动作生成的算力分配建模为元 MDP：冻结基础策略，由强化学习训练的元策略按状态调整去噪步长、保留或剪除并行动作候选。在扩散策略仿真任务中优于固定分配与单轴扩展；在 π0.5 驱动的实机杯子入篮任务上，达到 best-of-10 的成功表现，同时将推理延迟降低 34%。</p>
+<p><strong>证据范围</strong>　34% 指单次推理的墙钟延迟，不是整项任务完成时间；实机每种方法使用 20 次试验。收益依赖学习到的验证器和额外交互，元策略目前按任务训练，尚未证明对未见任务或环境的迁移；这里调节的是动作生成算力，并非语言推理 token 长度。</p>
+<p><a href="https://arxiv.org/html/2606.31132v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 多用户协作 · 评测</p>
+<div class="entry-head"><h3>Worse Together: How Performance Breaks Down in Multi-User Multi-Agent Teams</h3>
+<time class="meta" datetime="2026-11-11">2026-11-11</time></div><p class="meta">Anthropic / Anthropic Fellows Program / independent collaborator · 官方研究博客 / 研究论文</p>
+<p><strong>方法与结果</strong>　构建共享 API 预算、诊所排期、团体订单与代码合并队列四个仿真环境，比较每用户一个 agent 与单个 agent 服务所有用户。两种 Claude 模型在四个环境中，单个协调者的归一化群体得分均高于点对点团队，差距约 10–45 个百分点；下单前强制读取待收消息，挽救了约 73% 和 62% 的失败团队订单试次。</p>
+<p><strong>证据范围</strong>　研究针对用户目标和偏好不同、且竞争共享资源的设置，不能外推为所有多 agent 系统都不如单 agent。结果来自仿真用户与特定工具环境，协调者与团队的信息组织也不同；得分差距和失败试次挽救比例均不是通用部署成功率。</p>
+<p><a href="https://alignment.anthropic.com/2026/worse-together/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.anthropic.com/2026/worse-together/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 评测 · 评分器校准 · 可复现性</p>
+<div class="entry-head"><h3>Building strong safety evaluations</h3>
+<time class="meta" datetime="2026-11-13">2026-11-13</time></div><p class="meta">Anthropic Engineering · 官方方法与评测经验博客</p>
+<p><strong>方法与结果</strong>　围绕设计、运行和报告评测，强调用多轮情景测试、人工校准评分器、匹配部署配置，并报告不确定性。一个实证例子是多轮评测中的 98% 与 94% 得分差异并不显著；同一模型的 API 与产品配置在部分评测上可相差最多 34 个百分点，说明配置差异和采样噪声足以改变结论。</p>
+<p><strong>证据范围</strong>　这是安全评测的方法经验总结，并非新的机器人算法或统一性能提升实验。文中数值来自不同内部评测与具体产品配置，不能跨设置直接比较；迁移到机器人实验时，仍需独立定义物理成功条件、人工干预口径与实际执行成本。</p>
+<p><a href="https://www.anthropic.com/research/building-strong-safety-evaluations">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/building-strong-safety-evaluations">实验室官方来源</a></p></article></div></section>
 </main></body></html>
