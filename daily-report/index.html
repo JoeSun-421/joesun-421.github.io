@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-19/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-20/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-19">2026-11-19</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>整理机器人长任务评测交付材料</strong>。生成任务结果汇总表，整理任务名称、已判定试次、成功统计和录像链接，并按评测环境归类核验了 7 段录像。运行中和中断记录单独标记，避免混入已完成试次的统计。</li><li><strong>完成强化学习项目英文演讲稿</strong>。撰写并扩展逐页英文讲稿与纯英文朗读版，补充 Q-table、Bellman 更新、探索策略以及训练和评估的区别。交付可用于约 7 分钟汇报的稿件与中文讲述提示。</li><li><strong>整理研究文献原文与索引</strong>。将相关研究资料整理为本地 Markdown 索引，核对 8 条论文引用并归档对应原文 PDF。记录版本与页数，完成文件格式检查和首页试渲染。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:07，本机 Codex 已结束轮次累计运行 1 小时 4 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-20">2026-11-20</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>恢复桌面工具界面并核对运行状态</strong>。定位窗口被桌面隐藏的问题，将工具窗口恢复到前台并确认正常显示。核对后台进程与相关连通性，完成本机界面恢复。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 1 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">机器人策略 · 自适应推理算力 · 回顾</p>
-<div class="entry-head"><h3>ELASTIC: Efficiently Learning to Adaptively Scale Test-Time Compute for Generative Control Policies</h3>
-<time class="meta" datetime="2026-06-30">2026-06-30</time></div><p class="meta">Carnegie Mellon University · CoRL 2026 主会论文 · 仿真与实机</p>
-<p><strong>方法与结果</strong>　将动作生成的算力分配建模为元 MDP：冻结基础策略，由强化学习训练的元策略按状态调整去噪步长、保留或剪除并行动作候选。在扩散策略仿真任务中优于固定分配与单轴扩展；在 π0.5 驱动的实机杯子入篮任务上，达到 best-of-10 的成功表现，同时将推理延迟降低 34%。</p>
-<p><strong>证据范围</strong>　34% 指单次推理的墙钟延迟，不是整项任务完成时间；实机每种方法使用 20 次试验。收益依赖学习到的验证器和额外交互，元策略目前按任务训练，尚未证明对未见任务或环境的迁移；这里调节的是动作生成算力，并非语言推理 token 长度。</p>
-<p><a href="https://arxiv.org/html/2606.31132v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 多用户协作 · 评测</p>
-<div class="entry-head"><h3>Worse Together: How Performance Breaks Down in Multi-User Multi-Agent Teams</h3>
-<time class="meta" datetime="2026-11-11">2026-11-11</time></div><p class="meta">Anthropic / Anthropic Fellows Program / independent collaborator · 官方研究博客 / 研究论文</p>
-<p><strong>方法与结果</strong>　构建共享 API 预算、诊所排期、团体订单与代码合并队列四个仿真环境，比较每用户一个 agent 与单个 agent 服务所有用户。两种 Claude 模型在四个环境中，单个协调者的归一化群体得分均高于点对点团队，差距约 10–45 个百分点；下单前强制读取待收消息，挽救了约 73% 和 62% 的失败团队订单试次。</p>
-<p><strong>证据范围</strong>　研究针对用户目标和偏好不同、且竞争共享资源的设置，不能外推为所有多 agent 系统都不如单 agent。结果来自仿真用户与特定工具环境，协调者与团队的信息组织也不同；得分差距和失败试次挽救比例均不是通用部署成功率。</p>
-<p><a href="https://alignment.anthropic.com/2026/worse-together/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://alignment.anthropic.com/2026/worse-together/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 评测 · 评分器校准 · 可复现性</p>
-<div class="entry-head"><h3>Building strong safety evaluations</h3>
-<time class="meta" datetime="2026-11-13">2026-11-13</time></div><p class="meta">Anthropic Engineering · 官方方法与评测经验博客</p>
-<p><strong>方法与结果</strong>　围绕设计、运行和报告评测，强调用多轮情景测试、人工校准评分器、匹配部署配置，并报告不确定性。一个实证例子是多轮评测中的 98% 与 94% 得分差异并不显著；同一模型的 API 与产品配置在部分评测上可相差最多 34 个百分点，说明配置差异和采样噪声足以改变结论。</p>
-<p><strong>证据范围</strong>　这是安全评测的方法经验总结，并非新的机器人算法或统一性能提升实验。文中数值来自不同内部评测与具体产品配置，不能跨设置直接比较；迁移到机器人实验时，仍需独立定义物理成功条件、人工干预口径与实际执行成本。</p>
-<p><a href="https://www.anthropic.com/research/building-strong-safety-evaluations">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/building-strong-safety-evaluations">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">语言指令遵循 · 组合泛化 · 回顾</p>
+<div class="entry-head"><h3>Diagnosing Compositional Generalization in Sequential Robot Tasks</h3>
+<time class="meta" datetime="2026-10-15">2026-10-15</time></div><p class="meta">UC Berkeley · CoRL 2026 主会论文 · 仿真</p>
+<p><strong>方法与结果</strong>　将序列操作的泛化差距分解为指令边际、指令组合及上下文—动作分布偏移，并用控制实验检查训练集应覆盖哪些依赖关系。稀疏对角任务预训练后，为每个完整任务补充 1 条示范，可将原预训练未见组合上的成功率从 0.4% 提升至 54.7%；结果支持部分失败来自技能的指令调度，而不只是缺少底层技能。</p>
+<p><strong>证据范围</strong>　实验主要是三个小型序列操作仿真任务族，策略在冻结视觉编码器上训练，尚未验证对大规模预训练 VLA 的迁移。补充示范已覆盖原预训练未见任务，因此 54.7% 不能解读为微调后仍完全零样本的泛化；跨阶段依赖的结论也受任务构造范围限制。</p>
+<p><a href="https://arxiv.org/html/2607.29687v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 科研加速 · 自我改进证据</p>
+<div class="entry-head"><h3>Research acceleration: The jagged frontier</h3>
+<time class="meta" datetime="2026-11-18">2026-11-18</time></div><p class="meta">OpenAI · 官方研究报告</p>
+<p><strong>方法与结果</strong>　从内部 agent 使用、研究活动和产出三个层面测量 AI 研发加速。3 月至 10 月，预估需人类 2–4 小时的任务，其无人工干预成功率估计从 23% 升至 46%，4–8 小时任务从 13% 升至 35%；按工作类型拆分，监控训练为 79%，推理与服务代码编写为 25%，显示科研自动化存在明显能力落差。</p>
+<p><strong>证据范围</strong>　这是内部工作流的观察性测量，不是固定任务集合上的随机对照；研究人员随能力变化而改变委派任务，也会影响各时间桶的成功率。使用时长、代码量和实验数量都是代理指标，尚不能单独证明端到端科研产出按同比例增加，更不能直接视为无人参与的递归自我改进已经实现。</p>
+<p><a href="https://openai.com/index/research-acceleration-jagged-frontier/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/research-acceleration-jagged-frontier/">实验室官方来源</a></p></article><article class="entry"><p class="topic">人机协作 · Agent 影响 · 实验设计</p>
+<div class="entry-head"><h3>How AI agents shape experts’ judgment calls</h3>
+<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Anthropic Alignment · 官方研究博客 / 随机实验</p>
+<p><strong>方法与结果</strong>　让 50 名使用 Claude Code 的专业分析师完成同一个统计分析任务，并随机指定 agent 在每个可辩护选项之间的倾向。四类分析选择中，人类与 agent 倾向一致的比例合计为 86%；事后 77% 的分析师至少一次复述了 agent 的论据，而只有 15% 明确将其归因于 agent。研究提示，专家保留最后确认权，并不保证关键判断不受 agent 的偏好塑形。</p>
+<p><strong>证据范围</strong>　实验刻意强化 agent 的立场，只涵盖一个领域任务和一个模型，分析师也并非该应用领域的专家，真实工作中的影响强度可能不同。86% 衡量选项一致性，不代表错误率；不用 AI 的对照参与者是自行选择的，不能据其耗时和错误差异推断 AI 的因果生产率收益。</p>
+<p><a href="https://www.anthropic.com/research/agents-judgment-calls">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/agents-judgment-calls">实验室官方来源</a></p></article></div></section>
 </main></body></html>

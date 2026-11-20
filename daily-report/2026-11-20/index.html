@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-20">2026-11-20</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>恢复桌面工具界面并核对运行状态</strong>。定位窗口被桌面隐藏的问题，将工具窗口恢复到前台并确认正常显示。核对后台进程与相关连通性，完成本机界面恢复。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 1 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">语言指令遵循 · 组合泛化 · 回顾</p>
+<div class="entry-head"><h3>Diagnosing Compositional Generalization in Sequential Robot Tasks</h3>
+<time class="meta" datetime="2026-10-15">2026-10-15</time></div><p class="meta">UC Berkeley · CoRL 2026 主会论文 · 仿真</p>
+<p><strong>方法与结果</strong>　将序列操作的泛化差距分解为指令边际、指令组合及上下文—动作分布偏移，并用控制实验检查训练集应覆盖哪些依赖关系。稀疏对角任务预训练后，为每个完整任务补充 1 条示范，可将原预训练未见组合上的成功率从 0.4% 提升至 54.7%；结果支持部分失败来自技能的指令调度，而不只是缺少底层技能。</p>
+<p><strong>证据范围</strong>　实验主要是三个小型序列操作仿真任务族，策略在冻结视觉编码器上训练，尚未验证对大规模预训练 VLA 的迁移。补充示范已覆盖原预训练未见任务，因此 54.7% 不能解读为微调后仍完全零样本的泛化；跨阶段依赖的结论也受任务构造范围限制。</p>
+<p><a href="https://arxiv.org/html/2607.29687v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 科研加速 · 自我改进证据</p>
+<div class="entry-head"><h3>Research acceleration: The jagged frontier</h3>
+<time class="meta" datetime="2026-11-18">2026-11-18</time></div><p class="meta">OpenAI · 官方研究报告</p>
+<p><strong>方法与结果</strong>　从内部 agent 使用、研究活动和产出三个层面测量 AI 研发加速。3 月至 10 月，预估需人类 2–4 小时的任务，其无人工干预成功率估计从 23% 升至 46%，4–8 小时任务从 13% 升至 35%；按工作类型拆分，监控训练为 79%，推理与服务代码编写为 25%，显示科研自动化存在明显能力落差。</p>
+<p><strong>证据范围</strong>　这是内部工作流的观察性测量，不是固定任务集合上的随机对照；研究人员随能力变化而改变委派任务，也会影响各时间桶的成功率。使用时长、代码量和实验数量都是代理指标，尚不能单独证明端到端科研产出按同比例增加，更不能直接视为无人参与的递归自我改进已经实现。</p>
+<p><a href="https://openai.com/index/research-acceleration-jagged-frontier/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/research-acceleration-jagged-frontier/">实验室官方来源</a></p></article><article class="entry"><p class="topic">人机协作 · Agent 影响 · 实验设计</p>
+<div class="entry-head"><h3>How AI agents shape experts’ judgment calls</h3>
+<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Anthropic Alignment · 官方研究博客 / 随机实验</p>
+<p><strong>方法与结果</strong>　让 50 名使用 Claude Code 的专业分析师完成同一个统计分析任务，并随机指定 agent 在每个可辩护选项之间的倾向。四类分析选择中，人类与 agent 倾向一致的比例合计为 86%；事后 77% 的分析师至少一次复述了 agent 的论据，而只有 15% 明确将其归因于 agent。研究提示，专家保留最后确认权，并不保证关键判断不受 agent 的偏好塑形。</p>
+<p><strong>证据范围</strong>　实验刻意强化 agent 的立场，只涵盖一个领域任务和一个模型，分析师也并非该应用领域的专家，真实工作中的影响强度可能不同。86% 衡量选项一致性，不代表错误率；不用 AI 的对照参与者是自行选择的，不能据其耗时和错误差异推断 AI 的因果生产率收益。</p>
+<p><a href="https://www.anthropic.com/research/agents-judgment-calls">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/agents-judgment-calls">实验室官方来源</a></p></article></div></section>
+</main></body></html>
