@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-21">2026-11-21</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 0 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">视频规划 · 世界模型与动作迁移 · 回顾</p>
+<div class="entry-head"><h3>Large Video Planner Enables Generalizable Robot Control</h3>
+<time class="meta" datetime="2026-05-08">2026-05-08</time></div><p class="meta">MIT / UC Berkeley / Harvard · CoRL 2026 主会论文 · 视频评测与实机</p>
+<p><strong>方法与结果</strong>　以大规模人类和机器人视频训练 14B 视频规划模型，从场景图像和指令生成操作视频，再通过三维重建、手部姿态估计与重定向提取机器人动作。100 个第三方提出的任务中，生成视频的 Task Complete 平均得分为 59.3%，Best@4 为 82.0%；另在 Franka 和 G1 手臂上验证执行，例如舀咖啡豆 3/5、擦桌子 8/10。</p>
+<p><strong>证据范围</strong>　59.3% 与 82.0% 是生成视频的人工评分，不能当作实机成功率；Best@4 表示四次生成中至少一次满足条件。实机每任务仅 5 或 10 次试验，部分灵巧手任务没有兼容的 VLA 对照；单张 A100 生成视频需数分钟，且整体执行为开环，重建与重定向误差仍会导致失败。</p>
+<p><a href="https://arxiv.org/html/2512.15840v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 硬件优化 · 可验证工程</p>
+<div class="entry-head"><h3>Advancing chip design with OpenAI models</h3>
+<time class="meta" datetime="2026-11-18">2026-11-18</time></div><p class="meta">OpenAI / AMD · 官方研究报告 · 芯片设计</p>
+<p><strong>方法与结果</strong>　通过模型重写 RTL，并用 EDA 工具检查功能保持和功耗、性能、面积取舍。团队估计，模型提出的改动使 Jalapeño 向量单元与矩阵单元的标准单元面积分别下降约 13% 和 10%，这些优化经过硅后验证；在两款开放 RISC-V 核的可比约 112,000 token 预算评测中，GPT-6.2 Astra 均获得最高平均分。</p>
+<p><strong>证据范围</strong>　生产芯片收益来自人类工程团队与模型合作，不能解释为完整芯片已被自主设计。开放核评测使用仿真正确性检查与 Yosys 频率估算，允许最高 16 倍原始面积；从规格设计时也可能省略原核心的部分功能，因此基准得分优势不能直接等同于生产芯片的同约束收益。</p>
+<p><a href="https://openai.com/index/advancing-chip-design-with-our-models/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/advancing-chip-design-with-our-models/">实验室官方来源</a></p></article><article class="entry"><p class="topic">AI 科研助手 · 使用测量 · 生产率证据</p>
+<div class="entry-head"><h3>Science at the Frontier: How Scientists Use ChatGPT</h3>
+<time class="meta" datetime="2026-11-16">2026-11-16</time></div><p class="meta">OpenAI Economic Research · 官方研究报告 · 观察性研究与调查</p>
+<p><strong>方法与结果</strong>　分析学术研究者试点中 1,819 名科学家的 580,186 条科研消息，并调查 251 名参与者。受访者估计，在相同质量下，不使用 AI 完成同样工作需约 1.9 倍时间；行为分类还显示 68% 的研究者达到论文定义的研究构思使用门槛，覆盖提出问题、共同完善想法与请求模型建议等角色。</p>
+<p><strong>证据范围</strong>　1.9 倍是参与者对反事实耗时的主观估计，研究构思使用率是行为指标，二者都不是随机对照下的科研产出提升。消息类别由自动分类器测量，样本来自自选试点人群；对发现速度的期待尚未成为实际发现结果，也不能证明自主科研或递归自我改进已经实现。</p>
+<p><a href="https://openai.com/index/science-at-the-frontier/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/science-at-the-frontier/">实验室官方来源</a></p></article></div></section>
+</main></body></html>

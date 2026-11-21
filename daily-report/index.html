@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-20/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-21/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-20">2026-11-20</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>恢复桌面工具界面并核对运行状态</strong>。定位窗口被桌面隐藏的问题，将工具窗口恢复到前台并确认正常显示。核对后台进程与相关连通性，完成本机界面恢复。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 1 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-21">2026-11-21</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 0 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">语言指令遵循 · 组合泛化 · 回顾</p>
-<div class="entry-head"><h3>Diagnosing Compositional Generalization in Sequential Robot Tasks</h3>
-<time class="meta" datetime="2026-10-15">2026-10-15</time></div><p class="meta">UC Berkeley · CoRL 2026 主会论文 · 仿真</p>
-<p><strong>方法与结果</strong>　将序列操作的泛化差距分解为指令边际、指令组合及上下文—动作分布偏移，并用控制实验检查训练集应覆盖哪些依赖关系。稀疏对角任务预训练后，为每个完整任务补充 1 条示范，可将原预训练未见组合上的成功率从 0.4% 提升至 54.7%；结果支持部分失败来自技能的指令调度，而不只是缺少底层技能。</p>
-<p><strong>证据范围</strong>　实验主要是三个小型序列操作仿真任务族，策略在冻结视觉编码器上训练，尚未验证对大规模预训练 VLA 的迁移。补充示范已覆盖原预训练未见任务，因此 54.7% 不能解读为微调后仍完全零样本的泛化；跨阶段依赖的结论也受任务构造范围限制。</p>
-<p><a href="https://arxiv.org/html/2607.29687v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 科研加速 · 自我改进证据</p>
-<div class="entry-head"><h3>Research acceleration: The jagged frontier</h3>
-<time class="meta" datetime="2026-11-18">2026-11-18</time></div><p class="meta">OpenAI · 官方研究报告</p>
-<p><strong>方法与结果</strong>　从内部 agent 使用、研究活动和产出三个层面测量 AI 研发加速。3 月至 10 月，预估需人类 2–4 小时的任务，其无人工干预成功率估计从 23% 升至 46%，4–8 小时任务从 13% 升至 35%；按工作类型拆分，监控训练为 79%，推理与服务代码编写为 25%，显示科研自动化存在明显能力落差。</p>
-<p><strong>证据范围</strong>　这是内部工作流的观察性测量，不是固定任务集合上的随机对照；研究人员随能力变化而改变委派任务，也会影响各时间桶的成功率。使用时长、代码量和实验数量都是代理指标，尚不能单独证明端到端科研产出按同比例增加，更不能直接视为无人参与的递归自我改进已经实现。</p>
-<p><a href="https://openai.com/index/research-acceleration-jagged-frontier/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/research-acceleration-jagged-frontier/">实验室官方来源</a></p></article><article class="entry"><p class="topic">人机协作 · Agent 影响 · 实验设计</p>
-<div class="entry-head"><h3>How AI agents shape experts’ judgment calls</h3>
-<time class="meta" datetime="2026-10-27">2026-10-27</time></div><p class="meta">Anthropic Alignment · 官方研究博客 / 随机实验</p>
-<p><strong>方法与结果</strong>　让 50 名使用 Claude Code 的专业分析师完成同一个统计分析任务，并随机指定 agent 在每个可辩护选项之间的倾向。四类分析选择中，人类与 agent 倾向一致的比例合计为 86%；事后 77% 的分析师至少一次复述了 agent 的论据，而只有 15% 明确将其归因于 agent。研究提示，专家保留最后确认权，并不保证关键判断不受 agent 的偏好塑形。</p>
-<p><strong>证据范围</strong>　实验刻意强化 agent 的立场，只涵盖一个领域任务和一个模型，分析师也并非该应用领域的专家，真实工作中的影响强度可能不同。86% 衡量选项一致性，不代表错误率；不用 AI 的对照参与者是自行选择的，不能据其耗时和错误差异推断 AI 的因果生产率收益。</p>
-<p><a href="https://www.anthropic.com/research/agents-judgment-calls">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/agents-judgment-calls">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">视频规划 · 世界模型与动作迁移 · 回顾</p>
+<div class="entry-head"><h3>Large Video Planner Enables Generalizable Robot Control</h3>
+<time class="meta" datetime="2026-05-08">2026-05-08</time></div><p class="meta">MIT / UC Berkeley / Harvard · CoRL 2026 主会论文 · 视频评测与实机</p>
+<p><strong>方法与结果</strong>　以大规模人类和机器人视频训练 14B 视频规划模型，从场景图像和指令生成操作视频，再通过三维重建、手部姿态估计与重定向提取机器人动作。100 个第三方提出的任务中，生成视频的 Task Complete 平均得分为 59.3%，Best@4 为 82.0%；另在 Franka 和 G1 手臂上验证执行，例如舀咖啡豆 3/5、擦桌子 8/10。</p>
+<p><strong>证据范围</strong>　59.3% 与 82.0% 是生成视频的人工评分，不能当作实机成功率；Best@4 表示四次生成中至少一次满足条件。实机每任务仅 5 或 10 次试验，部分灵巧手任务没有兼容的 VLA 对照；单张 A100 生成视频需数分钟，且整体执行为开环，重建与重定向误差仍会导致失败。</p>
+<p><a href="https://arxiv.org/html/2512.15840v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents · 硬件优化 · 可验证工程</p>
+<div class="entry-head"><h3>Advancing chip design with OpenAI models</h3>
+<time class="meta" datetime="2026-11-18">2026-11-18</time></div><p class="meta">OpenAI / AMD · 官方研究报告 · 芯片设计</p>
+<p><strong>方法与结果</strong>　通过模型重写 RTL，并用 EDA 工具检查功能保持和功耗、性能、面积取舍。团队估计，模型提出的改动使 Jalapeño 向量单元与矩阵单元的标准单元面积分别下降约 13% 和 10%，这些优化经过硅后验证；在两款开放 RISC-V 核的可比约 112,000 token 预算评测中，GPT-6.2 Astra 均获得最高平均分。</p>
+<p><strong>证据范围</strong>　生产芯片收益来自人类工程团队与模型合作，不能解释为完整芯片已被自主设计。开放核评测使用仿真正确性检查与 Yosys 频率估算，允许最高 16 倍原始面积；从规格设计时也可能省略原核心的部分功能，因此基准得分优势不能直接等同于生产芯片的同约束收益。</p>
+<p><a href="https://openai.com/index/advancing-chip-design-with-our-models/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/advancing-chip-design-with-our-models/">实验室官方来源</a></p></article><article class="entry"><p class="topic">AI 科研助手 · 使用测量 · 生产率证据</p>
+<div class="entry-head"><h3>Science at the Frontier: How Scientists Use ChatGPT</h3>
+<time class="meta" datetime="2026-11-16">2026-11-16</time></div><p class="meta">OpenAI Economic Research · 官方研究报告 · 观察性研究与调查</p>
+<p><strong>方法与结果</strong>　分析学术研究者试点中 1,819 名科学家的 580,186 条科研消息，并调查 251 名参与者。受访者估计，在相同质量下，不使用 AI 完成同样工作需约 1.9 倍时间；行为分类还显示 68% 的研究者达到论文定义的研究构思使用门槛，覆盖提出问题、共同完善想法与请求模型建议等角色。</p>
+<p><strong>证据范围</strong>　1.9 倍是参与者对反事实耗时的主观估计，研究构思使用率是行为指标，二者都不是随机对照下的科研产出提升。消息类别由自动分类器测量，样本来自自选试点人群；对发现速度的期待尚未成为实际发现结果，也不能证明自主科研或递归自我改进已经实现。</p>
+<p><a href="https://openai.com/index/science-at-the-frontier/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/science-at-the-frontier/">实验室官方来源</a></p></article></div></section>
 </main></body></html>
