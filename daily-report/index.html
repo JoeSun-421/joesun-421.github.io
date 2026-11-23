@@ -44,20 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-22/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-23/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-22">2026-11-22</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>更新科研工作流技能</strong>。将研究审查流程扩展为需求对齐、问题验证、最近工作、基线、机制与实验设计、结果复盘和完成审查。补充公平对照、成本统计和停止标准，并完成结构、内部链接与调用配置检查。</li><li><strong>完成研究可行性与实验设计文档</strong>。完成资料核对、技术可行性和实验对照梳理，形成可行性报告与实验计划。文档明确了尚待验证的环节、比较条件与判断标准，供后续实验使用。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 2 小时 16 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-23">2026-11-23</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完善正式研究提案</strong>。整理正式提案，补齐数据来源与版本、实验对照、评价标准和资源预算，并统一训练公式及引用。完成文档保存与回读核对，保留原有研究笔记。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 19 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">VLA 推理效率 · Latent 规划 · 回顾</p>
-<div class="entry-head"><h3>Fast-ThinkAct: Efficient Vision-Language-Action Reasoning via Verbalizable Latent Planning</h3>
-<time class="meta" datetime="2026-02-24">2026-02-24</time></div><p class="meta">NVIDIA / National Taiwan University / UIUC · CVPR 2026 主会论文 · 仿真操控与具身推理评测</p>
-<p><strong>方法与结果</strong>　通过教师蒸馏与偏好引导的轨迹对齐，把冗长文本 CoT 压缩为少量连续 latent，并用视觉规划表示条件化动作模型。在 LIBERO、SimplerEnv 和 RoboTwin2.0 中保持或改善成功表现；相对 ThinkAct-7B，论文报告推理延迟最高降低 89.3%，相对 MolmoAct-7B 降低 88.0%。</p>
-<p><strong>证据范围</strong>　主要操控结果来自仿真；RoboFAC 的实拍视频失败分析分数也不能等同于真实机器人闭环恢复成功率。动作由独立的扩散策略生成，尚不能据此推断单个语言解码器直接控臂时的效果；报告的延迟收益针对推理环节，不代表整项物理任务按同比例加速。</p>
-<p><a href="https://arxiv.org/html/2601.09708v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openaccess.thecvf.com/content/CVPR2026/html/Huang_Fast-ThinkAct_Efficient_Vision-Language-Action_Reasoning_via_Verbalizable_Latent_Planning_CVPR_2026_paper.html">会议录用依据</a></p></article><article class="entry"><p class="topic">多模态科学推理 · 评测设计</p>
-<div class="entry-head"><h3>MedChemBench: Evaluating complex multimodal reasoning in medicinal chemistry</h3>
-<time class="meta" datetime="2026-11-20">2026-11-20</time></div><p class="meta">OpenAI · 官方研究发布 / 技术论文 · 历史材料评测</p>
-<p><strong>方法与结果</strong>　以 117 篇论文和专利构造 99 道多模态问题，覆盖分子结构重建、证据解释、候选排序与性质预测，并将研究决策点之后的结果留作评分依据。官方发布页在 xhigh 设置下报告 GPT-6.2 Astra 得分 84.5%，GPT-6 Astra 为 83.3%；后者结构重建得分 95.4%，但候选选择和数值预测只获得约一半分数，说明总分会掩盖关键决策短板。</p>
-<p><strong>证据范围</strong>　得分包含部分给分，不是完整问题答对率；6.2 的 84.5% 来自发布页，所附技术论文报告的是较早的 11 模型评测。来源均为已发表材料，无法排除训练接触；每次回答没有工具、反馈或新实验，结果尚不能证明实际药物发现或实验决策改善。</p>
-<p><a href="https://openai.com/index/introducing-medchembench/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/introducing-medchembench/">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">VLA 推理效率 · 训练机制分析 · 回顾</p>
+<div class="entry-head"><h3>Training Strategies for Efficient Embodied Reasoning</h3>
+<time class="meta" datetime="2025-10-07">2025-10-07</time></div><p class="meta">UC Berkeley / Stanford / Physical Intelligence · CoRL 2025 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　用控制实验区分机器人 CoT 的表征学习、学习课程和额外表达能力作用，并提出 ECoT-Lite：先做推理预训练，或训练时随机丢弃推理，使策略在测试时可不生成长 CoT。论文报告，相对标准机器人推理可实现约 3 倍推理加速，在 LIBERO-90 中保持较强表现，并在真实 Bridge 机械臂任务上验证训练方法的效果。</p>
+<p><strong>证据范围</strong>　两种训练配方在不同任务分布上各有取舍，完整 ECoT 在部分实机任务中仍更强，不能据此断言测试时推理普遍多余。方法仍需要机器人推理训练数据，且机制分析固定了许多架构与训练设置；约 3 倍指推理速度，不能直接等同于整项物理任务加速。</p>
+<p><a href="https://proceedings.mlr.press/v305/chen25a.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v305/chen25a.html">会议录用依据</a></p></article><article class="entry"><p class="topic">可验证推理 · 模型身份 · Agent 基础设施</p>
+<div class="entry-head"><h3>Progress on provable inference for large language models</h3>
+<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">Anthropic / EPFL / MIT and collaborators · 官方研究博客 / FlashProve 技术报告</p>
+<p><strong>方法与结果</strong>　FlashProve 用零知识证明，将输出绑定到预先承诺的模型权重，使验证方不必持有权重也能检查推理来源。对 4-bit Llama 4 Maverick 的原型测试中，单 H100 的证明生成吞吐约 110 token/秒，每份证明约 18.78 MB，24 线程 CPU 验证约 17 秒；团队同时发布代码、协议与 Lean 安全性质证明。</p>
+<p><strong>证据范围</strong>　这是证明生成吞吐，不是语言模型生成速度，测得 GPU 开销仍约为普通推理的 70–95 倍。原型只覆盖最长 1,024 token 上下文的整数模型和贪心选择，不能直接推广到浮点采样推理；Lean 协议证明与快速实现之间仍有信任缺口，也不保证输出内容正确或安全。</p>
+<p><a href="https://www.anthropic.com/research/provable-inference">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/provable-inference">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 监控 · 内部激活 · 可靠性</p>
+<div class="entry-head"><h3>Training activation classifiers for safety and alignment</h3>
+<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">OpenAI · 官方方法与实验研究博客</p>
+<p><strong>方法与结果</strong>　直接在模型残差流激活上训练小型分类器，逐 token 监测潜在违规输出，超过阈值后暂停生成或工具调用并交给推理模型复核。实验中，softmax 聚合训练目标改善了召回率与升级审查比例的折衷；探针在多个后训练阶段之间迁移较好，对所测试越狱整体比文本分类器更鲁棒，分类能力也随被监控模型能力提升。</p>
+<p><strong>证据范围</strong>　探针依赖已标注训练边界，只能检测被训练覆盖的行为；更换预训练底座须重新训练，权重漂移也可能使性能下降。图表来自多个内部实验，不必然代表部署分类器；对已测试攻击的鲁棒性不能视为对自适应攻击或未知失配的普适保证。</p>
+<p><a href="https://openai.com/safety-alignment/training-activation-classifiers/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/safety-alignment/training-activation-classifiers/">实验室官方来源</a></p></article></div></section>
 </main></body></html>
