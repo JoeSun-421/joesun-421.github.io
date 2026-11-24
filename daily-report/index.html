@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-23/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-24/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-23">2026-11-23</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>完善正式研究提案</strong>。整理正式提案，补齐数据来源与版本、实验对照、评价标准和资源预算，并统一训练公式及引用。完成文档保存与回读核对，保留原有研究笔记。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 19 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-24">2026-11-24</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 14 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">VLA 推理效率 · 训练机制分析 · 回顾</p>
-<div class="entry-head"><h3>Training Strategies for Efficient Embodied Reasoning</h3>
-<time class="meta" datetime="2025-10-07">2025-10-07</time></div><p class="meta">UC Berkeley / Stanford / Physical Intelligence · CoRL 2025 主会论文 · 仿真与实机</p>
-<p><strong>方法与结果</strong>　用控制实验区分机器人 CoT 的表征学习、学习课程和额外表达能力作用，并提出 ECoT-Lite：先做推理预训练，或训练时随机丢弃推理，使策略在测试时可不生成长 CoT。论文报告，相对标准机器人推理可实现约 3 倍推理加速，在 LIBERO-90 中保持较强表现，并在真实 Bridge 机械臂任务上验证训练方法的效果。</p>
-<p><strong>证据范围</strong>　两种训练配方在不同任务分布上各有取舍，完整 ECoT 在部分实机任务中仍更强，不能据此断言测试时推理普遍多余。方法仍需要机器人推理训练数据，且机制分析固定了许多架构与训练设置；约 3 倍指推理速度，不能直接等同于整项物理任务加速。</p>
-<p><a href="https://proceedings.mlr.press/v305/chen25a.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v305/chen25a.html">会议录用依据</a></p></article><article class="entry"><p class="topic">可验证推理 · 模型身份 · Agent 基础设施</p>
-<div class="entry-head"><h3>Progress on provable inference for large language models</h3>
-<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">Anthropic / EPFL / MIT and collaborators · 官方研究博客 / FlashProve 技术报告</p>
-<p><strong>方法与结果</strong>　FlashProve 用零知识证明，将输出绑定到预先承诺的模型权重，使验证方不必持有权重也能检查推理来源。对 4-bit Llama 4 Maverick 的原型测试中，单 H100 的证明生成吞吐约 110 token/秒，每份证明约 18.78 MB，24 线程 CPU 验证约 17 秒；团队同时发布代码、协议与 Lean 安全性质证明。</p>
-<p><strong>证据范围</strong>　这是证明生成吞吐，不是语言模型生成速度，测得 GPU 开销仍约为普通推理的 70–95 倍。原型只覆盖最长 1,024 token 上下文的整数模型和贪心选择，不能直接推广到浮点采样推理；Lean 协议证明与快速实现之间仍有信任缺口，也不保证输出内容正确或安全。</p>
-<p><a href="https://www.anthropic.com/research/provable-inference">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.anthropic.com/research/provable-inference">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 监控 · 内部激活 · 可靠性</p>
-<div class="entry-head"><h3>Training activation classifiers for safety and alignment</h3>
-<time class="meta" datetime="2026-11-02">2026-11-02</time></div><p class="meta">OpenAI · 官方方法与实验研究博客</p>
-<p><strong>方法与结果</strong>　直接在模型残差流激活上训练小型分类器，逐 token 监测潜在违规输出，超过阈值后暂停生成或工具调用并交给推理模型复核。实验中，softmax 聚合训练目标改善了召回率与升级审查比例的折衷；探针在多个后训练阶段之间迁移较好，对所测试越狱整体比文本分类器更鲁棒，分类能力也随被监控模型能力提升。</p>
-<p><strong>证据范围</strong>　探针依赖已标注训练边界，只能检测被训练覆盖的行为；更换预训练底座须重新训练，权重漂移也可能使性能下降。图表来自多个内部实验，不必然代表部署分类器；对已测试攻击的鲁棒性不能视为对自适应攻击或未知失配的普适保证。</p>
-<p><a href="https://openai.com/safety-alignment/training-activation-classifiers/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/safety-alignment/training-activation-classifiers/">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">多模态指令遵循 · 视觉指代 · 回顾</p>
+<div class="entry-head"><h3>Interleave-VLA: Enhancing Robot Manipulation with Interleaved Image-Text Instructions</h3>
+<time class="meta" datetime="2025-10-08">2025-10-08</time></div><p class="meta">Shanghai Jiao Tong University / Fudan / UC Berkeley / UNC-Chapel Hill · ICLR 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　将目标参考图像与文字交错放入指令，帮助 VLA 将用户意图对应到具体物体；同时把 Open X-Embodiment 的文本指令自动转成图文交错数据，形成约 210,000 条 episode。论文在仿真与实机的未见物体设置中，报告相对纯文本基线约 2 倍的域外泛化表现，并测试了裁剪图、网络图片和手绘草图等指令接口。</p>
+<p><strong>证据范围</strong>　约 2 倍来自论文特定域外任务集合，不能外推到任意语言任务或环境；输入图像还提供了文字未必包含的外观线索，收益需结合数据与输入条件理解。更长图像 token 序列增加训练计算需求；这些结果也不等同于开放环境长任务的稳定自主执行。</p>
+<p><a href="https://arxiv.org/html/2505.02152v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://iclr.cc/virtual/2026/poster/10009234">会议录用依据</a></p></article><article class="entry"><p class="topic">科学 Agent · 多模态证据 · 评测</p>
+<div class="entry-head"><h3>Measuring how AI agents handle everyday wet-lab science</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">OpenAI / Ligo · 官方研究发布 · BioBasicsBench</p>
+<p><strong>方法与结果</strong>　用 100 项来自真实实验的日常分析任务，测试模型读取原始图像、仪器文件、实验记录和视频，并检查对照、识别错误及承认证据不足的能力。相同 xhigh 推理设置下，GPT-6 Astra 获得 66.7% 的可用分数，GPT-5.6 Sol 为 43.8%；每设置每题采样 5 次，按完整任务 bootstrap 报告不确定性。</p>
+<p><strong>证据范围</strong>　平均分按专家 rubric 分项给分，不是完整实验成功率；本次只比较了 7 个 OpenAI 模型。发布页仍展示模型忽略对照、保留偏好解释及计数错误等失败，较高分数尚不能证明它能可靠开展湿实验、改善真实实验决策或自主产生科学发现。</p>
+<p><a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 安全 · 评测到部署 · 目标认知</p>
+<div class="entry-head"><h3>Eval-production behavior gaps in agent safety and the role of eval-awareness</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">OpenAI · 官方研究博客 · 部署记录分析与干预实验</p>
+<p><strong>方法与结果</strong>　比较 Respecting Warnings 安全评测与匹配的部署决策，发现 6 个模型在评测中的成功率均更低，差距为 10.2–37.4 个百分点。对 GPT-6.1 Sol 的干预中，单说正在评测几乎不改变成绩；明确正确目标则从约 63% 升至 91.6%，给出相反目标则降至 17.6%，说明模型如何理解评测目标会显著影响行为。</p>
+<p><strong>证据范围</strong>　成功定义为遇到相关警告后不作被禁止的绕过尝试，并非一般任务完成率。部署案例通过分类、审查和匹配筛选，环境与案例构成仍不完全相同；样本仅 6 个模型和一种代表性评测，CoT 中表达的评测猜测也不能完整代表内部信念，不能据此断言所有安全评测都低估部署表现。</p>
+<p><a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">实验室官方来源</a></p></article></div></section>
 </main></body></html>

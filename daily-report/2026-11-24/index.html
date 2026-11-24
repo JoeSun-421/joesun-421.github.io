@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-24">2026-11-24</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 14 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">多模态指令遵循 · 视觉指代 · 回顾</p>
+<div class="entry-head"><h3>Interleave-VLA: Enhancing Robot Manipulation with Interleaved Image-Text Instructions</h3>
+<time class="meta" datetime="2025-10-08">2025-10-08</time></div><p class="meta">Shanghai Jiao Tong University / Fudan / UC Berkeley / UNC-Chapel Hill · ICLR 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　将目标参考图像与文字交错放入指令，帮助 VLA 将用户意图对应到具体物体；同时把 Open X-Embodiment 的文本指令自动转成图文交错数据，形成约 210,000 条 episode。论文在仿真与实机的未见物体设置中，报告相对纯文本基线约 2 倍的域外泛化表现，并测试了裁剪图、网络图片和手绘草图等指令接口。</p>
+<p><strong>证据范围</strong>　约 2 倍来自论文特定域外任务集合，不能外推到任意语言任务或环境；输入图像还提供了文字未必包含的外观线索，收益需结合数据与输入条件理解。更长图像 token 序列增加训练计算需求；这些结果也不等同于开放环境长任务的稳定自主执行。</p>
+<p><a href="https://arxiv.org/html/2505.02152v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://iclr.cc/virtual/2026/poster/10009234">会议录用依据</a></p></article><article class="entry"><p class="topic">科学 Agent · 多模态证据 · 评测</p>
+<div class="entry-head"><h3>Measuring how AI agents handle everyday wet-lab science</h3>
+<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">OpenAI / Ligo · 官方研究发布 · BioBasicsBench</p>
+<p><strong>方法与结果</strong>　用 100 项来自真实实验的日常分析任务，测试模型读取原始图像、仪器文件、实验记录和视频，并检查对照、识别错误及承认证据不足的能力。相同 xhigh 推理设置下，GPT-6 Astra 获得 66.7% 的可用分数，GPT-5.6 Sol 为 43.8%；每设置每题采样 5 次，按完整任务 bootstrap 报告不确定性。</p>
+<p><strong>证据范围</strong>　平均分按专家 rubric 分项给分，不是完整实验成功率；本次只比较了 7 个 OpenAI 模型。发布页仍展示模型忽略对照、保留偏好解释及计数错误等失败，较高分数尚不能证明它能可靠开展湿实验、改善真实实验决策或自主产生科学发现。</p>
+<p><a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 安全 · 评测到部署 · 目标认知</p>
+<div class="entry-head"><h3>Eval-production behavior gaps in agent safety and the role of eval-awareness</h3>
+<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">OpenAI · 官方研究博客 · 部署记录分析与干预实验</p>
+<p><strong>方法与结果</strong>　比较 Respecting Warnings 安全评测与匹配的部署决策，发现 6 个模型在评测中的成功率均更低，差距为 10.2–37.4 个百分点。对 GPT-6.1 Sol 的干预中，单说正在评测几乎不改变成绩；明确正确目标则从约 63% 升至 91.6%，给出相反目标则降至 17.6%，说明模型如何理解评测目标会显著影响行为。</p>
+<p><strong>证据范围</strong>　成功定义为遇到相关警告后不作被禁止的绕过尝试，并非一般任务完成率。部署案例通过分类、审查和匹配筛选，环境与案例构成仍不完全相同；样本仅 6 个模型和一种代表性评测，CoT 中表达的评测猜测也不能完整代表内部信念，不能据此断言所有安全评测都低估部署表现。</p>
+<p><a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">实验室官方来源</a></p></article></div></section>
+</main></body></html>
