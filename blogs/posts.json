@@ -1,10 +1,10 @@
 [
   {
     "slug": "dynamic-reasoning-robot-use",
-    "title": "动态推理：让模型学会何时思考",
-    "date": "2026-11-24",
+    "title": "Adaptive Reasoning: From Computer Use to Robot Use",
+    "date": "2026-11-25",
     "published": "2026-11-25",
     "updated": "2026-11-25",
-    "summary": "按 Thinkless、AdaCoT、TON、DEER、DyCon 分别解读动态推理的控制与 RL 训练，结合原论文插图讨论 robot-use agent 迁移。"
+    "summary": "精选五篇 2026 工作，讲清动态推理的控制机制与 RL recipe，并讨论从 computer-use 到 robot-use 的迁移。"
   }
 ]

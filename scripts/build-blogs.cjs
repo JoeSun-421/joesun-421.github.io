@@ -75,11 +75,11 @@ for (const post of posts) {
   const source = fs.readFileSync(path.join(dir, "source.md"), "utf8");
   const compiled = compileMarkdown(source);
   const canonical = site + "/blogs/" + post.slug + "/";
-  const toc = '<details class="toc"><summary>文章目录</summary><ol>' +
+  const toc = '<details class="toc"><summary>Contents</summary><ol>' +
     compiled.headings.map(h => '<li><a href="#' + h.id + '">' + escape(h.label) + "</a></li>").join("") +
     "</ol></details>";
   const body = [
-    '<main><header class="post-header"><div class="eyebrow">Research notes · Dynamic reasoning</div>',
+    '<main><header class="post-header"><div class="eyebrow">Research notes · Adaptive reasoning</div>',
     "<h1>" + escape(post.title) + "</h1>",
     '<div class="post-meta"><time datetime="' + post.date + '">' + post.date + "</time>",
     "<span>Zhaoyuan Sun</span>",

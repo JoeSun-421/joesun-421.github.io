@@ -1,0 +1,249 @@
+[
+  {
+    "asset": "rpo-overview.png",
+    "source_pdf": "RPO_ACL2026_816.pdf",
+    "page": 1,
+    "figure": 1,
+    "crop_points": [
+      305,
+      222,
+      526,
+      454
+    ],
+    "sha256": "f9898f8fc1cb4b00d08e2ed3be05dd6181dee59f1958abeb40967ebe20fec400",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking",
+    "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
+    "version": "ACL 2026 proceedings",
+    "url": "https://aclanthology.org/2026.acl-long.816.pdf",
+    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary"
+  },
+  {
+    "asset": "rpo-recipe.png",
+    "source_pdf": "RPO_ACL2026_816.pdf",
+    "page": 2,
+    "figure": 2,
+    "crop_points": [
+      70,
+      72,
+      526,
+      216
+    ],
+    "sha256": "a9c9340c0e380a59790b93148564c9e5f6a2d764e5025c15fea466e4682ac08d",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking",
+    "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
+    "version": "ACL 2026 proceedings",
+    "url": "https://aclanthology.org/2026.acl-long.816.pdf",
+    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary"
+  },
+  {
+    "asset": "more-overview.png",
+    "source_pdf": "MORE_2610.33684v2.pdf",
+    "page": 3,
+    "figure": 2,
+    "crop_points": [
+      108,
+      83,
+      504,
+      269
+    ],
+    "sha256": "7f6b8432b47cc1d20f5f5c35669c3f7815761ac283a002fb1f9d276eaebfc66c",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "MORE: Mode-Optimized Reasoning with Self-Adaptive Effort for Self-Evolving Agents",
+    "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
+    "version": "2610.33684v2",
+    "url": "https://arxiv.org/pdf/2610.33684v2",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "more-training.png",
+    "source_pdf": "MORE_2610.33684v2.pdf",
+    "page": 8,
+    "figure": 5,
+    "crop_points": [
+      108,
+      81,
+      504,
+      213
+    ],
+    "sha256": "47a875da0d2ead8b0e4f186499959ec3d6c9cbd597125ac1c89973152cee6a15",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "MORE: Mode-Optimized Reasoning with Self-Adaptive Effort for Self-Evolving Agents",
+    "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
+    "version": "2610.33684v2",
+    "url": "https://arxiv.org/pdf/2610.33684v2",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "tab-overview.png",
+    "source_pdf": "TAB_2604.05164v4.pdf",
+    "page": 1,
+    "figure": 1,
+    "crop_points": [
+      108,
+      521,
+      506,
+      684
+    ],
+    "sha256": "e3cb6db43b5a624825b45d1a5a1c33dcbfd8fc5f7e8092b9423e931b1f8cfaa9",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
+    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
+    "version": "2604.05164v4",
+    "url": "https://arxiv.org/pdf/2604.05164v4",
+    "license": "CC BY-NC-ND 4.0"
+  },
+  {
+    "asset": "tab-transfer.png",
+    "source_pdf": "TAB_2604.05164v4.pdf",
+    "page": 9,
+    "figure": 5,
+    "crop_points": [
+      108,
+      79,
+      506,
+      203
+    ],
+    "sha256": "be691a85669eecd749b619ddff2c262a4e654a787937a182b3d60bd2512f6ea7",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
+    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
+    "version": "2604.05164v4",
+    "url": "https://arxiv.org/pdf/2604.05164v4",
+    "license": "CC BY-NC-ND 4.0"
+  },
+  {
+    "asset": "tab-latency.png",
+    "source_pdf": "TAB_2604.05164v4.pdf",
+    "page": 9,
+    "figure": 6,
+    "crop_points": [
+      108,
+      254,
+      506,
+      381
+    ],
+    "sha256": "f7e9ee2a8ee13ab87483e965f64aaf44625d2c3d25738872efb34e63e315df7f",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
+    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
+    "version": "2604.05164v4",
+    "url": "https://arxiv.org/pdf/2604.05164v4",
+    "license": "CC BY-NC-ND 4.0"
+  },
+  {
+    "asset": "race-logic.png",
+    "source_pdf": "RACE_2610.12061v1.pdf",
+    "page": 5,
+    "figure": 2,
+    "crop_points": [
+      108,
+      80,
+      504,
+      246
+    ],
+    "sha256": "e4fbbca970eb16b9a1df8e38ac8bf6c76911e63dc484bd0ec594dd0d170fe874",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
+    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
+    "version": "2610.12061v1",
+    "url": "https://arxiv.org/pdf/2610.12061v1",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+  },
+  {
+    "asset": "race-training.png",
+    "source_pdf": "RACE_2610.12061v1.pdf",
+    "page": 6,
+    "figure": 3,
+    "crop_points": [
+      108,
+      78,
+      504,
+      203
+    ],
+    "sha256": "136828a37ae11d375b393b8b94df3aa881ac12f3861f04712b487fbfa6b8925a",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
+    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
+    "version": "2610.12061v1",
+    "url": "https://arxiv.org/pdf/2610.12061v1",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+  },
+  {
+    "asset": "race-ablation.png",
+    "source_pdf": "RACE_2610.12061v1.pdf",
+    "page": 8,
+    "figure": 4,
+    "crop_points": [
+      108,
+      223,
+      504,
+      364
+    ],
+    "sha256": "c77c77769ad12ef14860760dd2ffc70df8b90a8d5ee7a04c12a5ba6de14aba1f",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
+    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
+    "version": "2610.12061v1",
+    "url": "https://arxiv.org/pdf/2610.12061v1",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+  },
+  {
+    "asset": "stepwise-overview.png",
+    "source_pdf": "STEPWISE_2604.27151v1.pdf",
+    "page": 1,
+    "figure": 1,
+    "crop_points": [
+      70.9,
+      480.9,
+      524.4,
+      645.4
+    ],
+    "sha256": "4fef8f3a5fa797e6cbc576b716b352d3d483d800039ee5c2f018e866fa13e530",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Step-level Optimization for Efficient Computer-use Agents",
+    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
+    "version": "2604.27151v1",
+    "url": "https://arxiv.org/pdf/2604.27151v1",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "stepwise-failures.png",
+    "source_pdf": "STEPWISE_2604.27151v1.pdf",
+    "page": 3,
+    "figure": 2,
+    "crop_points": [
+      70,
+      67,
+      526,
+      232
+    ],
+    "sha256": "be4db6d82a779c9c042788da5b614ece97dd0e5ebacd561d9147854048c0170c",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Step-level Optimization for Efficient Computer-use Agents",
+    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
+    "version": "2604.27151v1",
+    "url": "https://arxiv.org/pdf/2604.27151v1",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "stepwise-ablation.png",
+    "source_pdf": "STEPWISE_2604.27151v1.pdf",
+    "page": 7,
+    "figure": 3,
+    "crop_points": [
+      97,
+      389,
+      512,
+      540
+    ],
+    "sha256": "be6131a4c2b101461df0215eaa6e81e715bd022560f380fe9f1aaca8b1c23bf4",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Step-level Optimization for Efficient Computer-use Agents",
+    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
+    "version": "2604.27151v1",
+    "url": "https://arxiv.org/pdf/2604.27151v1",
+    "license": "CC BY 4.0"
+  }
+]
