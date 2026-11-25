@@ -458,5 +458,102 @@
     "active_in_blog": true,
     "modification": "Original PDF figure region; no annotation or overlay.",
     "license": "CC BY 4.0"
+  },
+  {
+    "source_pdf": "TAB_2604.05164v4.pdf",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
+    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
+    "version": "2604.05164v4",
+    "url": "https://arxiv.org/pdf/2604.05164v4",
+    "license": "CC BY-NC-ND 4.0",
+    "active_in_blog": true,
+    "asset": "tab-allocation.png",
+    "page": 8,
+    "figure": 4,
+    "crop_points": [
+      108,
+      78,
+      506,
+      264
+    ],
+    "sha256": "4d205128ee9c7179d4fb47772b6e8416e6a38898c93a0efa2a2efebf06d3a11c"
+  },
+  {
+    "source_pdf": "PUMA_2605.17672v1.pdf",
+    "version": "2605.17672v1",
+    "url": "https://arxiv.org/pdf/2605.17672v1",
+    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "asset": "puma-readiness.png",
+    "page": 2,
+    "figure": 1,
+    "crop_points": [
+      108,
+      70,
+      505,
+      243
+    ],
+    "sha256": "7916b61e3b041a8702fd76ea9e8cfb5102a8df90e8b934c7b628b7877297977c"
+  },
+  {
+    "source_pdf": "PUMA_2605.17672v1.pdf",
+    "version": "2605.17672v1",
+    "url": "https://arxiv.org/pdf/2605.17672v1",
+    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "asset": "puma-exit-behavior.png",
+    "page": 8,
+    "figure": 4,
+    "crop_points": [
+      108,
+      237,
+      506,
+      362
+    ],
+    "sha256": "15e50fdcb9ab4527595c58f8454a2e64ae6229fe1064278023082e8f8622ec33"
+  },
+  {
+    "source_pdf": "RACE_2610.12061v1.pdf",
+    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
+    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
+    "version": "2610.12061v1",
+    "url": "https://arxiv.org/pdf/2610.12061v1",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "active_in_blog": true,
+    "asset": "race-support.png",
+    "page": 2,
+    "figure": 1,
+    "crop_points": [
+      108,
+      82,
+      504,
+      265
+    ],
+    "sha256": "ce883c482ff15a8d79b47530a7b46bb8176817c7478db8582c8edec42cbdab16"
+  },
+  {
+    "source_pdf": "SpecAgent_2610.21463v1.pdf",
+    "version": "2610.21463v1",
+    "url": "https://arxiv.org/pdf/2610.21463v1",
+    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "CC BY 4.0",
+    "asset": "specagent-ablation.png",
+    "page": 11,
+    "figure": 4,
+    "crop_points": [
+      62,
+      78,
+      534,
+      198
+    ],
+    "sha256": "51b07e3ef5c41c7d80a761146d981580c541bc6e7dc6a5e9709951e2c6cc5d36"
   }
 ]

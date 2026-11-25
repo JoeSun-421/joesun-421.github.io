@@ -41,9 +41,8 @@ h1 { margin: 22px 0 28px; max-width: 960px; font: 400 clamp(34px, 5.4vw, 59px)/1
 .prose h3 { margin-block: 36px 18px; font: 500 21px/1.4 var(--sans); letter-spacing: -.012em; }
 .prose h2, .prose h3 { scroll-margin-top: 28px; }
 .prose strong { font-weight: 650; }
-.prose > p:has(> img) { max-width: none; margin-block: 34px 38px; }
-.prose img { display: block; max-width: 100%; height: auto; margin-inline: auto; background: white; }
-.prose img[alt="RPO training overview"] { max-width: min(450px, 100%); }
+.prose > p:has(> img) { width: 100%; max-width: var(--measure); margin: 28px auto 32px; }
+.prose img { display: block; width: 100%; max-width: 100%; height: auto; margin-inline: auto; background: white; }
 .prose ul, .prose ol { padding-left: 25px; }
 .prose li { margin-block: 12px; }
 .prose blockquote { padding-block: 4px; font-size: 19px; }
@@ -71,7 +70,6 @@ h1 { margin: 22px 0 28px; max-width: 960px; font: 400 clamp(34px, 5.4vw, 59px)/1
   .post-meta { gap: 6px 16px; font-size: 11px; }
   .prose h2 { font-size: 29px; margin-top: 58px; }
   .prose h3 { font-size: 20px; }
-  .prose > p:has(> img) { margin-inline: -8px; }
   .katex { font-size: .91em; }
   .prose blockquote { font-size: 17px; margin-left: 0; margin-right: 0; }
 }
