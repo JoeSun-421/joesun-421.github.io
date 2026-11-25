@@ -86,18 +86,26 @@
     "figure": 1,
     "crop_points": [
       108,
-      521,
+      500,
       506,
       684
     ],
-    "sha256": "e3cb6db43b5a624825b45d1a5a1c33dcbfd8fc5f7e8092b9423e931b1f8cfaa9",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "2cdcff3776150895398ee9b60aa1c25b0488ad13e1497ad7391244ec8db831d5",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      11,
+      52,
+      1577,
+      700
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "tab-transfer.png",
@@ -110,14 +118,22 @@
       506,
       203
     ],
-    "sha256": "be691a85669eecd749b619ddff2c262a4e654a787937a182b3d60bd2512f6ea7",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "dd757fc863f9cce77ee34c472c78dfce37bbfea9adf0db6d52c08c4536bb91f5",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      40,
+      18,
+      1533,
+      482
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "tab-latency.png",
@@ -130,14 +146,22 @@
       506,
       381
     ],
-    "sha256": "f7e9ee2a8ee13ab87483e965f64aaf44625d2c3d25738872efb34e63e315df7f",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "d30b7b8c2eac80be776daece9b4d22f3328be93daedc1f99b0d7026445e0fba7",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      40,
+      22,
+      1534,
+      498
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "race-logic.png",
@@ -150,14 +174,22 @@
       504,
       246
     ],
-    "sha256": "e4fbbca970eb16b9a1df8e38ac8bf6c76911e63dc484bd0ec594dd0d170fe874",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "694fa53ef0978d10f52ecf9cad7224605175f2858b63f488f1171ba67ff2e187",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
     "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      14,
+      11,
+      1558,
+      622
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "race-training.png",
@@ -170,14 +202,22 @@
       504,
       203
     ],
-    "sha256": "136828a37ae11d375b393b8b94df3aa881ac12f3861f04712b487fbfa6b8925a",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "8f5aed41761793556cdd0b2dad72819969a4c2f23ea669ef98c35fbfec040773",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
     "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      18,
+      25,
+      1553,
+      455
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "race-ablation.png",
@@ -190,14 +230,22 @@
       504,
       364
     ],
-    "sha256": "c77c77769ad12ef14860760dd2ffc70df8b90a8d5ee7a04c12a5ba6de14aba1f",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "33f2e61b5543932ae635d416f8bbe16d2c1c8d24af56f46e40720cfb890e73b4",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
     "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      16,
+      16,
+      1561,
+      523
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "stepwise-overview.png",
@@ -210,14 +258,22 @@
       524.4,
       645.4
     ],
-    "sha256": "4fef8f3a5fa797e6cbc576b716b352d3d483d800039ee5c2f018e866fa13e530",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "40b3fa4a5d2a27d741585ec817cff699b2ed038cff825de36bd840c042f59704",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Step-level Optimization for Efficient Computer-use Agents",
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
     "license": "CC BY 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      17,
+      36,
+      1784,
+      638
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "stepwise-failures.png",
@@ -230,14 +286,22 @@
       526,
       232
     ],
-    "sha256": "be4db6d82a779c9c042788da5b614ece97dd0e5ebacd561d9147854048c0170c",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "d6ec9472770b3c4e0f017301e68a79386940f37efb3e04350bc02905afee25cf",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Step-level Optimization for Efficient Computer-use Agents",
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
     "license": "CC BY 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      38,
+      5,
+      1792,
+      631
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "stepwise-ablation.png",
@@ -245,19 +309,27 @@
     "page": 7,
     "figure": 3,
     "crop_points": [
-      97,
-      389,
-      512,
+      94,
+      373,
+      517,
       540
     ],
-    "sha256": "be6131a4c2b101461df0215eaa6e81e715bd022560f380fe9f1aaca8b1c23bf4",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "sha256": "c35555dc603db1030e2b09514877f100300a05bdece0d02665f9d6acf799c081",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Step-level Optimization for Efficient Computer-use Agents",
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
     "license": "CC BY 4.0",
-    "active_in_blog": true
+    "active_in_blog": true,
+    "render_scale": 4,
+    "trim_pixels": [
+      26,
+      54,
+      1606,
+      665
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "sar-results.png",
@@ -378,10 +450,18 @@
     "version": "2605.17672v1",
     "url": "https://arxiv.org/pdf/2605.17672v1",
     "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "sha256": "546b4766724ba49a1f7e6624b4f38371904cf2443167e3de470a2bff5f9261ce",
+    "sha256": "a2acbcc51fe25ef4865e088ad8b3222243405951e60fc08bccbe98ac83bb40f6",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "render_scale": 4,
+    "trim_pixels": [
+      42,
+      25,
+      1542,
+      832
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "puma-latency.png",
@@ -397,10 +477,18 @@
     "version": "2605.17672v1",
     "url": "https://arxiv.org/pdf/2605.17672v1",
     "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "sha256": "d011494a9f66ed5ffd26bb93061cde330d8271c20d424ee3983cf877821e294e",
+    "sha256": "2c32a87a5319d473c6f2763ef1f8e7f0394b519960ab9fcda1e42ff7028ff6bf",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "render_scale": 4,
+    "trim_pixels": [
+      24,
+      8,
+      1560,
+      609
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "specagent-protocol.png",
@@ -416,10 +504,18 @@
     "version": "2610.21463v1",
     "url": "https://arxiv.org/pdf/2610.21463v1",
     "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "453fec815f178a9b616feb1d0755291a29893b5fd50eb3d2fe31ec8a38038074",
+    "sha256": "fb6c90658776b7d416afb42bbc714422aa72314be7d73ad129883a5269dcfae7",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
-    "license": "CC BY 4.0"
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "license": "CC BY 4.0",
+    "render_scale": 4,
+    "trim_pixels": [
+      21,
+      18,
+      1864,
+      836
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "specagent-frontier.png",
@@ -428,17 +524,25 @@
     "figure": 2,
     "crop_points": [
       62,
-      87,
+      72,
       534,
       271
     ],
     "version": "2610.21463v1",
     "url": "https://arxiv.org/pdf/2610.21463v1",
     "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "f4b86ef3af682da47ea194b1244a9da40676e6df63ce6660efa52240fa1d0ccf",
+    "sha256": "60bea29280491ba0b3a55ce233025a15c8f00315277eddd4f6fdf657328d03ef",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
-    "license": "CC BY 4.0"
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "license": "CC BY 4.0",
+    "render_scale": 4,
+    "trim_pixels": [
+      230,
+      56,
+      1642,
+      763
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "specagent-cost.png",
@@ -446,22 +550,30 @@
     "page": 10,
     "figure": 3,
     "crop_points": [
-      62,
-      88,
-      534,
+      60,
+      74,
+      536,
       240
     ],
     "version": "2610.21463v1",
     "url": "https://arxiv.org/pdf/2610.21463v1",
     "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "805625fba275170bba9c912f83814ef40b3317746ef3877c34e70a143a089624",
+    "sha256": "2e50258aaddec25de8dbdacdca381fd49afdf14eefc66014ff4072970ac1f8c0",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
-    "license": "CC BY 4.0"
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "license": "CC BY 4.0",
+    "render_scale": 4,
+    "trim_pixels": [
+      15,
+      49,
+      1888,
+      629
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "source_pdf": "TAB_2604.05164v4.pdf",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
@@ -477,7 +589,15 @@
       506,
       264
     ],
-    "sha256": "4d205128ee9c7179d4fb47772b6e8416e6a38898c93a0efa2a2efebf06d3a11c"
+    "sha256": "3aaccefb629a6055a21a51e65fd0cde1d0bf62999072cc216ad0108ad9560540",
+    "render_scale": 4,
+    "trim_pixels": [
+      5,
+      21,
+      1580,
+      721
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "source_pdf": "PUMA_2605.17672v1.pdf",
@@ -485,18 +605,26 @@
     "url": "https://arxiv.org/pdf/2605.17672v1",
     "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
     "asset": "puma-readiness.png",
     "page": 2,
     "figure": 1,
     "crop_points": [
       108,
-      70,
+      64,
       505,
       243
     ],
-    "sha256": "7916b61e3b041a8702fd76ea9e8cfb5102a8df90e8b934c7b628b7877297977c"
+    "sha256": "9190c5afb135837a766ac762508d0c70daef19b716fe9b495121948762877577",
+    "render_scale": 4,
+    "trim_pixels": [
+      49,
+      25,
+      1535,
+      694
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "source_pdf": "PUMA_2605.17672v1.pdf",
@@ -504,7 +632,7 @@
     "url": "https://arxiv.org/pdf/2605.17672v1",
     "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
     "asset": "puma-exit-behavior.png",
     "page": 8,
@@ -515,11 +643,19 @@
       506,
       362
     ],
-    "sha256": "15e50fdcb9ab4527595c58f8454a2e64ae6229fe1064278023082e8f8622ec33"
+    "sha256": "a383c34d7fce8a4b1d487e01876bd64804a0448e558aa30e3bf569cd687f64f8",
+    "render_scale": 4,
+    "trim_pixels": [
+      43,
+      12,
+      1539,
+      482
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "source_pdf": "RACE_2610.12061v1.pdf",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
@@ -535,7 +671,15 @@
       504,
       265
     ],
-    "sha256": "ce883c482ff15a8d79b47530a7b46bb8176817c7478db8582c8edec42cbdab16"
+    "sha256": "52b3d95213c68bee218f0d7c7e709a708aaca85ea02dfb8ab83b25fe66b9a008",
+    "render_scale": 4,
+    "trim_pixels": [
+      24,
+      4,
+      1560,
+      690
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "source_pdf": "SpecAgent_2610.21463v1.pdf",
@@ -543,7 +687,7 @@
     "url": "https://arxiv.org/pdf/2610.21463v1",
     "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
     "active_in_blog": true,
-    "modification": "Original PDF figure region; no annotation or overlay.",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "license": "CC BY 4.0",
     "asset": "specagent-ablation.png",
     "page": 11,
@@ -554,6 +698,14 @@
       534,
       198
     ],
-    "sha256": "51b07e3ef5c41c7d80a761146d981580c541bc6e7dc6a5e9709951e2c6cc5d36"
+    "sha256": "7bdb8c608d0def7348d1ce983bf788e206180538a5baa016407e40bc3b455de7",
+    "render_scale": 4,
+    "trim_pixels": [
+      6,
+      32,
+      1880,
+      461
+    ],
+    "outer_padding_pixels": 24
   }
 ]

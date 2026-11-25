@@ -10,7 +10,7 @@ slug: dynamic-reasoning-robot-use
 
 ## Why Robot Use Needs Adaptive Reasoning
 
-考虑一个闭环：模型读取相机画面与机器人状态，生成末端位姿 JSON，控制器执行，再把实际结果送回模型。夹爪顺利接近杯子时，下一步可能只需沿用计划；抓取落空、杯子被碰动时，模型需要重新判断位置、接触状态与后续动作。
+在直接输出末端位姿的 robot-use 闭环中，模型读取图像与机器人状态，生成动作 JSON，控制器执行后返回新观察。抓取失败和物体位移会改变后续决策所需的信息。
 
 推理调度的目标是根据执行状态分配计算，同时保持完整任务的成功率。
 
@@ -30,7 +30,7 @@ TAB、PUMA、RACE 减少重复或过量推理；STEPWISE、SpecAgent 调整大�
 
 ### Problem
 
-多轮任务的预算存在前后依赖：前面少花一点，可能节省计算，也可能因为漏掉约束导致后面反复补救。每轮独立估计难度，无法充分评价这种影响。
+多轮任务中，一轮预算会影响回答质量，也会影响后续交互。TAB 将这些依赖建模为序贯决策，用整条轨迹的终局结果评价预算分配。
 
 TAB 将整条交互视为预算分配问题，优化**完成任务与总预算之间的折中**。
 
@@ -50,7 +50,7 @@ $$
 
 $t$ 是交互轮次；$h_t$ 包括当前输入与之前的交互；$\phi$ 是预算策略参数，$\theta$ 是 Solver 参数。RL 更新 Budgeter，Solver 提供预算动作后的反馈。
 
-原文只在便宜的多轮数学任务上训练 Budgeter，随后不再微调，迁移到 BFCL、Tau-Bench、Terminal-Bench。预算策略在这些环境上保持冻结。
+训练数据来自 MATH 训练集的 Level-5 问题。Planner 先分解问题，Budgeter 逐轮选择档位，固定的 Solver 在对应预算下生成回答。训练只更新 Budgeter。完成训练后，同一预算策略直接用于 BFCL、Tau-Bench 和 Terminal-Bench。
 
 训练用 GRPO：
 
@@ -75,7 +75,9 @@ $$
 
 $\mathcal G(x)$ 是同一道题的完整轨迹组。**同一条轨迹的各轮共享这个优势**；它学习哪些整体分配方案更好，尚未给每一轮提供独立的因果贡献估计。
 
-训练配置为 Qwen3-4B Budgeter、LoRA rank 64、125 个更新；每个全局目标预算分别训练一个策略。下图展示数学任务中的预算分布：预算收紧时，策略增加较小预算的使用比例。
+Qwen3-4B Budgeter 使用 LoRA rank 64、学习率 $10^{-5}$，训练 125 个更新。全局预算 $B\in\{3k,5k,8k,10k\}$ 各自对应一个独立策略。模型输出 0–4 五个档位，映射到 Solver 的 256–4096 token 预算。
+
+数学任务中的预算分布如下；全局预算收紧时，小预算档位的使用比例上升。
 
 ![TAB learned allocation under different budgets](assets/efficient_agents_2026/tab-allocation.png)
 
@@ -85,19 +87,12 @@ $\mathcal G(x)$ 是同一道题的完整轨迹组。**同一条轨迹的各轮�
 
 迁移实验最多节省约 20% token 与 15% 延迟，计时包含 Budgeter 开销。两张图分别给出准确率与总 token、准确率与端到端延迟的关系。
 
-### Transfer to Robot Use
-
-在 robot-use 中，预算策略可以读取当前图像、执行历史与动作反馈，选择下一轮推理强度。
-
-TAB 的跨域实验主要使用文本交互状态。迁移到机器人需要处理图像、接触与物体位移，并检验预算档位对控臂模型的作用。
-
-Budgeter 本身还会增加延迟。对小型控臂模型，额外跑一次 4B Budgeter 可能不划算。实验应固定动作底座，对照轻量选择器与固定预算，统计整项任务耗时。
 
 ## Early Exit — PUMA
 
 ### Problem
 
-模型可能很早就给出一个稳定答案，但后面的推理仍在发现约束或修正漏洞。只看答案置信度，会把“已经有答案”和“已经完成必要推理”混在一起。
+PUMA 观察到，高置信度和重复出现的答案可以早于推理收敛。模型此时仍在探索或自我修正，直接截断会损失后续推理。
 
 原文用示意图区分答案就绪与推理收敛：置信度和答案一致性可能较早变高，步骤语义相似度则在重复验证阶段持续升高。
 
@@ -109,7 +104,17 @@ PUMA 据此用语义冗余定位候选退出点，再核验答案，截去收敛
 
 ![PUMA redundancy detection and verified early exit](assets/efficient_agents_2026/puma-framework.png)
 
-主方法在推理时运行，底座模型保持冻结。训练对象是一个从 Qwen3-Embedding-0.6B 初始化的冗余检测器：用对比学习区分“语义接近但有新进展”和“重复已有结论”的推理步骤，避免直接把通用 embedding 相似度当作逻辑冗余。
+#### Redundancy Detector Training
+
+PUMA 的主推理模型保持冻结，另行训练 Qwen3-Embedding-0.6B 冗余检测器。Appendix B.2 的数据与训练流程为：
+
+1. 从四个长推理模型收集 AMC23、GSM8K 推理轨迹，并加入 Open-Thoughts-114K，覆盖约 5,098 道不同问题。
+2. 切分推理步骤，用 GPT-5-mini 标注当前步骤相对前文是否带来新信息，得到 40,844 条种子样例。
+3. 用 GPT-4o-mini 将新颖步骤改写为语义冗余版本，扩充重复、重述和无进展验证等模式。
+4. 整理为 anchor、冗余正样本、新颖负样本，去重后得到 701,641 条对比训练数据。
+5. 用 InfoNCE 训练检测器：LoRA rank 32、学习率 $10^{-4}$、5 epochs。冗余步骤被拉近，有新进展的步骤被拉远。
+
+#### Inference-Time Exit
 
 在线流程是：
 
@@ -136,13 +141,15 @@ $s_t$ 超过相似度阈值时，只产生候选退出点。原文默认 $k=1$�
 
 退出行为进一步分为核验通过、Loop Breaker 和完整生成。上图同时比较各分组的答案正确性，检查早停是否打断自我修正。
 
-原文随后比较三种训练方式：
+#### Model Internalization
 
-- PUMA-SFT 训练正确的截断推理与答案。
-- PUMA-DPO 在长短回答都正确时，偏好 PUMA 截断版本。
-- **PUMA-RL 提供已经截断并闭合思考的前缀，让模型只生成答案阶段。**
+§6.2 与 Appendix F 使用 12K 道数学训练题，让底座生成完整 CoT，再运行 PUMA 记录候选退出点与通过核验的停止点。随后分别构造：
 
-RL 的四条同前缀采样使用：
+- **SFT：** 保留提前退出后仍正确、且前缀长度低于完整 CoT 的 60% 的样例，约 6.5K 条；训练目标是截断推理与答案。
+- **DPO：** 长短版本都正确时，以 PUMA 截断链为 chosen、完整链为 rejected，约 5.8K 对。
+- **GRPO：** 将问题、候选位置前缀和结束思考标记拼成输入，约 15K 条；每个输入采样 4 个答案 completion。
+
+三种训练均在 DS-R1-Distill-Qwen-7B 上使用 LoRA rank 64。GRPO 的 rollout 从给定前缀后的答案阶段开始，奖励为：
 
 $$
 R_i=c_i\!\left[1+0.5\!\left(1-\frac{\ell_i}{4096}\right)\right]
@@ -151,21 +158,14 @@ $$
 
 $c_i$ 表示答案正确性，$\ell_i$ 是该前缀之后的 completion 长度，$b_i^{\mathrm{rank}}$ 是组内排序奖励，取值为 $\{0.5,0.25,0,-0.25\}$，偏好更短的正确 completion。原文用 GRPO 更新，比较相同 recipe 下的固定位置前缀。
 
-这组实验检验 PUMA 选出的前缀能否改善后续生成。RL 中受奖励的长度是答案阶段的 completion；自主选择退出位置仍需单独验证。
+GRPO 训练最多 1,500 个更新，学习率 $10^{-6}$，completion 上限为 4,096 token。训练后的变体直接用 vLLM 推理，不调用冗余检测器和答案核验模块。训练中的长度项统计给定前缀之后的答案阶段。
 
-### Transfer to Robot Use
-
-在固定当前观察的一轮决策中，可以从部分 CoT 诱导动作，检验推理继续展开时动作是否变化，以及最终执行是否成功。
-
-但两个坐标 JSON 很相似，不代表动作正确；文本推理重复，也可能是反复检查关键接触条件。机器人中的“可停止”最终需要与完整任务成功和异常恢复联系起来。反复试动作与试答的成本也需计入总耗时。
-
-用 PPO 学习自主停止时，需要加入继续／停止决策，并用后续动作的执行结果评价该决策。
 
 ## Cross-Turn Reuse — RACE
 
 ### Problem
 
-前一轮形成的计划可以支持后面几轮动作。逐轮独立删掉看似多余的思考，可能忽略它对后续动作的作用；每次都重新采样动作来验证，又会增加训练成本。
+RACE 研究推理的跨轮支持：一轮思考会持续影响后续动作，删减时需要同时检查这些动作。逐个上下文重新采样动作验证，会增加训练成本。
 
 原文先删除部分思考，检查后续参考动作是否仍能生成，再比较动作恢复率与似然下降的关系。
 
@@ -205,12 +205,20 @@ before、after 分别表示本次删除前后的上下文，后续参考动作�
 
 ![RACE supervised and reinforcement-learning stages](assets/efficient_agents_2026/race-training.png)
 
-这些信号进入两个训练阶段：
+#### Supervised Fine-Tuning
 
-1. **SFT：** 删除通过检查的思考，得到有些轮次直接行动的示范。
-2. **On-policy RL：** 先采样完整任务轨迹，对成功轨迹运行 LoGiC；失败轨迹继续普通 GRPO。
-3. **Reasoning masking：** SKIP 轮次的思考 token 不进入 GRPO 策略梯度，动作 token 仍参与优化。原有 token 数继续用于损失归一化。
-4. **Reasoning closure：** 在 SKIP 轮次的压缩上下文上，监督模型输出结束思考的 token。
+1. 使用 DeepSeek-V4-Pro-0813 标注的成功轨迹。
+2. 由 Qwen3.5-9B 运行 LoGiC，似然下降阈值设为 $0.001$。
+3. 删除通过检查的思考，保留动作和观察，构成 THINK／SKIP 混合轨迹。
+4. 对模型生成的思考与动作 token 计算交叉熵，得到 RACE-SFT checkpoint。
+
+#### Agentic Reinforcement Learning
+
+1. 从 RACE-SFT 初始化，在同一任务上采样多条完整轨迹。每批 16 个任务、每个任务 8 条，共 128 条轨迹。
+2. 计算任务回报和组相对优势。对成功轨迹运行 LoGiC，得到 SKIP 轮次；失败轨迹沿用普通 GRPO。
+3. **Reasoning masking：** SKIP 轮次的思考 token 不进入 GRPO 策略损失，动作 token 继续参与。归一化分母保留原始 token 数。
+4. **Reasoning closure：** 在 SKIP 轮次的压缩上下文上，将结束思考 token 作为监督目标，提高立即结束当前思考段的概率，随后继续生成动作。
+5. 联合计算 masked GRPO 与 closure 损失，更新同一策略模型。
 
 仅仅 mask 会停止强化冗余思考，closure 则提供主动结束它的信号：
 
@@ -227,19 +235,12 @@ $$
 \end{aligned}
 $$
 
-$T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\mathcal S_i$ 是 LoGiC 判为 SKIP 的轮次；$e$ 是思考终止 token，$\widetilde h_{i,t}$ 是对应压缩上下文。任务回报优化成功率，closure 项提供结束思考的监督。
+$T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\mathcal S_i$ 是 LoGiC 判为 SKIP 的轮次；$e$ 是思考终止 token，$\widetilde h_{i,t}$ 是对应压缩上下文。closure 使用目标 token 的交叉熵。其权重在 ScienceWorld、WebShop、AppWorld 中设为 0.02，在 DeepSearch 中设为 0.01。RL 学习率为 $10^{-6}$，每批 rollout 更新 1 epoch。
 
 ![RACE success and reasoning-token ablation](assets/efficient_agents_2026/race-ablation.png)
 
 在相同底座的消融中，RACE 相对普通 SFT＋GRPO 减少约 32%–80% 的推理 token，四个基准上的成功率变化不超过 1.4 个百分点。效率指标是推理 token 数。
 
-### Transfer to Robot Use
-
-在 robot-use 中，已有计划可以支持连续的常规动作；抓取失败或目标移动会改变后续动作所需的信息。可以据此检验哪些轮次需要重新思考。
-
-其似然信号也有物理迁移风险。JSON 数值的 token 概率与抓取质量之间需要校准；不同坐标可能产生等效动作，相似坐标也可能落在不同接触区域。
-
-LoGiC 评估时保留原来的后续观察，因此它提供的是固定轨迹上的支持度代理。删掉思考后重新闭环执行，动作分布和后续状态都可能改变。迁移实验应把似然代理与实际任务结果对照，额外计算也需要计入训练成本。
 
 ## Selective Escalation — STEPWISE
 
@@ -264,36 +265,30 @@ Stuck 超阈值后，下一步交给强策略恢复。Milestone 超阈值后，�
 
 checkpoint 用于选择核验位置。监测器的训练目标是事件分类。
 
-监测器的训练流程为：
+Appendix B 使用 300 条 GUI 执行轨迹训练两个 ModernBERT-base 分类器：
 
-1. 收集小模型执行轨迹，切出局部历史窗口。
-2. 用强 LLM 多次标注 stuck 与 milestone，保留高一致性标签。
-3. 用带类别平衡的交叉熵训练两个分类器。
-4. 在部署时选择阈值，权衡成功率与强模型使用成本。
+1. 每条轨迹由 GPT-5.2 独立标注 5 次，分别识别 stuck 和 milestone。
+2. 至少 3 次标为正例的步骤保留为正例；5 次都未标中的保留为负例；只出现 1–2 次的样例丢弃。
+3. 输入包含当前步骤及最多 5 个前序步骤；milestone 输入额外包含任务描述。
+4. 在 `[CLS]` 表征上接二分类头，用逆类别频率加权的交叉熵训练。
+5. 两个分类器各训练 5 epochs，AdamW 学习率为 $5\times10^{-5}$，最大序列长度为 2,048。
 
-约 300 条 GUI 轨迹用于监督训练两个分类器。轻量监测器逐步读取文本记录，触发 milestone 后的强核验再读取截图。
+运行时，两个监测器读取文本推理与动作记录；只有触发 milestone 后的强核验才读取截图。
 
 ![STEPWISE monitor ablation](assets/efficient_agents_2026/stepwise-ablation.png)
 
 OSWorld 与 WebArena 的消融分别启用 stuck、milestone 和两种监测器，完整配置取得最高成功率。原文还比较固定间隔核验；成本表中的延迟按单次请求统计。
 
-### Transfer to Robot Use
-
-抓取持续失败时触发恢复，抓住物体或放入容器后核验阶段结果，可以分别对应两种事件。
-
-但相同的末端动作重复几次，既可能是卡住，也可能是正常接触操作。只看模型自己的文本描述容易遗漏“它认为抓住了，实际上没有”的情况。机器人监测需要考虑图像、本体状态或实际动作结果。
-
-一种直接的对照是固定动作模型，按可观测异常触发长推理，再与学习式调度比较成功率和耗时。
 
 ## Speculative Verification — SpecAgent
 
 ### Problem
 
-长工具链中，让强模型逐步生成所有动作很慢。直接换成小模型可能损失质量；每步再请强模型重新生成一次，又容易付出两份解码成本。
+长工具链中，强模型逐步生成动作会累积串行解码时间。小模型成本较低，但任务成功率低于强模型。SpecAgent 利用强模型的核验与修复能力保留小模型的有效进展。
 
 SpecAgent 把强模型的主要工作改为**审核小模型已经写出的多步片段**。核验一次读入整段，强模型只需生成短判定与必要修复，因而有机会减少串行解码。
 
-### Method and Training Recipe
+### Execution Protocol
 
 ![SpecAgent draft verify and repair protocol](assets/efficient_agents_2026/specagent-protocol.png)
 
@@ -334,19 +329,14 @@ FLOPs 和 HBM-read 按请求 token 与模型架构估算，耗时实际计量。
 
 ![SpecAgent verification and repair ablation](assets/efficient_agents_2026/specagent-ablation.png)
 
-### Transfer to Robot Use
-
-小模型提案、强模型核验的分工可以用于候选计划。原文能够批量推进，依赖连续的只读操作，以及在修改环境的边界暂停草稿。
-
-机械臂每次移动通常都会改变状态，后续画面需要执行后才能取得，可批量核验的片段可能很短。传感器读取、物体信息检索和仿真规划更适合先测试这类分工。
 
 ## Transfer to Robot Use
 
-五种方法分别控制预算、停止位置、跨轮重复、模型升级与核验方式。迁移到机器人后，需要共同评价完整任务成功率、异常恢复率和任务总耗时；调度、试答、核验、重试都计入成本。
+五种机制分别作用于预算、停止位置、跨轮推理、模型升级和批量核验。迁移到 robot-use 时，输入扩展为图像、本体状态与执行反馈，输出对应实际动作。
 
-一种待验证的训练设置是冻结已有动作模型，用 PPO 训练推理强度选择器与价值头。选择器读取当前图像、历史和执行反馈，决定下一轮采用直接动作、短推理或完整重规划。
+动作置信度、文本冗余和 JSON 一致性需要与物理执行结果共同评价。机械臂动作改变环境，后续观察依赖真实执行；SpecAgent 连续执行只读工具调用的条件因此受到限制。
 
-实验可在同一动作底座上比较固定预算、匹配预算的随机选择、异常触发和学习式选择。正常任务与抓取落空、物体移动等扰动任务分别报告结果，再比较加入执行反馈后的变化。
+采用 PPO 训练调度策略时，需要明确调度动作、可见反馈、任务回报及计算成本。评测统一报告完整任务成功率、异常恢复率和总耗时，并计入调度、核验、重试及失败轨迹的成本。
 
 ## References
 

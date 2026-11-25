@@ -89,3 +89,9 @@ The current article displays 19 original PDF figure regions rendered at 3.5x. Hi
 ## Editorial Revision — Source Narrative and Figure Measure
 
 The user requested less editorial self-narration, source-paper argument order, and figure widths matching the prose. The article now removes curation dates, selection rationale, optimizer-selection commentary, the generic serial-cost equation, and the long proposed PPO tutorial from the main narrative. Concrete method assumptions and empirical limitations remain beside their claims. Five additional original figures bring the active count to 19: TAB allocation, PUMA readiness and exit behavior, RACE support, SpecAgent ablation. Figures use the same 750px desktop measure as body text and the same mobile column, without bleed or stretching of aspect ratio.
+
+## Consolidated Transfer and Source-Recipe Revision
+
+The user requested one final robot-use section, source-faithful training descriptions, improved crops, and fewer hypothetical/editorial statements. All five per-paper transfer sections were removed; the final section contains the interface differences and evaluation requirements. Training descriptions were checked against TAB §3.3/Appendix A, PUMA Appendix B.2/F, RACE §3.2–3.3/Appendix C.2, and STEPWISE Appendix B. SpecAgent remains an execution protocol with frozen models.
+
+All 19 active figures were re-rendered from their unchanged PDFs at 4x. Critical crop bounds were expanded to recover top labels and legends; whitespace was trimmed and a uniform 24-pixel white border added. Provenance records include PDF crop coordinates, trim bounds, rendering scale and final checksums.
