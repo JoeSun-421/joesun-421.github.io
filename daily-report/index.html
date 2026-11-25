@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-24/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-25/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-24">2026-11-24</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 14 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-25">2026-11-25</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">发布动态推理技术综述</a></strong>。完成并发布 Adaptive Reasoning: From Computer Use to Robot Use，比较五种推理预算与执行核验机制，补充原论文图示、公式和机器人迁移的最小实验对照，并核对前三篇的正式会议出处。</li><li><strong><a href="https://github.com/JoeSun-421/personal-skills/tree/main/skills/technical-blog-writing">更新技术博客写作 Skill</a></strong>。完善多论文综述的选材、机制比较、原图使用与证据核查规范，并发布到个人 Skills 仓库，供后续技术写作复用。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:04，本机 Codex 已结束轮次累计运行 1 小时 26 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 2 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">多模态指令遵循 · 视觉指代 · 回顾</p>
-<div class="entry-head"><h3>Interleave-VLA: Enhancing Robot Manipulation with Interleaved Image-Text Instructions</h3>
-<time class="meta" datetime="2025-10-08">2025-10-08</time></div><p class="meta">Shanghai Jiao Tong University / Fudan / UC Berkeley / UNC-Chapel Hill · ICLR 2026 主会论文 · 仿真与实机</p>
-<p><strong>方法与结果</strong>　将目标参考图像与文字交错放入指令，帮助 VLA 将用户意图对应到具体物体；同时把 Open X-Embodiment 的文本指令自动转成图文交错数据，形成约 210,000 条 episode。论文在仿真与实机的未见物体设置中，报告相对纯文本基线约 2 倍的域外泛化表现，并测试了裁剪图、网络图片和手绘草图等指令接口。</p>
-<p><strong>证据范围</strong>　约 2 倍来自论文特定域外任务集合，不能外推到任意语言任务或环境；输入图像还提供了文字未必包含的外观线索，收益需结合数据与输入条件理解。更长图像 token 序列增加训练计算需求；这些结果也不等同于开放环境长任务的稳定自主执行。</p>
-<p><a href="https://arxiv.org/html/2505.02152v2">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://iclr.cc/virtual/2026/poster/10009234">会议录用依据</a></p></article><article class="entry"><p class="topic">科学 Agent · 多模态证据 · 评测</p>
-<div class="entry-head"><h3>Measuring how AI agents handle everyday wet-lab science</h3>
-<time class="meta" datetime="2026-11-06">2026-11-06</time></div><p class="meta">OpenAI / Ligo · 官方研究发布 · BioBasicsBench</p>
-<p><strong>方法与结果</strong>　用 100 项来自真实实验的日常分析任务，测试模型读取原始图像、仪器文件、实验记录和视频，并检查对照、识别错误及承认证据不足的能力。相同 xhigh 推理设置下，GPT-6 Astra 获得 66.7% 的可用分数，GPT-5.6 Sol 为 43.8%；每设置每题采样 5 次，按完整任务 bootstrap 报告不确定性。</p>
-<p><strong>证据范围</strong>　平均分按专家 rubric 分项给分，不是完整实验成功率；本次只比较了 7 个 OpenAI 模型。发布页仍展示模型忽略对照、保留偏好解释及计数错误等失败，较高分数尚不能证明它能可靠开展湿实验、改善真实实验决策或自主产生科学发现。</p>
-<p><a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science/">实验室官方来源</a></p></article><article class="entry"><p class="topic">Agent 安全 · 评测到部署 · 目标认知</p>
-<div class="entry-head"><h3>Eval-production behavior gaps in agent safety and the role of eval-awareness</h3>
-<time class="meta" datetime="2026-11-03">2026-11-03</time></div><p class="meta">OpenAI · 官方研究博客 · 部署记录分析与干预实验</p>
-<p><strong>方法与结果</strong>　比较 Respecting Warnings 安全评测与匹配的部署决策，发现 6 个模型在评测中的成功率均更低，差距为 10.2–37.4 个百分点。对 GPT-6.1 Sol 的干预中，单说正在评测几乎不改变成绩；明确正确目标则从约 63% 升至 91.6%，给出相反目标则降至 17.6%，说明模型如何理解评测目标会显著影响行为。</p>
-<p><strong>证据范围</strong>　成功定义为遇到相关警告后不作被禁止的绕过尝试，并非一般任务完成率。部署案例通过分类、审查和匹配筛选，环境与案例构成仍不完全相同；样本仅 6 个模型和一种代表性评测，CoT 中表达的评测猜测也不能完整代表内部信念，不能据此断言所有安全评测都低估部署表现。</p>
-<p><a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/safety-alignment/eval-production-behavior-gap/">实验室官方来源</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">AI agents / 形式化验证</p>
+<div class="entry-head"><h3>Finding faster quantum algorithms with agents and formal verification</h3>
+<time class="meta" datetime="2026-11-23">2026-11-23</time></div><p class="meta">Google DeepMind / Google Quantum AI · 官方研究博客 · 算法搜索与形式化证明</p>
+<p><strong>方法与结果</strong>　多个 Gemini agent 团队独立搜索量子算法改进，候选经 Lean 验证后写入共享记录，并定期交流。聚变模拟案例的量子资源成本估算降低 11.8 倍，所需纠错量子比特由 5,650 降至 4,338；P450 模拟案例改善 2.5 倍。值得关注的是把正确性检查接入搜索循环，让共享经验受可检验约束。</p>
+<p><strong>证据范围</strong>　结果是特定算法的形式化正确性与资源估算，不是量子硬件上的墙钟加速；作者明确指出，应用仍可能超出早期纠错量子计算机的资源。研究方向和问题由人类设定，不能据此推断 agent 已能自主改进学习算法，或迁移到机器人闭环。</p>
+<p><a href="https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/">实验室官方来源</a></p></article><article class="entry"><p class="topic">语言指令遵循 / 科学工具使用</p>
+<div class="entry-head"><h3>GPT-6 models demonstrate intrinsic protein-design capabilities</h3>
+<time class="meta" datetime="2026-11-24">2026-11-24</time></div><p class="meta">OpenAI / Onava · 官方研究博客 · 计算评测与湿实验</p>
+<p><strong>方法与结果</strong>　模型通过自然语言约束、推理和通用代码生成蛋白骨架，并可调整结合位置与结构形态。湿实验检测了基于 GPT-6.2 骨架设计的 322 个 minibinder，35 个显示结合信号，命中率 10.9%，覆盖五个靶点；这提供了模型输出经真实实验检验的证据，而不只是生成示例。</p>
+<p><strong>证据范围</strong>　骨架生成环节未调用专用生成模型，但该湿实验的序列建议和候选筛选仍使用专用蛋白模型，尚未证明零样本端到端设计完全独立于它们。结合信号也不等于功能、选择性或药效；完整结构预测仍明显落后于专用模型，部分公开基准存在记忆混杂。</p>
+<p><a href="https://openai.com/index/gpt-6-models-demonstrate-intrinsic-protein-design-capabilities/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/gpt-6-models-demonstrate-intrinsic-protein-design-capabilities/">实验室官方来源</a></p></article><article class="entry"><p class="topic">自适应推理 / 长任务 agent · 回顾</p>
+<div class="entry-head"><h3>Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents</h3>
+<time class="meta" datetime="2026-07-06">2026-07-06</time></div><p class="meta">复旦大学 / 腾讯混元 · ICML 2026 主会论文 · 文本交互仿真</p>
+<p><strong>方法与结果</strong>　CogRouter 让 agent 每步选择四档认知深度，先用 CoSFT 建立各档行为，再以 CoPO 的置信度加权优势分配步骤信用。论文表 1 中，Qwen2.5-7B 在 ALFWorld 和 ScienceWorld 的成功率为 92.5% 与 72.0%；相比同一 CoSFT 初始化的 GRPO，两环境平均成功率提高约 14 个百分点，平均 token 用量由 4,367.3 降至 1,641.4，约减少 62%。</p>
+<p><strong>证据范围</strong>　主会身份由 PMLR 正式论文集核对。实验是在两个文本交互环境中进行，token 节省没有直接给出机器人传感、动作执行与重试在内的总耗时收益；动作置信度也未必对应真实执行成功。迁移到 VLA 时仍需验证相同底座、相同信息和匹配预算下的完整任务成功率。</p>
+<p><a href="https://proceedings.mlr.press/v306/yang26cz.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v306/yang26cz.html">会议录用依据</a></p></article></div></section>
 </main></body></html>

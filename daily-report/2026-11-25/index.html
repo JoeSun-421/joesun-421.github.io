@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-25">2026-11-25</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">发布动态推理技术综述</a></strong>。完成并发布 Adaptive Reasoning: From Computer Use to Robot Use，比较五种推理预算与执行核验机制，补充原论文图示、公式和机器人迁移的最小实验对照，并核对前三篇的正式会议出处。</li><li><strong><a href="https://github.com/JoeSun-421/personal-skills/tree/main/skills/technical-blog-writing">更新技术博客写作 Skill</a></strong>。完善多论文综述的选材、机制比较、原图使用与证据核查规范，并发布到个人 Skills 仓库，供后续技术写作复用。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:04，本机 Codex 已结束轮次累计运行 1 小时 26 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 2 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">AI agents / 形式化验证</p>
+<div class="entry-head"><h3>Finding faster quantum algorithms with agents and formal verification</h3>
+<time class="meta" datetime="2026-11-23">2026-11-23</time></div><p class="meta">Google DeepMind / Google Quantum AI · 官方研究博客 · 算法搜索与形式化证明</p>
+<p><strong>方法与结果</strong>　多个 Gemini agent 团队独立搜索量子算法改进，候选经 Lean 验证后写入共享记录，并定期交流。聚变模拟案例的量子资源成本估算降低 11.8 倍，所需纠错量子比特由 5,650 降至 4,338；P450 模拟案例改善 2.5 倍。值得关注的是把正确性检查接入搜索循环，让共享经验受可检验约束。</p>
+<p><strong>证据范围</strong>　结果是特定算法的形式化正确性与资源估算，不是量子硬件上的墙钟加速；作者明确指出，应用仍可能超出早期纠错量子计算机的资源。研究方向和问题由人类设定，不能据此推断 agent 已能自主改进学习算法，或迁移到机器人闭环。</p>
+<p><a href="https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://deepmind.google/blog/finding-faster-quantum-algorithms-with-agents-and-formal-verification/">实验室官方来源</a></p></article><article class="entry"><p class="topic">语言指令遵循 / 科学工具使用</p>
+<div class="entry-head"><h3>GPT-6 models demonstrate intrinsic protein-design capabilities</h3>
+<time class="meta" datetime="2026-11-24">2026-11-24</time></div><p class="meta">OpenAI / Onava · 官方研究博客 · 计算评测与湿实验</p>
+<p><strong>方法与结果</strong>　模型通过自然语言约束、推理和通用代码生成蛋白骨架，并可调整结合位置与结构形态。湿实验检测了基于 GPT-6.2 骨架设计的 322 个 minibinder，35 个显示结合信号，命中率 10.9%，覆盖五个靶点；这提供了模型输出经真实实验检验的证据，而不只是生成示例。</p>
+<p><strong>证据范围</strong>　骨架生成环节未调用专用生成模型，但该湿实验的序列建议和候选筛选仍使用专用蛋白模型，尚未证明零样本端到端设计完全独立于它们。结合信号也不等于功能、选择性或药效；完整结构预测仍明显落后于专用模型，部分公开基准存在记忆混杂。</p>
+<p><a href="https://openai.com/index/gpt-6-models-demonstrate-intrinsic-protein-design-capabilities/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/gpt-6-models-demonstrate-intrinsic-protein-design-capabilities/">实验室官方来源</a></p></article><article class="entry"><p class="topic">自适应推理 / 长任务 agent · 回顾</p>
+<div class="entry-head"><h3>Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents</h3>
+<time class="meta" datetime="2026-07-06">2026-07-06</time></div><p class="meta">复旦大学 / 腾讯混元 · ICML 2026 主会论文 · 文本交互仿真</p>
+<p><strong>方法与结果</strong>　CogRouter 让 agent 每步选择四档认知深度，先用 CoSFT 建立各档行为，再以 CoPO 的置信度加权优势分配步骤信用。论文表 1 中，Qwen2.5-7B 在 ALFWorld 和 ScienceWorld 的成功率为 92.5% 与 72.0%；相比同一 CoSFT 初始化的 GRPO，两环境平均成功率提高约 14 个百分点，平均 token 用量由 4,367.3 降至 1,641.4，约减少 62%。</p>
+<p><strong>证据范围</strong>　主会身份由 PMLR 正式论文集核对。实验是在两个文本交互环境中进行，token 节省没有直接给出机器人传感、动作执行与重试在内的总耗时收益；动作置信度也未必对应真实执行成功。迁移到 VLA 时仍需验证相同底座、相同信息和匹配预算下的完整任务成功率。</p>
+<p><a href="https://proceedings.mlr.press/v306/yang26cz.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.mlr.press/v306/yang26cz.html">会议录用依据</a></p></article></div></section>
+</main></body></html>
