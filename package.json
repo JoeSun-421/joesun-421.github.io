@@ -1,0 +1,11 @@
+{
+  "name": "joesun-personal-site",
+  "private": true,
+  "scripts": {
+    "build:blogs": "node scripts/build-blogs.cjs"
+  },
+  "devDependencies": {
+    "katex": "0.19.1",
+    "marked": "15.0.12"
+  }
+}

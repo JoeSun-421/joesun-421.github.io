@@ -1,0 +1,43 @@
+{
+  "paper_figures": [
+    {
+      "name": "thinkless-figure-1",
+      "page": 2,
+      "title": "Thinkless: LLM Learns When to Think",
+      "authors": "Gongfan Fang, Xinyin Ma, Xinchao Wang",
+      "version": "2505.13379v2",
+      "source": "https://arxiv.org/html/2505.13379v2",
+      "file": "thinkless-figure-1.png",
+      "figure": 1,
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modification": "Cropped from the PDF page to the diagram only; original diagram labels retained.",
+      "dpi": 240,
+      "size_px": [
+        1334,
+        303
+      ],
+      "sha256": "d801bde61aed0f9e654f5c95ac03d92362ada951a21f58ad6421d427514ad6ff"
+    },
+    {
+      "name": "ton-figure-1",
+      "page": 2,
+      "title": "Think or Not? Selective Reasoning via Reinforcement Learning for Vision-Language Models",
+      "authors": "Jiaqi Wang, Kevin Qinghong Lin, James Cheng, Mike Zheng Shou",
+      "version": "2505.16854v3",
+      "source": "https://arxiv.org/html/2505.16854v3",
+      "file": "ton-figure-1.png",
+      "figure": 1,
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modification": "Cropped from the PDF page to the diagram only; original diagram labels retained.",
+      "dpi": 240,
+      "size_px": [
+        1330,
+        386
+      ],
+      "sha256": "6f620cb48503f193b953fc8c1fdd8d3977d475e186875d02e62228f3c2541c5c"
+    }
+  ],
+  "original_diagrams": "editorial-diagrams.json"
+}
