@@ -17,7 +17,7 @@
     "version": "ACL 2026 proceedings",
     "url": "https://aclanthology.org/2026.acl-long.816.pdf",
     "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
-    "active_in_blog": true
+    "active_in_blog": false
   },
   {
     "asset": "rpo-recipe.png",
@@ -37,7 +37,7 @@
     "version": "ACL 2026 proceedings",
     "url": "https://aclanthology.org/2026.acl-long.816.pdf",
     "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
-    "active_in_blog": true
+    "active_in_blog": false
   },
   {
     "asset": "more-overview.png",
@@ -97,7 +97,7 @@
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": false
+    "active_in_blog": true
   },
   {
     "asset": "tab-transfer.png",
@@ -117,7 +117,7 @@
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": false
+    "active_in_blog": true
   },
   {
     "asset": "tab-latency.png",
@@ -137,7 +137,7 @@
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
     "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": false
+    "active_in_blog": true
   },
   {
     "asset": "race-logic.png",
@@ -272,7 +272,7 @@
     ],
     "sha256": "e1f41157d5c30a2eb4d3edfb11754c4bb6ee85fa635ff9f876449e6a1c59713a",
     "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": true,
+    "active_in_blog": false,
     "version": "ICLR 2026 proceedings",
     "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
     "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
@@ -293,7 +293,7 @@
     ],
     "sha256": "089f66199208ef860dbcf330b53832dff2915efef0d0c1bbd8eccb385861e0d5",
     "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": true,
+    "active_in_blog": false,
     "version": "ICLR 2026 proceedings",
     "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
     "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
@@ -314,7 +314,7 @@
     ],
     "sha256": "b7e84a5f4a505ea36eb2ab42d481f5484113749c1046671d2575e3d4b748b80c",
     "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": true,
+    "active_in_blog": false,
     "version": "ICLR 2026 proceedings",
     "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
     "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
@@ -335,7 +335,7 @@
     ],
     "sha256": "6374b838a1e82c8cbae30fae635cf748702f4485199dcf0a0cf258d51d2ebef8",
     "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": true,
+    "active_in_blog": false,
     "version": "ICML 2026 proceedings",
     "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
     "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
@@ -356,12 +356,107 @@
     ],
     "sha256": "60130a2d97e5259c4ec5366e1fd81e3c41763b160561c3514d692711b04a1321",
     "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": true,
+    "active_in_blog": false,
     "version": "ICML 2026 proceedings",
     "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
     "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
     "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
     "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
     "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents"
+  },
+  {
+    "asset": "puma-framework.png",
+    "source_pdf": "PUMA_2605.17672v1.pdf",
+    "page": 3,
+    "figure": 2,
+    "crop_points": [
+      108,
+      60,
+      504,
+      273
+    ],
+    "version": "2605.17672v1",
+    "url": "https://arxiv.org/pdf/2605.17672v1",
+    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
+    "sha256": "546b4766724ba49a1f7e6624b4f38371904cf2443167e3de470a2bff5f9261ce",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+  },
+  {
+    "asset": "puma-latency.png",
+    "source_pdf": "PUMA_2605.17672v1.pdf",
+    "page": 7,
+    "figure": 3,
+    "crop_points": [
+      108,
+      72,
+      506,
+      229
+    ],
+    "version": "2605.17672v1",
+    "url": "https://arxiv.org/pdf/2605.17672v1",
+    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
+    "sha256": "d011494a9f66ed5ffd26bb93061cde330d8271c20d424ee3983cf877821e294e",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+  },
+  {
+    "asset": "specagent-protocol.png",
+    "source_pdf": "SpecAgent_2610.21463v1.pdf",
+    "page": 3,
+    "figure": 1,
+    "crop_points": [
+      62,
+      88,
+      534,
+      309
+    ],
+    "version": "2610.21463v1",
+    "url": "https://arxiv.org/pdf/2610.21463v1",
+    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
+    "sha256": "453fec815f178a9b616feb1d0755291a29893b5fd50eb3d2fe31ec8a38038074",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "specagent-frontier.png",
+    "source_pdf": "SpecAgent_2610.21463v1.pdf",
+    "page": 8,
+    "figure": 2,
+    "crop_points": [
+      62,
+      87,
+      534,
+      271
+    ],
+    "version": "2610.21463v1",
+    "url": "https://arxiv.org/pdf/2610.21463v1",
+    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
+    "sha256": "f4b86ef3af682da47ea194b1244a9da40676e6df63ce6660efa52240fa1d0ccf",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "CC BY 4.0"
+  },
+  {
+    "asset": "specagent-cost.png",
+    "source_pdf": "SpecAgent_2610.21463v1.pdf",
+    "page": 10,
+    "figure": 3,
+    "crop_points": [
+      62,
+      88,
+      534,
+      240
+    ],
+    "version": "2610.21463v1",
+    "url": "https://arxiv.org/pdf/2610.21463v1",
+    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
+    "sha256": "805625fba275170bba9c912f83814ef40b3317746ef3877c34e70a143a089624",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; no annotation or overlay.",
+    "license": "CC BY 4.0"
   }
 ]

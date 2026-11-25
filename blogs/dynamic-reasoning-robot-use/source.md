@@ -1,7 +1,7 @@
 ---
 title: "Adaptive Reasoning: From Computer Use to Robot Use"
 date: 2026-11-25
-description: "三篇 2026 顶会工作与两篇近期 agent 工作：从根决策、内容相关奖励、逐步认知深度到跨轮推理与事件核验。"
+description: "按加速机制解读五篇近期工作：预算分配、生成中早停、跨轮推理复用、事件升级与推测式核验，追踪训练配方与真实耗时。"
 tags: [dynamic-reasoning, efficient-agents, computer-use, robot-use, reinforcement-learning]
 slug: dynamic-reasoning-robot-use
 ---
@@ -10,257 +10,167 @@ slug: dynamic-reasoning-robot-use
 
 ## Why Robot Use Needs Adaptive Reasoning
 
-考虑一个闭环：模型读入相机画面与机器人状态，生成末端位姿 JSON，控制器执行，再把实际结果送回模型。夹爪顺利接近杯子时，下一步可能只需要沿用已有计划；抓取落空、杯子被碰动时，模型需要重新判断位置、接触状态与后续动作。
+考虑一个闭环：模型读取相机画面与机器人状态，生成末端位姿 JSON，控制器执行，再把实际结果送回模型。夹爪顺利接近杯子时，下一步可能只需沿用计划；抓取落空、杯子被碰动时，模型需要重新判断位置、接触状态与后续动作。
 
-如果每一步都完整思考，常规动作会反复支付推理成本。如果一直采用短推理，异常状态又可能沿着旧计划继续执行。**我们想控制的是计算在执行过程中的分布：何时思考、思考多少，以及何时重新检查。**
+每轮完整思考会给常规动作重复付费，一直压缩思考又可能使异常状态下的错误持续累积。我们想研究的是：**根据任务进展与实际反馈，把必要计算放到能够改善后续执行的时刻。** 本文讨论 LLM 生成文本动作的 robot-use 接口，不将这种执行方式推广到所有 VLA，也不展开连续 latent 推理。
 
-这里的 dynamic reasoning 指根据当前上下文、推理进度或执行反馈调整计算。本文聚焦有外部反馈的 agent；不展开连续 latent 推理。上述控臂接口也只是讨论对象，不能代表所有 VLA 的执行方式。
+computer-use 提供了接近的交互结构：观察、决策、执行、新观察。其执行时间、错误恢复和多轮约束与机器人有关；差别在于机械臂每次移动都会改变物理状态，动作结果又受接触与感知误差影响。迁移需要保留闭环，而不是只把工具名改成坐标。
 
-computer-use 是一个值得先看的相邻领域。点击与机械臂移动都遵循“观察 → 决策 → 执行 → 新观察”，任务成功取决于整条交互轨迹。两者也有实质差别：机器人动作受接触、动力学和感知误差影响，生成一个正确格式的坐标，并不能保证达到预期物理状态。
+## Where Acceleration Comes From
 
-下面保留五个有区分度的切入点：**RPO** 缩小训练的决策位置；**SAR** 为推理质量与效率提供内容相关奖励；**CogRouter** 在每一步选择认知深度；**RACE** 判断哪些跨轮思考可以省略；**STEPWISE** 在卡住或关键节点时升级核验。它们覆盖从单轮路由到多轮交互，STEPWISE 最直接研究 computer-use。
+先确定省掉了什么，再选代表论文。对串行执行的 agent，可以用下面的近似分解建立成本直觉：
 
-选文核对至 2026-11-25。前三篇按 2026 年顶会正式版本选取：RPO（ACL）、SAR（ICLR）、CogRouter（ICML）；SAR 的预印本首次发表于 2025 年。RACE 和 STEPWISE 保留文末指定的预印本版本。算法沿用原文：SAR 实际测试 actor–critic PPO，RPO、CogRouter、RACE 使用组相对信号，STEPWISE 训练分类监测器。最后再讨论 robot-use 的 PPO 适配。
+$$
+\begin{aligned}
+T_{\mathrm{serial}}\approx\sum_t\Big(
+&T_{\mathrm{obs},t}+T_{\mathrm{prefill},t}
++\frac{N_t}{\nu_t}\\
+&+T_{\mathrm{aux},t}+T_{\mathrm{exec},t}\Big).
+\end{aligned}
+$$
 
-## RPO — Learn the Root Decision
+$t$ 是交互轮次，$N_t$ 是解码 token 数，$\nu_t$ 是有效解码速率。其余各项分别是观察处理、上下文 prefill、路由与核验等辅助计算、工具或动作执行的秒数。这是解释用的串行近似；有重叠执行时，需要测实际关键路径。
+
+按主要加速来源，下面选择五篇：
+
+- **Adaptive Budgets — TAB：** 生成前，根据历史给不同轮次分配计算预算。
+- **Early Exit — PUMA：** 生成中，发现推理趋于冗余且答案稳定时提前结束。
+- **Cross-Turn Reuse — RACE：** 前面推理已经支持后续动作时，省掉重复思考。
+- **Selective Escalation — STEPWISE：** 默认使用小模型，把强模型留给异常恢复和关键核验。
+- **Speculative Verification — SpecAgent：** 小模型起草多步，强模型批量核验，减少昂贵的串行解码。
+
+这些类别按主要干预位置组织，机制可以交叉。前两类主要控制一次生成的计算量，第三类利用交互历史，后两类改变大小模型的分工。**少 token、少 FLOPs、少等待时间是三个不同结论。** SpecAgent 就展示了 FLOPs 上升而耗时下降的情况。
+
+选文核对至 2026-11-25，优先考虑 2026 年首次公开、方法清楚、消融与成本口径可追踪的工作。TAB 首发于 4 月，采用 11 月 v4；PUMA 为 5 月工作；RACE 和 SpecAgent 为 10 月工作；STEPWISE 是保留的 4 月 computer-use 工作。会议状态作为辅助信息，不用会议年份替代首次发布日期。
+
+PPO 保留为 robot-use 迁移时的算法选择。原论文中的 GRPO、对比学习、监督分类和推理时协议分别解释，不把优化器名称当作分类轴。五篇结果均是原论文报告，本文没有复现其训练或加速数值。
+
+## Adaptive Budgets — TAB
 
 ### Problem
 
-模型可能已经具备长推理和直接回答两种能力，却不擅长选择。若目标主要是改善这个选择，对整段长 CoT 反向传播会花费大量显存与计算。
+多轮任务的预算存在前后依赖：前面少花一点，可能节省计算，也可能因为漏掉约束导致后面反复补救。每轮独立估计难度，无法充分评价这种影响。
 
-RPO 将问题收窄到**生成开头的分支决策**：当前输入应该进入长推理，还是直接回答？
+TAB 将整条交互视为预算分配问题，优化**完成任务与总预算之间的折中**。
 
-![RPO training overview](assets/efficient_agents_2026/rpo-overview.png)
-
-### Method and RL Recipe
-
-原文先用同一个模型强制生成 SHORT、LONG 两种输出，筛出格式正确且答案正确的样本做自蒸馏 SFT，让两个分支都能工作。SFT 数据分别从两个池中采样，并不要求同一道题在两个分支都答对。
-
-分支使用模型原有的 tokenization：固定 `<think>` 前缀后，以不同换行 token 选择长短路径。这里将分支 token 记为 $z$，输入记为 $x$，策略参数为 $\theta$。
-
-![RPO self-distillation and root-token update](assets/efficient_agents_2026/rpo-recipe.png)
-
-RL 的流程是：
-
-1. 每道题各采样相同数量的 SHORT、LONG 完整回答。
-2. 用答案验证器统计两种模式各自答对的次数 $C_S(x),C_L(x)$。
-3. 把该模式的成功次数作为这道题的分支奖励，并给 SHORT 一个较小的偏好系数。
-4. 在整个 minibatch 内，按模式分别标准化奖励。
-5. **只对根 token 的 log-probability 求策略损失**，加上根分布相对 SFT checkpoint 的 KL。
-
-对于第 $i$ 条采样，原文的奖励是：
-
-$$
-\begin{aligned}
-r_i(x)&=\alpha_{z_i}C_{z_i}(x),\\
-\alpha_L&=1,\qquad \alpha_S=1+\frac{1}{n}.
-\end{aligned}
-$$
-
-$n$ 是每道题两种模式合计的采样数。$C_z(x)$ 来自完整回答的正确性检查，后续回答仍需实际生成。
-
-$$
-\widehat A_i(x)
-=\frac{r_i(x)-\mu_{z_i}}{\sigma_{z_i}+\varepsilon}.
-$$
-
-$\mu_z,\sigma_z$ 从 **minibatch 中所有题目的模式 $z$ 样本**计算。这个统计范围很关键：同一道题、同一种强制模式下的奖励完全一样，在该小组内部标准化会得到零方差。
-
-最终优化根分布：
-
-$$
-\begin{aligned}
-K_\theta(x)&=D_{\mathrm{KL}}\!\left(
- p_\theta(\cdot\mid x)\,\Vert\,p_{\mathrm{ref}}(\cdot\mid x)
-\right),\\
-J_{\mathrm{RPO}}
-&=\mathbb E_x\!\left[
-\frac1n\sum_i\widehat A_i(x)\log p_\theta(z_i\mid x)
-\right]\\
-&\quad-\beta\,\mathbb E_x[K_\theta(x)].
-\end{aligned}
-$$
-
-为排版将根分布的 KL 项记为 $K_\theta(x)$。这里沿用原文的根策略梯度目标，没有额外添加 PPO clipping。$p_{\mathrm{ref}}$ 是 SFT 后冻结的参考分支分布，$\beta$ 控制偏离幅度。根 token 后的生成不进入直接策略损失。
-
-**特点是把完整回答作为评价分支的依据，把反向传播集中到选择点。** 原文 §3.3、Table 2 和 Table 5 分别讨论优势、显存与计算开销；其中显存估算与训练计算口径需要分开阅读。论文约 2% 的计算结论对应其匹配配置，不能推成所有模型都能加速 50 倍。
-
-### Transfer to Robot Use
-
-可借鉴的是先建立“短推理／完整推理都能输出有效动作”的底座，再学习每轮的分支选择。整条机器人任务的成功可用于评价这些选择，但终局奖励如何分配到多个分支，仍需另外设计。
-
-还需要区分**损失位置**与**可训练参数**。RPO 只在根位置计算损失，共享模型参数仍会更新，后续动作分布可能随之改变。若实验要隔离调度作用，可以冻结动作模型、训练独立选择器；这属于迁移设计，不能当成 RPO 已验证的配置。
-
-它主要解决训练成本，未直接证明多轮控臂性能。机器人 rollout、环境复位和长短分支采样的成本仍然存在。
-
-## SAR — Reward Query-Specific Reasoning
-
-### Problem
-
-只按答案对错给奖励，正确但冗长的回答和正确且简洁的回答可能同分。直接按长度收费，又可能同时压低必要推导与重复解释。
-
-SAR 增加一个内容相关的信号：**当前问题给这段回答带来的可预测性增益。** 它用这个差异补充最终正确性，而不预先指定每道题应该写多长。
-
-这篇采用 ICLR 2026 正式版本；预印本首次发布于 2025 年 9 月。它属于 efficient reasoning 的奖励方法，原文没有训练多轮机器人或 GUI 预算路由器。
+![TAB budget allocator and solver loop](assets/efficient_agents_2026/tab-overview.png)
 
 ### Method and RL Recipe
 
-对采样得到的完整回答 $y_i$，用同一个当前策略分别打两次分：一次保留问题 $q$，一次移除用户问题。实现中仍保留 system prompt，答案和 padding 的 mask 保持一致。
+TAB 分开使用 Budgeter 和 Solver。每轮 Budgeter 根据历史与当前输入输出难度档位，再映射成 Solver 的 token 预算或 reasoning-effort 设置。Solver 在这个设置下生成回答，新的反馈进入下一轮。
 
-把每个回答 token 在两种上下文中的平均 log-probability 记为：
-
-$$
-\begin{aligned}
-\ell_q(y_i)&=\frac1{K_i}\sum_{k=1}^{K_i}
-\log\pi_\theta(y_{i,k}\mid q,y_{i,<k}),\\
-\ell_0(y_i)&=\frac1{K_i}\sum_{k=1}^{K_i}
-\log\pi_\theta(y_{i,k}\mid y_{i,<k}).
-\end{aligned}
-$$
-
-$K_i$ 是回答的有效 token 数；下标 0 表示去掉用户问题后的评分上下文，并非完全无条件模型。两项均由 teacher-forced scoring 获得，无需再次采样一段回答。
-
-原文式 (6)–(7) 用 perplexity 定义奖励。将它写成上述 log-probability 的等价形式，数值关系更清楚：
+可将其写为：
 
 $$
-\begin{aligned}
-\Delta_i&=\ell_q(y_i)-\ell_0(y_i),\\
-R_{\mathrm{SA},i}
-&=\operatorname{clip}\!\left(1-e^{-\Delta_i},-1,1\right),\\
-R_i&=R_{\mathrm{VR},i}+\alpha R_{\mathrm{SA},i}.
-\end{aligned}
+b_t\sim\pi_\phi(\cdot\mid h_t),
+\qquad
+y_t\sim f_\theta(\cdot\mid h_t;b_t).
 $$
 
-$R_{\mathrm{VR},i}$ 来自答案验证，正确为 1，否则为 0；$\alpha$ 控制 SAR 的权重。如果问题明显提高了回答概率，$\Delta_i$ 为正，SAR 也为正。泛化套话即使本身很流畅，保留和删除问题时的概率差也可能较小。
+$t$ 是交互轮次；$h_t$ 包括当前输入与之前的交互；$\phi$ 是预算策略参数，$\theta$ 是 Solver 参数。RL 更新 Budgeter，Solver 提供预算动作后的反馈。
 
-![SAR token-level query dependence](assets/efficient_agents_2026/sar-token-signal.png)
+原文只在便宜的多轮数学任务上训练 Budgeter，随后不再微调，迁移到 BFCL、Tau-Bench、Terminal-Bench。这个设置直接检验了**预算策略的跨任务迁移**。
 
-上图的颜色展示 token 对问题的依赖差异。原文把这作为解释整体奖励的分析；**训练仍使用回答级 SAR，不能把图中的颜色直接称为已经验证的逐 token 过程奖励。**
+训练用 GRPO：
 
-SA-PPO 的训练链条是：
+1. 同一道训练题采样多条完整交互，每条使用不同的预算分配序列。
+2. 到终局检查答案，同时统计实际消耗的 Solver token。
+3. 根据全局预算计算奖励，在同题轨迹组内标准化。
+4. 将轨迹优势用于该轨迹中所有预算决策的 clipped policy 更新。
 
-1. 从数学训练问题采样完整回答，取得最终正确性。
-2. 复用已有的条件 log-probability，额外计算去掉问题后的 log-probability。
-3. 计算 $R_{\mathrm{SA},i}$，与正确性合成 $R_i$，作为这条回答的任务奖励。
-4. 使用 PPO 的价值基线估计优势，更新 actor 与 critic，并保留相对参考模型的 KL 约束。
-
-其 actor 更新采用逐 token 的 clipped surrogate。为突出奖励接入位置，记 $h_{i,k}$ 为生成前缀：
+为区分“分配量”与“消耗量”，这里把第 $t$ 轮实际消耗记为 $n_t$。原文式 (2) 的脚注明确，训练计分使用实际 token：
 
 $$
-\begin{aligned}
-\rho_{i,k}
-&=\frac{\pi_\theta(y_{i,k}\mid h_{i,k})}
-{\pi_{\mathrm{old}}(y_{i,k}\mid h_{i,k})},\\
-\overline\rho_{i,k}
-&=\operatorname{clip}(\rho_{i,k},1-\epsilon,1+\epsilon),\\
-F_{i,k}&=\min\!\left(
-\rho_{i,k}\widehat A_{i,k},
-\overline\rho_{i,k}\widehat A_{i,k}\right),\\
-J_{\mathrm{SA\text{-}PPO}}
-&=\mathbb E_i\!\left[\frac1{K_i}\sum_kF_{i,k}\right]
--\beta D_{\mathrm{KL}}.
-\end{aligned}
+R_i=S_i-\lambda\max\!\left(0,\sum_t n_{i,t}-B\right).
 $$
 
-$\widehat A_{i,k}$ 是由合成奖励进入回报估计后得到的 PPO 优势，$\epsilon$ 为裁剪宽度，$\beta$ 为参考策略 KL 权重。这里沿用原文 §3.1 的 PPO 目标；SAR 的变化发生在奖励端，没有另造一个模式选择损失。
-
-原文 Appendix B.3 明确列出 critic 学习率，因此这里确实包含价值学习。其配置中 actor 学习率为 $10^{-6}$、critic 为 $2\times10^{-6}$，PPO 与 SA-PPO 保持同一训练配置。论文还测试 SA-GRPO，采用 Dr. GRPO 的中心化优势，不能与 PPO 的 critic 混写。
-
-![SAR accuracy and efficiency across backbones](assets/efficient_agents_2026/sar-results.png)
-
-![SAR accuracy-length tradeoff](assets/efficient_agents_2026/sar-pareto.png)
-
-上图给跨模型结果，下图给奖励权重变化时的准确率与长度折中。下图对应 SA-GRPO，不应归到 SA-PPO 名下。原文主要测试数学与逻辑推理；附录的视觉语言扩展收益较有限，因此不能假定这个文本概率信号会直接迁移到控臂。
-
-### Transfer to Robot Use
-
-可以借鉴的是**用内容相关的评分补充粗粒度成功信号**，以及把这类评分直接接入现有 PPO，而非重新设计整个优化器。
-
-机器人中需要先确定“删掉什么上下文”才有意义：任务要求、历史反馈和当前视觉状态分别承担不同信息。简单移除任务文本，可能鼓励模型重复目标名称；移除视觉信息，又会改变模型对坐标的预测条件。
-
-SAR 奖励的是概率差，无法直接保证物理有效性。它甚至可能压低某些正确的无思考回答：原文 Table 2 就分析了这种现象。因此，针对每轮可以直接输出动作的 robot-use agent，应该先验证评分与实际成功、恢复能力的关系，再决定是否用来塑造奖励。
-
-## CogRouter — Adapt Cognitive Depth at Each Step
-
-### Problem
-
-多轮 agent 的终局奖励会强化整条成功轨迹，但其中可能既有必要的规划，也有机械地重复长思考。统一强化所有步骤，容易让模型固定使用某一种推理模式。
-
-CogRouter 让模型每一步选择认知深度，并用**不同思考对同一个动作的预测置信度**重新分配训练权重。它已发表于 ICML 2026，实验是 ALFWorld 和 ScienceWorld 的文本交互，尚未直接测试 GUI 或末端坐标控制。
-
-### Method and RL Recipe
-
-四个层级具有不同输出结构：L1 直接响应；L2 分析当前状态与可用动作；L3 结合目标和执行历史做反思；L4 进一步评价候选动作的未来影响。每轮依次输出 `<level>`、`<think>` 和 `<action>`。
-
-![CogRouter cognition-aware supervised and RL training](assets/efficient_agents_2026/cogrouter-framework.png)
-
-先做 CoSFT：收集专家成功轨迹，在各步骤均衡随机指定四个层级，再让专家模型根据历史和固定参考动作补写对应思考。这样先建立四种可用的输出模式，避免 RL 一开始就失去某个分支。
-
-CoPO 的训练顺序如下：
-
-1. 当前策略与环境交互，采样完整任务轨迹。
-2. 用任务成功和输出格式计算轨迹奖励：任一步格式不合要求，格式项为 0。
-3. 同一任务的轨迹组计算组相对优势。
-4. 对成功轨迹的每一步，固定已有观察与动作，重新生成四个层级的思考，形成 cognitive group。
-5. 对固定动作做 teacher-forced scoring，按四种思考下的动作置信度分配该步优势；失败轨迹保持原始轨迹优势。
-6. 用这些优势优化层级、思考和动作 token 的 clipped policy loss，保留参考策略 KL。
-
-轨迹奖励与优势仍是组相对形式：
+$S_i$ 是终局正确性，$B$ 是整项任务的目标预算，$\lambda$ 是超额成本系数。低于 $B$ 时成本项为零，策略可以把预算集中到关键轮次。
 
 $$
-\begin{aligned}
-R_i&=R_i^{\mathrm{task}}R_i^{\mathrm{format}},\\
 \widehat A_i
-&=\frac{R_i-\operatorname{mean}_{j\in\mathcal G(x)}R_j}
+=\frac{R_i-\operatorname{mean}_{j\in\mathcal G(x)}R_j}
 {\operatorname{std}_{j\in\mathcal G(x)}R_j}.
-\end{aligned}
 $$
 
-两个奖励因子均为 0/1。$\mathcal G(x)$ 是同一任务的轨迹组；CoPO 沿用 GRPO 的组相对信号，没有引入 PPO critic。
+$\mathcal G(x)$ 是同一道题的完整轨迹组。**同一条轨迹的各轮共享这个优势**；它学习哪些整体分配方案更好，尚未给每一轮提供独立的因果贡献估计。
 
-对成功轨迹 $i$ 的第 $t$ 步，将其固定参考动作记为 $a_{i,t}$，长度为 $M_{i,t}$。在第 $c$ 个认知层级生成的思考和历史共同构成上下文 $h_{i,t}^{(c)}$，动作置信度为：
+recipe 的一个可复现配置是 Qwen3-4B Budgeter、LoRA rank 64、125 个训练更新；对不同全局目标预算分别训练策略。原文 §3.3 与 Appendix A 给出奖励、映射、训练和计时口径。
 
-$$
-C_{i,t}^{(c)}
-=\frac1{M_{i,t}}\sum_{k=1}^{M_{i,t}}
-\log\pi_\theta\!\left(
- a_{i,t,k}\mid h_{i,t}^{(c)},a_{i,t,<k}
-\right).
-$$
+![TAB transfer accuracy versus total tokens](assets/efficient_agents_2026/tab-transfer.png)
 
-这里 $c\in\{1,2,3,4\}$ 表示层级，$k$ 表示动作 token。四个分数都在**同一历史、同一动作**上比较，因此能减少不同动作本身难度的干扰。
+![TAB transfer accuracy versus end-to-end latency](assets/efficient_agents_2026/tab-latency.png)
 
-在这四个分数内部标准化，再做 softmax：
-
-$$
-\begin{aligned}
-\widetilde C_{i,t}^{(c)}
-&=\frac{C_{i,t}^{(c)}-\mu_{i,t}}{\sigma_{i,t}},\\
-w_{i,t}^{(c)}
-&=\frac{\exp(\eta\widetilde C_{i,t}^{(c)})}
-{\sum_{b=1}^{4}\exp(\eta\widetilde C_{i,t}^{(b)})},\\
-\widehat A_{i,t}^{(c)}
-&=w_{i,t}^{(c)}\widehat A_i\qquad(R_i>0).
-\end{aligned}
-$$
-
-$\mu_{i,t},\sigma_{i,t}$ 仅由该步四个层级的分数计算；$\eta$ 控制权重分布的尖锐程度，原文设为 2。四个权重之和为 1，分数高的层级分到更多正向权重。失败轨迹不扩展四组思考，继续使用 $\widehat A_i$。
-
-这些权重**并未增加新的环境成功奖励**。当轨迹优势本来就是 0 时，乘上权重仍然是 0。它解决的是已有学习信号如何分配，不能自动解决无奖励启动。
-
-![CogRouter adaptation across task progress and complexity](assets/efficient_agents_2026/cogrouter-adaptation.png)
-
-上图比较不同任务进度与任务复杂度下的层级使用。它检验模型是否一直选最深层，而不只看平均 token 是否减少。原文 §3.4、Algorithm 1 和 Table 5 分别给出优势加权、完整流程与置信度消融。
+两图需要一起看：上图检验 token，下面检验时间。原文迁移实验报告最多约 20% token 与 15% 延迟节省；计时包含 Budgeter 开销。它支持这些测试环境中的迁移，尚未覆盖物理控臂。
 
 ### Transfer to Robot Use
 
-这是新名单中最接近我们“每轮根据状态调整思考”的训练先例。可以把其层级化输出映射到直接动作、状态核验、失败反思与候选动作规划，随后检验这些层级是否真的带来不同执行行为。
+这篇最直接支持“先学调度，再尝试跨域迁移”的研究路线。可以先让预算策略读历史、当前视觉信息与执行反馈，再决定控臂模型下一轮的推理强度。
 
-但固定成功动作、为它补写不同思考，更接近对已知行为的解释与打分。若四个层级重新闭环执行，它们未必选择同一动作，也未必有同样的后续结果。**动作置信度仍是代理信号，不能直接当作物理因果贡献。**
+不过，TAB 的跨域实验仍主要使用文本交互状态。相机变化、接触与物体位移需要合适的表征；同一个难度档位对不同控臂模型是否具有一致含义，也要测试。
 
-对坐标 JSON，还需排查格式、数值编码和动作等价性是否支配置信度。若高置信度只表示“更容易复述这串坐标”，CoPO 的信号可能无法选出更可靠的推理深度。迁移对照应同时检验实际执行反馈，并计入训练中额外生成四种思考的成本。
+Budgeter 本身还会增加延迟。对小型控臂模型，额外跑一次 4B Budgeter 可能不划算。冻结同一动作底座、比较轻量选择器与固定预算，并统计整项任务真实耗时，才容易解释收益来自哪里。
 
-## RACE — Preserve Cross-Turn Reasoning Support
+## Early Exit — PUMA
+
+### Problem
+
+模型可能很早就给出一个稳定答案，但后面的推理仍在发现约束或修正漏洞。只看答案置信度，会把“已经有答案”和“已经完成必要推理”混在一起。
+
+PUMA 先检查最近的推理是否开始重复，再核验停止时的答案。它希望省掉的是**收敛之后的冗余生成**，同时避免在有效探索中途截断。
+
+### Method and Training Recipe
+
+![PUMA redundancy detection and verified early exit](assets/efficient_agents_2026/puma-framework.png)
+
+主方法在推理时运行，底座模型保持冻结。训练对象是一个从 Qwen3-Embedding-0.6B 初始化的冗余检测器：用对比学习区分“语义接近但有新进展”和“重复已有结论”的推理步骤，避免直接把通用 embedding 相似度当作逻辑冗余。
+
+在线流程是：
+
+1. 按自然段或步骤边界切分当前 CoT。
+2. 检测器比较当前步骤与最近的历史步骤，标出可能冗余的位置。
+3. 仅在这些候选位置，从当前前缀诱导一个试答，取得答案及其 token 置信度。
+4. 在后续候选位置继续试答，检查答案一致、置信度足够且没有明显下降。
+5. 检查通过就结束思考；否则继续生成。晚期持续重复时，另有带最低置信度门槛的 Loop Breaker。
+
+将当前推理步骤记为 $r_t$，检测器记为 $f$，回看窗口为 $k$：
+
+$$
+s_t=\max_{\max(1,t-k)\le j<t}
+\cos\!\left(f(r_j),f(r_t)\right).
+$$
+
+$s_t$ 超过相似度阈值时，只产生候选退出点。原文默认 $k=1$。试答的置信度来自其 token 概率的几何平均；连续候选之间还要比较答案一致性。这个二阶段结构把较便宜的检测放在前面，减少试答调用。
+
+![PUMA measured latency and runtime breakdown](assets/efficient_agents_2026/puma-latency.png)
+
+这篇进入主线的一个原因是它实际核算了时间。原文 §5.2 与 Appendix C.5 报告检测、试答和总耗时，在 DS-7B、DS-14B 上分别得到约 1.40×、1.28× 加速。它也报告部分对照虽然减少 token，却因频繁试答而更慢。收益仍受模型、任务与实现影响，不能直接套到控臂系统。
+
+原文 §6.2 进一步比较 SFT、DPO、GRPO 内化停止信号，其中有一个容易忽略的实现细节：
+
+- PUMA-SFT 训练正确的截断推理与答案。
+- PUMA-DPO 在长短回答都正确时，偏好 PUMA 截断版本。
+- **PUMA-RL 的 Appendix F 配方提供已经截断并闭合思考的前缀，让模型只生成答案阶段。** 它没有在这段训练中重新采样整条 CoT 来自主选择退出位置。
+
+RL 的四条同前缀采样使用：
+
+$$
+R_i=c_i\!\left[1+0.5\!\left(1-\frac{\ell_i}{4096}\right)\right]
++b_i^{\mathrm{rank}}.
+$$
+
+$c_i$ 表示答案正确性，$\ell_i$ 是该前缀之后的 completion 长度，$b_i^{\mathrm{rank}}$ 是组内排序奖励，取值为 $\{0.5,0.25,0,-0.25\}$，偏好更短的正确 completion。原文用 GRPO 更新，比较相同 recipe 下的固定位置前缀。
+
+因此，这组实验支持“PUMA 选出的前缀能提供有用的训练信号”。它没有单独证明模型学到了一个与外部检测器等价的在线停止策略。RL 配方中的长度也不能误读成训练时重新生成的完整 CoT 长度。
+
+### Transfer to Robot Use
+
+可借鉴的是**先检测推理是否仍有新进展，再决定是否值得继续支付解码成本**。对固定当前观察的一轮决策，可以测试在部分 CoT 后诱导动作，比较动作稳定性与最终执行结果。
+
+但两个坐标 JSON 很相似，不代表动作正确；文本推理重复，也可能是反复检查关键接触条件。机器人中的“可停止”最终需要与完整任务成功和异常恢复联系起来。反复试动作或试答本身也有成本，不能只汇报截断后的 token。
+
+如果目标是用 PPO 学习自主停止，需要明确增加继续／停止决策，并从它之后的实际动作结果学习。这属于新的迁移实验，不能直接称为复现 PUMA-RL。
+
+## Cross-Turn Reuse — RACE
 
 ### Problem
 
@@ -326,7 +236,7 @@ $T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\m
 
 ![RACE success and reasoning-token ablation](assets/efficient_agents_2026/race-ablation.png)
 
-相对普通 SFT＋GRPO，论文在四个 agent 基准上报告约 32%–80% 的推理 token 减少，成功率变化不超过 1.4 个百分点。应以这个同底座消融评价删减机制，不能把相对未训练底座的全部提升都归给它。方法见 §3，消融见 Table 2、Figure 4。
+相对普通 SFT＋GRPO，论文在四个 agent 基准上报告约 32%–80% 的推理 token 减少，成功率变化不超过 1.4 个百分点。应以这个同底座消融评价删减机制，不能把相对未训练底座的全部提升都归给它。这部分直接证据是推理 token 数，尚不能等同于机器人闭环的实测加速。方法见 §3，消融见 Table 2、Figure 4。
 
 ### Transfer to Robot Use
 
@@ -336,7 +246,7 @@ $T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\m
 
 LoGiC 评估时保留原来的后续观察，因此它提供的是固定轨迹上的支持度代理。删掉思考后重新闭环执行，动作分布和后续状态都可能改变。迁移实验应把似然代理与实际任务结果对照，额外计算也需要计入训练成本。
 
-## STEPWISE — Escalate at Events
+## Selective Escalation — STEPWISE
 
 ### Problem
 
@@ -370,7 +280,7 @@ Stuck 超阈值后，下一步交给强策略恢复。Milestone 超阈值后，�
 
 ![STEPWISE monitor ablation](assets/efficient_agents_2026/stepwise-ablation.png)
 
-论文在 OSWorld 与 WebArena 比较了小模型、强模型和级联，另做 stuck-only、milestone-only、两者结合与固定间隔核验的对照。它提供的是系统成本与成功率的折中，不能归结为单模型学出了更短的 CoT。方法见 §4，事件与固定间隔比较见 §6.2。
+论文在 OSWorld 与 WebArena 比较了小模型、强模型和级联，另做 stuck-only、milestone-only、两者结合与固定间隔核验的对照。它提供的是系统成本与成功率的折中，不能归结为单模型学出了更短的 CoT。表中的延迟列是每次请求的 Lat./Req.，需要与整项任务耗时区分。方法见 §4，事件与固定间隔比较见 §6.2。
 
 ### Transfer to Robot Use
 
@@ -380,9 +290,64 @@ Stuck 超阈值后，下一步交给强策略恢复。Milestone 超阈值后，�
 
 这篇也适合作为简单而有力的基线：固定动作模型，按可观测异常触发长推理。若学习式调度不能胜过这个规则方案，其额外训练与模块成本就需要重新解释。
 
+## Speculative Verification — SpecAgent
+
+### Problem
+
+长工具链中，让强模型逐步生成所有动作很慢。直接换成小模型可能损失质量；每步再请强模型重新生成一次，又容易付出两份解码成本。
+
+SpecAgent 把强模型的主要工作改为**审核小模型已经写出的多步片段**。核验一次读入整段，强模型只需生成短判定与必要修复，因而有机会减少串行解码。
+
+### Method and Training Recipe
+
+![SpecAgent draft verify and repair protocol](assets/efficient_agents_2026/specagent-protocol.png)
+
+这篇的主方法是推理时协议，没有用 PPO 或 GRPO 更新模型。理解它的核心是跟踪哪些动作已经执行、哪些动作尚未提交：
+
+1. **Draft：** 小模型连续起草；只读工具调用可以执行并取得真实结果，后续步骤依赖这些实际观察。
+2. **Hold：** 遇到第一个会修改环境的动作，将其暂存，并结束当前草稿段。
+3. **Verify：** 强模型读历史和整段草稿，返回语义上可接受的最长前缀，以及首个错误的解释和可选替换动作。
+4. **Commit or repair：** 全部通过才执行暂存动作；被拒绝的后缀丢弃，必要时由强模型补一个修复步骤，再从已提交历史重新起草。
+
+纯只读片段达到长度上限时，原文允许不经强核验直接提交。核验也不要求草稿与强模型自己会写出的动作逐字一致，而是评价它是否合理推进任务。
+
+为什么可能加速，可以用原文 §3.3 的近似成本模型理解。设一段有 $n$ 步、每步被接受的概率约为 $p$，强模型完整生成一步需 $d$ 次权重读取，而短核验需 $v$ 次。若拒绝后额外调用强模型修复的概率为 $q$，强模型成本相对值为：
+
+$$
+\mathcal R=
+\frac{1-p}{1-p^n}\frac{v}{d}
++q(1-p).
+$$
+
+在同一近似下，若小模型起草一步的耗时是强模型生成一步的 $\kappa$ 倍，总延迟相对值为：
+
+$$
+\mathcal L=
+\mathcal R+
+\kappa\frac{n(1-p)}{1-p^n}.
+$$
+
+这里把原文的修复概率换记为 $q$，避免与 PPO 概率比混淆。公式假设强模型处于 decode-bound 的服务区间、片段内接受近似独立，并忽略工具时间。它说明：较短判定、较高接受率和更快的小模型都会改善收益；若小模型很慢或修复频繁，整项任务未必更快。
+
+![SpecAgent task quality against memory traffic and time](assets/efficient_agents_2026/specagent-frontier.png)
+
+![SpecAgent compute memory and wall-time decomposition](assets/efficient_agents_2026/specagent-cost.png)
+
+原文用相同大小模型部署和相同并发比较不同协议，并计入草稿、拒绝片段、核验、修复与重试。其 Table 2 中，Airline 的成功率均为 86.0%，平均任务时间从 305.2 秒降至 126.2 秒；其他任务的质量恢复程度不一致。
+
+值得注意的是，FLOPs 和 HBM-read 来自请求 token 与架构的估算，耗时则实际计量。SpecAgent 的估算 FLOPs 可以上升：强模型对草稿做较大的并行 prefill，同时减少反复读取权重的逐 token 解码。**它主要改变计算形态与时间成本，不能概括为总计算量必然减少。**
+
+### Transfer to Robot Use
+
+可以借鉴“小模型提案、强模型核验”的角色分工，也可以研究把多步候选计划一次送给强模型检查。但原文的加速依赖能连续执行若干只读操作，并在修改环境的边界停下来。
+
+机械臂每次移动通常都会改变状态。若每个动作都是这样的边界，能够批量核验的片段就会很短；尚未执行动作后的相机画面也不能当成已知观察。因此，多步工具草稿无法直接变成多步真实控臂动作。
+
+更合适的初步迁移对象是读传感器、检索物体信息、规划候选等片段，或有明确验证接口的仿真规划。是否能省掉真实控臂的关键路径时间，需要单独测量；未完成执行前，不能把未来动作对应的反馈补写成实际观察。
+
 ## Synthesis — What Transfers, What Must Be Tested
 
-五篇给出的经验可以沿执行链连接起来。**RPO** 帮我们缩小需要优化的决策位置；**SAR** 补充内容相关的推理奖励；**CogRouter** 将轨迹信号分配到具体步骤和思考层级；**RACE** 检验已有思考的跨轮支持；**STEPWISE** 提供异常和阶段检查的触发方式。
+五类方法对应不同的干预：TAB 在生成前分配预算，PUMA 在生成中决定退出，RACE 判断历史推理能否继续支持动作，STEPWISE 选择需要强模型介入的时刻，SpecAgent 把强模型的生成转成批量核验。可以组合这些机制，但每多一个模块都增加成本与归因难度。
 
 这些经验还没有自动组成一个有效的 robot-use 方法。优先验证的主张可以收窄为：
 
@@ -417,7 +382,7 @@ $$
 
 $d_t$ 表示该轮后是否终止，$\gamma$ 是轮级折扣，$\lambda_{\mathrm{GAE}}$ 控制优势估计。用 $\rho_t,\widehat A_t$ 做 PPO clipped 更新，价值头拟合相应回报目标。冻结的动作生成 token 不加入预算策略的 PPO loss。
 
-SAR 已经在原文中采用 PPO，但其任务是单轮数学与逻辑；这里改为闭环预算决策，观察、动作和回报粒度都发生了变化。CogRouter 则提供了必须认真比较的多轮 CoPO 基线。引入 critic 增加了价值学习误差，采用 PPO 本身不构成新贡献。
+TAB 和 RACE 的原文采用组相对信号；PUMA 的外部早停及其前缀条件化 GRPO 也各有不同训练边界。这里的轮级 actor–critic PPO 是拟议迁移配方。引入 critic 增加了价值学习误差，采用 PPO 本身不构成新贡献。
 
 ### The Smallest Useful Comparison
 
@@ -429,8 +394,8 @@ SAR 已经在原文中采用 PPO，但其任务是单轮数学与逻辑；这里
 
 ## References
 
-- Taehyeon Kim et al. **Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking.** ACL 2026. [Paper](https://aclanthology.org/2026.acl-long.816/). Methods §3.2–3.3; Tables 2–5.
-- Peixuan Han et al. **Self-Aligned Reward: Towards Effective and Efficient Reasoners.** ICLR 2026. [Proceedings](https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html). Methods §3; Appendix B.1 and B.3. Preprint first released 2025-09-05.
-- Ruihan Yang et al. **Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents.** ICML 2026, PMLR 306. [Proceedings](https://proceedings.mlr.press/v306/yang26cz.html). Methods §3.3–3.4; Algorithm 1; Table 5.
-- Yiruo Cheng et al. **When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation.** arXiv:2610.12061v1, 2026-10-08. [Paper](https://arxiv.org/html/2610.12061v1). Methods §3.1–3.3; Table 2 and Figure 4.
-- Jinbiao Wei et al. **Step-level Optimization for Efficient Computer-use Agents.** arXiv:2604.27151v1, 2026-04-29. [Paper](https://arxiv.org/html/2604.27151v1). Methods §4; ablations §6; Appendix B.
+- Neharika Jali et al. **Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents.** First released 2026-04-06; reviewed version 2604.05164v4, 2026-11-15. [Paper](https://arxiv.org/html/2604.05164v4). §3.3, §4.3, Appendix A.
+- Dehai Min et al. **Stop When Reasoning Converges: Semantic-Preserving Early Exit for Reasoning Models.** 2605.17672v1, 2026-05-17. [Paper](https://arxiv.org/html/2605.17672v1). §3, §5.2, §6.2, Appendix F.
+- Yiruo Cheng et al. **When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation.** 2610.12061v1, 2026-10-08. [Paper](https://arxiv.org/html/2610.12061v1). §3.1–3.3, Table 2, Figure 4.
+- Jinbiao Wei et al. **Step-level Optimization for Efficient Computer-use Agents.** 2604.27151v1, 2026-04-29. [Paper](https://arxiv.org/html/2604.27151v1). §4, §6, Appendix B.
+- Zilin Wang et al. **Trajectory-Level Speculation with Semantic Verification for Tool-Using Agents.** 2610.21463v1, 2026-10-15. [Paper](https://arxiv.org/html/2610.21463v1). §3.2–3.3, Table 2, §5.

@@ -2,7 +2,32 @@
 
 Checked: 2026-11-25. Scope: adaptive/efficient reasoning for multi-turn agents, with computer-use as the closest interaction analogy and robot-use as a proposed transfer. No GPU workload, model training or simulator restoration was performed.
 
-## Current Selection
+## Current Mechanism-Oriented Selection
+
+The latest user clarification supersedes the venue-first constraint. Priorities: recent original releases, clear acceleration mechanism, evidence quality, agent relevance, and an interpretable recipe. Acceptance and PPO are supporting criteria rather than quotas. Five main works now cover five primary interventions: TAB (budget allocation), PUMA (within-generation early exit), RACE (cross-turn support/redundancy), STEPWISE (event-driven strong-model escalation), SpecAgent (draft/verify collaboration replacing serial strong decoding). Original release dates and reviewed-version dates are listed separately in the article.
+
+These classes are editorial intervention categories, not a claim of mutually exclusive methods. The article separates token savings, FLOPs and actual wall time. RPO is supplementary because its headline contribution targets gradient/training cost; SAR is supplementary because its original release is 2025 and it studies a general single-turn reward; CogRouter remains relevant prior work within adaptive effort but is not a sixth main section. All archived papers and historical assets are preserved.
+
+Quality evidence used for the selection:
+
+- TAB: multi-turn formulation; fixed solver versus trainable budgeter; auxiliary-task training followed by unchanged-policy transfer; overhead-inclusive latency; ablations and explicit terminal-credit limitation. Source: v4 §3.3, §4.3, Appendix A. Token consumption in training differs from allocated budget; the blog uses n_t for consumption.
+- PUMA: five-backbone/five-benchmark comparison; detector and verification ablations; actual wall-clock breakdown with counterexamples where token-saving baselines are slower; public code; train/test separation discussed in Appendix F. Critical qualification: its PUMA-RL expands question + RD-selected prefix + closing think token and generates only the answer phase. This does not directly demonstrate an autonomously sampled online stopping controller. §3, §5.2, §6.2, Appendix F.
+- RACE: matched-backbone SFT/RL ablations and explicit deletion procedure. Main efficiency evidence is reasoning tokens, not robot latency. Fixed reference actions/observations make the likelihood check a proxy, not an intervention rollout.
+- STEPWISE: GUI benchmarks, learned monitor ablations and periodic-verification comparison. Monitoring/verification inputs differ; no end-to-end PPO or process reward is asserted.
+- SpecAgent: matched Weak/Strong serving and concurrency; quality/resource tables; repair/review/semantic-match ablations; actual wall time plus separately estimated FLOPs/HBM-read. Read-only steps can execute; first mutation is held. No RL training in the main protocol. Physical manipulation changes the environment almost every step and limits available speculative depth. §3.2–3.3, Table 2, §5.
+
+Additional newly screened sources, not main selections:
+
+- Calibration-Free Early Stopping via E-processes, 2610.25212v1 (October): elegant zero-calibration rule and explicit probe cost, but signal-null crossing guarantees do not bound semantic answer-error probability. Predominantly replay/probe-based math evaluation; no wall-clock robot claim. Retained as an alternate early-exit reading.
+- Early Stopping in LRMs: A Survey and Empirical Audit, 2611.00166v1: supports evaluating probe overhead, reasoning leakage and retained justification; a survey/audit is not a representative training mechanism.
+- ESTAR, 2602.10004v1: classifier + stop-cue SFT + GRPO. §5.3 names MATH-500 for SFT data construction; split scope would need clarification before treating MATH-500 gains as clean held-out evidence. Its principal figures emphasize length; not preferred over PUMA's explicit timing and data-separation account.
+- ESPO, 2605.29860: early termination of failed training rollouts. Useful for training resource efficiency, but its rollout-token saving does not directly establish faster deployment.
+- AAPT, 2607.28399v1: moves decoding out of event-time critical path with precompiled policy trees; paired controlled evidence, but narrow pre-enumerable scenario, aggregate external-benchmark tie, and late-bound control outside current contract. SpecAgent selected for broader tool-agent cost/quality evidence.
+- RECAP, 2609.27156v1: semantic dependency graph and gold-answer-likelihood efficacy reshape GRPO advantages in mathematical reasoning; useful recent training mechanism, but no physical agent transfer or direct timing claim established here.
+
+No independent reproduction, official-code execution, or GPU workload was performed. The shortlist is an evidence-based editorial choice within the checked scope, not a global quality ranking.
+
+## Earlier Venue-Oriented Selection
 
 The user subsequently required the three papers other than RACE and STEPWISE to have verified top-conference acceptance. Current main papers: RPO (ACL 2026), SAR (ICLR 2026), CogRouter (ICML 2026), RACE and STEPWISE. MORE and TAB remain archived but are removed from the main article.
 
@@ -59,4 +84,4 @@ No official code was run, and no independent replication of the papers' empirica
 
 Preserve the personal site's light research-note identity: paper #f3f2ed, ink #191917, muted #66645e, line #d8d7d0, links #354b58. Use a restrained Helvetica/Arial sans-serif stack with CJK fallbacks and monospace metadata. The exact PI webfont could not be inspected because direct requests returned an access challenge and the UI browser host was unavailable; no exact font match is claimed. Narrow prose measure, wider original figures, light heading weights, no cards or tables.
 
-The current article displays 13 original PDF figure regions rendered at 3.5x. Historical MORE/TAB assets are preserved and marked inactive in provenance.json; five new SAR/CogRouter assets replace them in the article. No generated redraws, annotations or added source overlays. See provenance.json for authors, versions, licenses, pages, crops and checksums. The page provides five paper references at its end; figures have descriptive alt text and no image hyperlinks. Source PDFs remain unchanged.
+The current article displays 14 original PDF figure regions rendered at 3.5x. Historical assets remain preserved and inactive entries are marked in provenance.json. No generated redraws, annotations or added source overlays. See provenance.json for authors, versions, licenses, pages, crops and checksums. The page provides five paper references at its end; figures have descriptive alt text and no image hyperlinks. Source PDFs remain unchanged.

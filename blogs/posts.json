@@ -5,6 +5,6 @@
     "date": "2026-11-25",
     "published": "2026-11-25",
     "updated": "2026-11-25",
-    "summary": "三篇 2026 顶会工作 RPO、SAR、CogRouter，结合 RACE 与 STEPWISE，讲清动态推理、PPO 奖励及 robot-use 迁移。"
+    "summary": "按预算分配、生成中早停、跨轮复用、事件升级与推测式核验解读五篇近期工作，核对 RL recipe、实际耗时与机器人迁移。"
   }
 ]
