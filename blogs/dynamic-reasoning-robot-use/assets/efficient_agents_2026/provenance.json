@@ -16,7 +16,8 @@
     "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
     "version": "ACL 2026 proceedings",
     "url": "https://aclanthology.org/2026.acl-long.816.pdf",
-    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary"
+    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
+    "active_in_blog": true
   },
   {
     "asset": "rpo-recipe.png",
@@ -35,7 +36,8 @@
     "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
     "version": "ACL 2026 proceedings",
     "url": "https://aclanthology.org/2026.acl-long.816.pdf",
-    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary"
+    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
+    "active_in_blog": true
   },
   {
     "asset": "more-overview.png",
@@ -54,7 +56,8 @@
     "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
     "version": "2610.33684v2",
     "url": "https://arxiv.org/pdf/2610.33684v2",
-    "license": "CC BY 4.0"
+    "license": "CC BY 4.0",
+    "active_in_blog": false
   },
   {
     "asset": "more-training.png",
@@ -73,7 +76,8 @@
     "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
     "version": "2610.33684v2",
     "url": "https://arxiv.org/pdf/2610.33684v2",
-    "license": "CC BY 4.0"
+    "license": "CC BY 4.0",
+    "active_in_blog": false
   },
   {
     "asset": "tab-overview.png",
@@ -92,7 +96,8 @@
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0"
+    "license": "CC BY-NC-ND 4.0",
+    "active_in_blog": false
   },
   {
     "asset": "tab-transfer.png",
@@ -111,7 +116,8 @@
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0"
+    "license": "CC BY-NC-ND 4.0",
+    "active_in_blog": false
   },
   {
     "asset": "tab-latency.png",
@@ -130,7 +136,8 @@
     "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
     "version": "2604.05164v4",
     "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0"
+    "license": "CC BY-NC-ND 4.0",
+    "active_in_blog": false
   },
   {
     "asset": "race-logic.png",
@@ -149,7 +156,8 @@
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "active_in_blog": true
   },
   {
     "asset": "race-training.png",
@@ -168,7 +176,8 @@
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "active_in_blog": true
   },
   {
     "asset": "race-ablation.png",
@@ -187,7 +196,8 @@
     "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary"
+    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
+    "active_in_blog": true
   },
   {
     "asset": "stepwise-overview.png",
@@ -206,7 +216,8 @@
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
-    "license": "CC BY 4.0"
+    "license": "CC BY 4.0",
+    "active_in_blog": true
   },
   {
     "asset": "stepwise-failures.png",
@@ -225,7 +236,8 @@
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
-    "license": "CC BY 4.0"
+    "license": "CC BY 4.0",
+    "active_in_blog": true
   },
   {
     "asset": "stepwise-ablation.png",
@@ -244,6 +256,112 @@
     "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
-    "license": "CC BY 4.0"
+    "license": "CC BY 4.0",
+    "active_in_blog": true
+  },
+  {
+    "asset": "sar-results.png",
+    "source_pdf": "SAR_ICLR2026.pdf",
+    "page": 1,
+    "figure": 1,
+    "crop_points": [
+      108,
+      485,
+      504,
+      591
+    ],
+    "sha256": "e1f41157d5c30a2eb4d3edfb11754c4bb6ee85fa635ff9f876449e6a1c59713a",
+    "modification": "Original PDF figure region; no annotations or overlays.",
+    "active_in_blog": true,
+    "version": "ICLR 2026 proceedings",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
+    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
+    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
+    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
+    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
+  },
+  {
+    "asset": "sar-token-signal.png",
+    "source_pdf": "SAR_ICLR2026.pdf",
+    "page": 5,
+    "figure": 2,
+    "crop_points": [
+      108,
+      322,
+      504,
+      404
+    ],
+    "sha256": "089f66199208ef860dbcf330b53832dff2915efef0d0c1bbd8eccb385861e0d5",
+    "modification": "Original PDF figure region; no annotations or overlays.",
+    "active_in_blog": true,
+    "version": "ICLR 2026 proceedings",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
+    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
+    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
+    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
+    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
+  },
+  {
+    "asset": "sar-pareto.png",
+    "source_pdf": "SAR_ICLR2026.pdf",
+    "page": 7,
+    "figure": 3,
+    "crop_points": [
+      108,
+      205,
+      504,
+      438
+    ],
+    "sha256": "b7e84a5f4a505ea36eb2ab42d481f5484113749c1046671d2575e3d4b748b80c",
+    "modification": "Original PDF figure region; no annotations or overlays.",
+    "active_in_blog": true,
+    "version": "ICLR 2026 proceedings",
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
+    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
+    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
+    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
+    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
+  },
+  {
+    "asset": "cogrouter-framework.png",
+    "source_pdf": "CogRouter_ICML2026.pdf",
+    "page": 4,
+    "figure": 2,
+    "crop_points": [
+      55,
+      67,
+      543,
+      284
+    ],
+    "sha256": "6374b838a1e82c8cbae30fae635cf748702f4485199dcf0a0cf258d51d2ebef8",
+    "modification": "Original PDF figure region; no annotations or overlays.",
+    "active_in_blog": true,
+    "version": "ICML 2026 proceedings",
+    "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
+    "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
+    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
+    "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
+    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents"
+  },
+  {
+    "asset": "cogrouter-adaptation.png",
+    "source_pdf": "CogRouter_ICML2026.pdf",
+    "page": 7,
+    "figure": 5,
+    "crop_points": [
+      307,
+      60,
+      543,
+      251
+    ],
+    "sha256": "60130a2d97e5259c4ec5366e1fd81e3c41763b160561c3514d692711b04a1321",
+    "modification": "Original PDF figure region; no annotations or overlays.",
+    "active_in_blog": true,
+    "version": "ICML 2026 proceedings",
+    "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
+    "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
+    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
+    "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
+    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents"
   }
 ]

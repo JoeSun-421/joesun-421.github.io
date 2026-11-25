@@ -2,7 +2,23 @@
 
 Checked: 2026-11-25. Scope: adaptive/efficient reasoning for multi-turn agents, with computer-use as the closest interaction analogy and robot-use as a proposed transfer. No GPU workload, model training or simulator restoration was performed.
 
-## Selection
+## Current Selection
+
+The user subsequently required the three papers other than RACE and STEPWISE to have verified top-conference acceptance. Current main papers: RPO (ACL 2026), SAR (ICLR 2026), CogRouter (ICML 2026), RACE and STEPWISE. MORE and TAB remain archived but are removed from the main article.
+
+Acceptance was checked at the official proceedings:
+
+- RPO: https://aclanthology.org/2026.acl-long.816/
+- SAR: https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html
+- CogRouter: https://proceedings.mlr.press/v306/yang26cz.html
+
+SAR first appeared as arXiv:2509.05489 on 2025-09-05; its selection is based on the 2026 conference version, not a claim of first release in 2026. CogRouter uses the official PMLR PDF because its arXiv and proceedings metadata/numbering differ.
+
+SAR source check: §3.1–3.2, Appendix B.1/B.3, Table 9. PPO includes a critic. Conditional scoring reuses log-probabilities; standalone scoring removes the user prompt but retains the system prompt. The SAR-GRPO branch uses Dr. GRPO without std normalization. The plotted token importance is explanatory, not the implemented per-token environment reward. Official code is published, but direct raw requests to the README-named ppo.sh returned 404 in this check; no runnable reproduction claim is made.
+
+CogRouter source check: official §3.3–3.4, Algorithm 1, Appendix E, Table 5. Four-level CoSFT precedes group-relative CoPO. Successful trajectories are expanded with four alternative thoughts at each fixed observation/action; confidence is the mean action-token log probability. Within-step standardization and softmax weights redistribute the trajectory advantage. Failed trajectories are not expanded. There is no learned critic or direct length penalty. No simulator reruns of the alternative thoughts are part of that scoring procedure.
+
+## Superseded Selection
 
 Five main papers: RPO (ACL 2026 proceedings), MORE (2610.33684v2), TAB (2604.05164v4), RACE (2610.12061v1), STEPWISE (2604.27151v1). The year for RPO is its verified proceedings year; no unverified first-preprint date is asserted. All other selected versions are arXiv preprints; no acceptance status is inferred.
 
@@ -43,4 +59,4 @@ No official code was run, and no independent replication of the papers' empirica
 
 Preserve the personal site's light research-note identity: paper #f3f2ed, ink #191917, muted #66645e, line #d8d7d0, links #354b58. Use a restrained Helvetica/Arial sans-serif stack with CJK fallbacks and monospace metadata. The exact PI webfont could not be inspected because direct requests returned an access challenge and the UI browser host was unavailable; no exact font match is claimed. Narrow prose measure, wider original figures, light heading weights, no cards or tables.
 
-All 13 figures are original PDF regions rendered at 3.5x. No generated redraws, annotations or added source overlays. See provenance.json for authors, versions, licenses, pages, crops and checksums. The page provides five paper references at its end; figures have descriptive alt text and no image hyperlinks. Source PDFs remain unchanged.
+The current article displays 13 original PDF figure regions rendered at 3.5x. Historical MORE/TAB assets are preserved and marked inactive in provenance.json; five new SAR/CogRouter assets replace them in the article. No generated redraws, annotations or added source overlays. See provenance.json for authors, versions, licenses, pages, crops and checksums. The page provides five paper references at its end; figures have descriptive alt text and no image hyperlinks. Source PDFs remain unchanged.

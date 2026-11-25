@@ -1,7 +1,7 @@
 ---
 title: "Adaptive Reasoning: From Computer Use to Robot Use"
 date: 2026-11-25
-description: "五篇 2026 工作：从根决策、模式与预算、多轮分配、跨轮推理覆盖到事件触发核验，理解 RL recipe 及其机器人迁移边界。"
+description: "三篇 2026 顶会工作与两篇近期 agent 工作：从根决策、内容相关奖励、逐步认知深度到跨轮推理与事件核验。"
 tags: [dynamic-reasoning, efficient-agents, computer-use, robot-use, reinforcement-learning]
 slug: dynamic-reasoning-robot-use
 ---
@@ -18,9 +18,9 @@ slug: dynamic-reasoning-robot-use
 
 computer-use 是一个值得先看的相邻领域。点击与机械臂移动都遵循“观察 → 决策 → 执行 → 新观察”，任务成功取决于整条交互轨迹。两者也有实质差别：机器人动作受接触、动力学和感知误差影响，生成一个正确格式的坐标，并不能保证达到预期物理状态。
 
-下面保留五个有区分度的切入点：**RPO** 缩小训练的决策位置；**MORE** 联合优化推理形式与预算；**TAB** 分配整条交互的预算；**RACE** 判断哪些跨轮思考可以省略；**STEPWISE** 在卡住或关键节点时升级核验。它们覆盖从单轮路由到多轮交互，STEPWISE 最直接研究 computer-use。
+下面保留五个有区分度的切入点：**RPO** 缩小训练的决策位置；**SAR** 为推理质量与效率提供内容相关奖励；**CogRouter** 在每一步选择认知深度；**RACE** 判断哪些跨轮思考可以省略；**STEPWISE** 在卡住或关键节点时升级核验。它们覆盖从单轮路由到多轮交互，STEPWISE 最直接研究 computer-use。
 
-选文核对至 2026-11-25。RPO 采用 ACL 2026 正式版，其余采用文末列出的 2026 arXiv 版本。PPO 是我们关注的迁移路线，但原文中的算法分别保留：MORE 是 PPO-style 更新，RPO、TAB、RACE 使用组相对信号，STEPWISE 训练分类监测器。最后再讨论 actor–critic PPO 的适配。
+选文核对至 2026-11-25。前三篇按 2026 年顶会正式版本选取：RPO（ACL）、SAR（ICLR）、CogRouter（ICML）；SAR 的预印本首次发表于 2025 年。RACE 和 STEPWISE 保留文末指定的预印本版本。算法沿用原文：SAR 实际测试 actor–critic PPO，RPO、CogRouter、RACE 使用组相对信号，STEPWISE 训练分类监测器。最后再讨论 robot-use 的 PPO 适配。
 
 ## RPO — Learn the Root Decision
 
@@ -93,73 +93,58 @@ $$
 
 它主要解决训练成本，未直接证明多轮控臂性能。机器人 rollout、环境复位和长短分支采样的成本仍然存在。
 
-## MORE — Couple Reasoning Mode and Budget
+## SAR — Reward Query-Specific Reasoning
 
 ### Problem
 
-“思考多久”与“采用什么推理方式”相互影响。代码、长 CoT、短 CoT 和直接回答的合理长度不同；模型变强之后，原来困难的任务也可能已经不需要长推理。
+只按答案对错给奖励，正确但冗长的回答和正确且简洁的回答可能同分。直接按长度收费，又可能同时压低必要推导与重复解释。
 
-MORE 同时调整**模式选择、难度状态与模式对应的预算区间**，让效率约束随训练变化。
+SAR 增加一个内容相关的信号：**当前问题给这段回答带来的可预测性增益。** 它用这个差异补充最终正确性，而不预先指定每道题应该写多长。
+
+这篇采用 ICLR 2026 正式版本；预印本首次发布于 2025 年 9 月。它属于 efficient reasoning 的奖励方法，原文没有训练多轮机器人或 GUI 预算路由器。
 
 ### Method and RL Recipe
 
-先看图中两个阶段，以及右侧与策略一起更新的控制状态。
+对采样得到的完整回答 $y_i$，用同一个当前策略分别打两次分：一次保留问题 $q$，一次移除用户问题。实现中仍保留 system prompt，答案和 padding 的 mask 保持一致。
 
-![MORE two-stage training and mode-budget controller](assets/efficient_agents_2026/more-overview.png)
-
-Stage 1 用 SFT 建立 direct、short-CoT、long-CoT、code 四类输出格式。Stage 2 采用 proposer–solver 循环：共享策略生成可执行任务，再解这些任务，由执行器提供验证反馈。原文包含 input、output、function 三类任务的 proposer 与 solver，共六路轨迹。
-
-每条轨迹的处理顺序是：
-
-1. 保存生成前的难度与预算状态。
-2. 模型先生成模式标记，再按对应格式生成回答。
-3. 执行验证，计算任务反馈和模式、预算相关奖励。
-4. 用保存的旧控制状态给当前轨迹计分。
-5. 汇总轨迹做策略更新，并把新结果写入后续使用的难度与预算状态。
-
-先保存旧状态再计分，可以避免当前样本一边改变预算标准、一边按变化后的标准给自己打分。
-
-难度由相近任务簇的滚动成功率估计。预算下界与上界 $B^-_{d,m},B^+_{d,m}$ 则逐渐根据正确回答长度的分位数更新；$d$ 表示难度档位，$m$ 表示模式。它们提供软奖励约束，并非每条轨迹都强制生成到目标长度。
-
-下式展开 solver 的终局回报；proposer 使用其任务构造反馈替换第一项：
-
-$$
-R_i=R_{\mathrm{acc},i}
-+\alpha R_{\mathrm{BD},i}
-+\beta R_{\mathrm{MF},i}
-+\xi R_{\mathrm{MB},i}.
-$$
-
-$R_{\mathrm{acc},i}$ 来自执行验证器。$R_{\mathrm{BD},i}$ 衡量长度偏离预算区间；$R_{\mathrm{MF},i}$ 给正确回答分配难度与模式匹配的效用；$R_{\mathrm{MB},i}$ 给正确回答施加模式与预算的联合偏离项。这里用 $\xi$ 表示原文的第三个奖励权重，避免与 RL 折扣混淆。
-
-长度 $L_i$ 的上、下偏离分别为：
+把每个回答 token 在两种上下文中的平均 log-probability 记为：
 
 $$
 \begin{aligned}
-o_i&=\max\!\left(0,\frac{L_i-B^+_{d,m}}{B^+_{d,m}}\right),\\
-u_i&=\max\!\left(0,\frac{B^-_{d,m}-L_i}{B^-_{d,m}}\right),\\
-D_i&=o_i+w_u(c_i)u_i,\\
-R_{\mathrm{BD},i}
-&=\operatorname{clip}(-\lambda_dD_i,-0.5,0).
+\ell_q(y_i)&=\frac1{K_i}\sum_{k=1}^{K_i}
+\log\pi_\theta(y_{i,k}\mid q,y_{i,<k}),\\
+\ell_0(y_i)&=\frac1{K_i}\sum_{k=1}^{K_i}
+\log\pi_\theta(y_{i,k}\mid y_{i,<k}).
 \end{aligned}
 $$
 
-$D_i$ 合并上、下预算偏离，$\lambda_d$ 是难度档位的偏离惩罚权重。$c_i$ 是验证正确性。原文设置 $w_u(1)=1$、$w_u(0)=0.1$：过长都会被罚，错误回答低于预算下界时的压力较小。**这个奖励也约束过短输出，因此不能概括为“越短越好”。** 模式效用 $U(d,m)$ 则包含预设偏好，并非完全从结果中自由学出。
+$K_i$ 是回答的有效 token 数；下标 0 表示去掉用户问题后的评分上下文，并非完全无条件模型。两项均由 teacher-forced scoring 获得，无需再次采样一段回答。
 
-原文称更新方法为 MATE-PPO，但附录 C.3 使用的是 **REINFORCE++ 回报标准化，没有 learned critic 或 GAE**。终局奖励写在最后一个有效 token，折扣为 1，各生成位置取得同一条轨迹的回报：
+原文式 (6)–(7) 用 perplexity 定义奖励。将它写成上述 log-probability 的等价形式，数值关系更清楚：
 
 $$
 \begin{aligned}
-G_{i,k}&=R_i,\\
-\widehat A_{i,k}
-&=\frac{G_{i,k}-\mu_{\mathcal V}}
-{\sqrt{\sigma_{\mathcal V}^2+10^{-8}}}.
+\Delta_i&=\ell_q(y_i)-\ell_0(y_i),\\
+R_{\mathrm{SA},i}
+&=\operatorname{clip}\!\left(1-e^{-\Delta_i},-1,1\right),\\
+R_i&=R_{\mathrm{VR},i}+\alpha R_{\mathrm{SA},i}.
 \end{aligned}
 $$
 
-$k$ 是生成 token 位置；$\mathcal V$ 是六路轨迹合并后的有效 token 集，均值和标准差也在这个集合上计算。模式标记参与策略损失，因此能从最终回报获得梯度。
+$R_{\mathrm{VR},i}$ 来自答案验证，正确为 1，否则为 0；$\alpha$ 控制 SAR 的权重。如果问题明显提高了回答概率，$\Delta_i$ 为正，SAR 也为正。泛化套话即使本身很流畅，保留和删除问题时的概率差也可能较小。
 
-随后使用逐 token 的新旧策略比 $\rho_{i,k}$ 做 clipped actor 更新：
+![SAR token-level query dependence](assets/efficient_agents_2026/sar-token-signal.png)
+
+上图的颜色展示 token 对问题的依赖差异。原文把这作为解释整体奖励的分析；**训练仍使用回答级 SAR，不能把图中的颜色直接称为已经验证的逐 token 过程奖励。**
+
+SA-PPO 的训练链条是：
+
+1. 从数学训练问题采样完整回答，取得最终正确性。
+2. 复用已有的条件 log-probability，额外计算去掉问题后的 log-probability。
+3. 计算 $R_{\mathrm{SA},i}$，与正确性合成 $R_i$，作为这条回答的任务奖励。
+4. 使用 PPO 的价值基线估计优势，更新 actor 与 critic，并保留相对参考模型的 KL 约束。
+
+其 actor 更新采用逐 token 的 clipped surrogate。为突出奖励接入位置，记 $h_{i,k}$ 为生成前缀：
 
 $$
 \begin{aligned}
@@ -168,92 +153,112 @@ $$
 {\pi_{\mathrm{old}}(y_{i,k}\mid h_{i,k})},\\
 \overline\rho_{i,k}
 &=\operatorname{clip}(\rho_{i,k},1-\epsilon,1+\epsilon),\\
-J_{\mathrm{MATE}}
-&=\mathbb E_{i,k}\!\left[
-\min\!\left(\rho_{i,k}\widehat A_{i,k},
-\overline\rho_{i,k}\widehat A_{i,k}\right)
-\right].
+F_{i,k}&=\min\!\left(
+\rho_{i,k}\widehat A_{i,k},
+\overline\rho_{i,k}\widehat A_{i,k}\right),\\
+J_{\mathrm{SA\text{-}PPO}}
+&=\mathbb E_i\!\left[\frac1{K_i}\sum_kF_{i,k}\right]
+-\beta D_{\mathrm{KL}}.
 \end{aligned}
 $$
 
-$h_{i,k}$ 是该 token 的已采样上下文，$\epsilon$ 是裁剪宽度，$\overline\rho_{i,k}$ 是裁剪后的概率比。这个 PPO-style actor 目标不能单独证明方法具有 actor–critic PPO 的价值估计机制。
+$\widehat A_{i,k}$ 是由合成奖励进入回报估计后得到的 PPO 优势，$\epsilon$ 为裁剪宽度，$\beta$ 为参考策略 KL 权重。这里沿用原文 §3.1 的 PPO 目标；SAR 的变化发生在奖励端，没有另造一个模式选择损失。
 
-![MORE mode proportions and training token cost](assets/efficient_agents_2026/more-training.png)
+原文 Appendix B.3 明确列出 critic 学习率，因此这里确实包含价值学习。其配置中 actor 学习率为 $10^{-6}$、critic 为 $2\times10^{-6}$，PPO 与 SA-PPO 保持同一训练配置。论文还测试 SA-GRPO，采用 Dr. GRPO 的中心化优势，不能与 PPO 的 critic 混写。
 
-上图左侧看模式比例随训练变化，右侧看 token 开销；它们共同检验模型是否一直坍缩到某个模式。论文还在 §5 与附录给出模块消融和跨规模实验。代码、数学任务的可执行验证是这套 recipe 的重要基础。
+![SAR accuracy and efficiency across backbones](assets/efficient_agents_2026/sar-results.png)
+
+![SAR accuracy-length tradeoff](assets/efficient_agents_2026/sar-pareto.png)
+
+上图给跨模型结果，下图给奖励权重变化时的准确率与长度折中。下图对应 SA-GRPO，不应归到 SA-PPO 名下。原文主要测试数学与逻辑推理；附录的视觉语言扩展收益较有限，因此不能假定这个文本概率信号会直接迁移到控臂。
 
 ### Transfer to Robot Use
 
-最值得借鉴的是**预算与模型当前能力一起校准**，以及让模式标记真正参与策略优化。机器人中可以比较直接动作、短推理和完整重规划，但原文的 code 模式和代码任务生成器需要重新评估。
+可以借鉴的是**用内容相关的评分补充粗粒度成功信号**，以及把这类评分直接接入现有 PPO，而非重新设计整个优化器。
 
-直接照搬奖励有两个风险。首先，文本回答正确性通常可以直接验证，机器人中则需要实际执行才能知道动作有没有奏效。其次，少数正确轨迹的长度不一定能代表合理预算：环境难度、失败恢复和模型能力会同时影响它。
+机器人中需要先确定“删掉什么上下文”才有意义：任务要求、历史反馈和当前视觉状态分别承担不同信息。简单移除任务文本，可能鼓励模型重复目标名称；移除视觉信息，又会改变模型对坐标的预测条件。
 
-因此可以先借用模式选择机制，保持简单可解释的成本项；只有观察到固定预算随训练失配，再加入动态预算区间。各模块应分别贡献可测收益。
+SAR 奖励的是概率差，无法直接保证物理有效性。它甚至可能压低某些正确的无思考回答：原文 Table 2 就分析了这种现象。因此，针对每轮可以直接输出动作的 robot-use agent，应该先验证评分与实际成功、恢复能力的关系，再决定是否用来塑造奖励。
 
-## TAB — Allocate Compute Across Turns
+## CogRouter — Adapt Cognitive Depth at Each Step
 
 ### Problem
 
-多轮任务的预算存在前后依赖：前面少花一点，可能节省计算，也可能因为漏掉约束导致后面反复补救。每轮独立估计难度，无法充分评价这种影响。
+多轮 agent 的终局奖励会强化整条成功轨迹，但其中可能既有必要的规划，也有机械地重复长思考。统一强化所有步骤，容易让模型固定使用某一种推理模式。
 
-TAB 将整条交互视为预算分配问题，优化**完成任务与总预算之间的折中**。
-
-![TAB budget allocator and solver loop](assets/efficient_agents_2026/tab-overview.png)
+CogRouter 让模型每一步选择认知深度，并用**不同思考对同一个动作的预测置信度**重新分配训练权重。它已发表于 ICML 2026，实验是 ALFWorld 和 ScienceWorld 的文本交互，尚未直接测试 GUI 或末端坐标控制。
 
 ### Method and RL Recipe
 
-TAB 分开使用 Budgeter 和 Solver。每轮 Budgeter 根据历史与当前输入输出难度档位，再映射成 Solver 的 token 预算或 reasoning-effort 设置。Solver 在这个设置下生成回答，新的反馈进入下一轮。
+四个层级具有不同输出结构：L1 直接响应；L2 分析当前状态与可用动作；L3 结合目标和执行历史做反思；L4 进一步评价候选动作的未来影响。每轮依次输出 `<level>`、`<think>` 和 `<action>`。
 
-可将其写为：
+![CogRouter cognition-aware supervised and RL training](assets/efficient_agents_2026/cogrouter-framework.png)
 
-$$
-b_t\sim\pi_\phi(\cdot\mid h_t),
-\qquad
-y_t\sim f_\theta(\cdot\mid h_t;b_t).
-$$
+先做 CoSFT：收集专家成功轨迹，在各步骤均衡随机指定四个层级，再让专家模型根据历史和固定参考动作补写对应思考。这样先建立四种可用的输出模式，避免 RL 一开始就失去某个分支。
 
-$t$ 是交互轮次；$h_t$ 包括当前输入与之前的交互；$\phi$ 是预算策略参数，$\theta$ 是 Solver 参数。RL 更新 Budgeter，Solver 提供预算动作后的反馈。
+CoPO 的训练顺序如下：
 
-原文只在便宜的多轮数学任务上训练 Budgeter，随后不再微调，迁移到 BFCL、Tau-Bench、Terminal-Bench。这个设置直接检验了**预算策略的跨任务迁移**。
+1. 当前策略与环境交互，采样完整任务轨迹。
+2. 用任务成功和输出格式计算轨迹奖励：任一步格式不合要求，格式项为 0。
+3. 同一任务的轨迹组计算组相对优势。
+4. 对成功轨迹的每一步，固定已有观察与动作，重新生成四个层级的思考，形成 cognitive group。
+5. 对固定动作做 teacher-forced scoring，按四种思考下的动作置信度分配该步优势；失败轨迹保持原始轨迹优势。
+6. 用这些优势优化层级、思考和动作 token 的 clipped policy loss，保留参考策略 KL。
 
-训练用 GRPO：
-
-1. 同一道训练题采样多条完整交互，每条使用不同的预算分配序列。
-2. 到终局检查答案，同时统计实际消耗的 Solver token。
-3. 根据全局预算计算奖励，在同题轨迹组内标准化。
-4. 将轨迹优势用于该轨迹中所有预算决策的 clipped policy 更新。
-
-为区分“分配量”与“消耗量”，这里把第 $t$ 轮实际消耗记为 $n_t$。原文式 (2) 的脚注明确，训练计分使用实际 token：
+轨迹奖励与优势仍是组相对形式：
 
 $$
-R_i=S_i-\lambda\max\!\left(0,\sum_t n_{i,t}-B\right).
-$$
-
-$S_i$ 是终局正确性，$B$ 是整项任务的目标预算，$\lambda$ 是超额成本系数。低于 $B$ 时成本项为零，策略可以把预算集中到关键轮次。
-
-$$
+\begin{aligned}
+R_i&=R_i^{\mathrm{task}}R_i^{\mathrm{format}},\\
 \widehat A_i
-=\frac{R_i-\operatorname{mean}_{j\in\mathcal G(x)}R_j}
+&=\frac{R_i-\operatorname{mean}_{j\in\mathcal G(x)}R_j}
 {\operatorname{std}_{j\in\mathcal G(x)}R_j}.
+\end{aligned}
 $$
 
-$\mathcal G(x)$ 是同一道题的完整轨迹组。**同一条轨迹的各轮共享这个优势**；它学习哪些整体分配方案更好，尚未给每一轮提供独立的因果贡献估计。
+两个奖励因子均为 0/1。$\mathcal G(x)$ 是同一任务的轨迹组；CoPO 沿用 GRPO 的组相对信号，没有引入 PPO critic。
 
-recipe 的一个可复现配置是 Qwen3-4B Budgeter、LoRA rank 64、125 个训练更新；对不同全局目标预算分别训练策略。原文 §3.3 与 Appendix A 给出奖励、映射、训练和计时口径。
+对成功轨迹 $i$ 的第 $t$ 步，将其固定参考动作记为 $a_{i,t}$，长度为 $M_{i,t}$。在第 $c$ 个认知层级生成的思考和历史共同构成上下文 $h_{i,t}^{(c)}$，动作置信度为：
 
-![TAB transfer accuracy versus total tokens](assets/efficient_agents_2026/tab-transfer.png)
+$$
+C_{i,t}^{(c)}
+=\frac1{M_{i,t}}\sum_{k=1}^{M_{i,t}}
+\log\pi_\theta\!\left(
+ a_{i,t,k}\mid h_{i,t}^{(c)},a_{i,t,<k}
+\right).
+$$
 
-![TAB transfer accuracy versus end-to-end latency](assets/efficient_agents_2026/tab-latency.png)
+这里 $c\in\{1,2,3,4\}$ 表示层级，$k$ 表示动作 token。四个分数都在**同一历史、同一动作**上比较，因此能减少不同动作本身难度的干扰。
 
-两图需要一起看：上图检验 token，下面检验时间。原文迁移实验报告最多约 20% token 与 15% 延迟节省；计时包含 Budgeter 开销。它支持这些测试环境中的迁移，尚未覆盖物理控臂。
+在这四个分数内部标准化，再做 softmax：
+
+$$
+\begin{aligned}
+\widetilde C_{i,t}^{(c)}
+&=\frac{C_{i,t}^{(c)}-\mu_{i,t}}{\sigma_{i,t}},\\
+w_{i,t}^{(c)}
+&=\frac{\exp(\eta\widetilde C_{i,t}^{(c)})}
+{\sum_{b=1}^{4}\exp(\eta\widetilde C_{i,t}^{(b)})},\\
+\widehat A_{i,t}^{(c)}
+&=w_{i,t}^{(c)}\widehat A_i\qquad(R_i>0).
+\end{aligned}
+$$
+
+$\mu_{i,t},\sigma_{i,t}$ 仅由该步四个层级的分数计算；$\eta$ 控制权重分布的尖锐程度，原文设为 2。四个权重之和为 1，分数高的层级分到更多正向权重。失败轨迹不扩展四组思考，继续使用 $\widehat A_i$。
+
+这些权重**并未增加新的环境成功奖励**。当轨迹优势本来就是 0 时，乘上权重仍然是 0。它解决的是已有学习信号如何分配，不能自动解决无奖励启动。
+
+![CogRouter adaptation across task progress and complexity](assets/efficient_agents_2026/cogrouter-adaptation.png)
+
+上图比较不同任务进度与任务复杂度下的层级使用。它检验模型是否一直选最深层，而不只看平均 token 是否减少。原文 §3.4、Algorithm 1 和 Table 5 分别给出优势加权、完整流程与置信度消融。
 
 ### Transfer to Robot Use
 
-这篇最直接支持“先学调度，再尝试跨域迁移”的研究路线。可以先让预算策略读历史、当前视觉信息与执行反馈，再决定控臂模型下一轮的推理强度。
+这是新名单中最接近我们“每轮根据状态调整思考”的训练先例。可以把其层级化输出映射到直接动作、状态核验、失败反思与候选动作规划，随后检验这些层级是否真的带来不同执行行为。
 
-不过，TAB 的跨域实验仍主要使用文本交互状态。相机变化、接触与物体位移需要合适的表征；同一个难度档位对不同控臂模型是否具有一致含义，也要测试。
+但固定成功动作、为它补写不同思考，更接近对已知行为的解释与打分。若四个层级重新闭环执行，它们未必选择同一动作，也未必有同样的后续结果。**动作置信度仍是代理信号，不能直接当作物理因果贡献。**
 
-Budgeter 本身还会增加延迟。对小型控臂模型，额外跑一次 4B Budgeter 可能不划算。冻结同一动作底座、比较轻量选择器与固定预算，并统计整项任务真实耗时，才容易解释收益来自哪里。
+对坐标 JSON，还需排查格式、数值编码和动作等价性是否支配置信度。若高置信度只表示“更容易复述这串坐标”，CoPO 的信号可能无法选出更可靠的推理深度。迁移对照应同时检验实际执行反馈，并计入训练中额外生成四种思考的成本。
 
 ## RACE — Preserve Cross-Turn Reasoning Support
 
@@ -377,7 +382,7 @@ Stuck 超阈值后，下一步交给强策略恢复。Milestone 超阈值后，�
 
 ## Synthesis — What Transfers, What Must Be Tested
 
-五篇给出的经验可以沿执行链连接起来。**RPO** 帮我们缩小需要优化的决策位置；**MORE** 提醒模式与预算会随能力变化；**TAB** 把预算放到整项任务中评价；**RACE** 检验已有思考的跨轮支持；**STEPWISE** 提供异常和阶段检查的触发方式。
+五篇给出的经验可以沿执行链连接起来。**RPO** 帮我们缩小需要优化的决策位置；**SAR** 补充内容相关的推理奖励；**CogRouter** 将轨迹信号分配到具体步骤和思考层级；**RACE** 检验已有思考的跨轮支持；**STEPWISE** 提供异常和阶段检查的触发方式。
 
 这些经验还没有自动组成一个有效的 robot-use 方法。优先验证的主张可以收窄为：
 
@@ -412,7 +417,7 @@ $$
 
 $d_t$ 表示该轮后是否终止，$\gamma$ 是轮级折扣，$\lambda_{\mathrm{GAE}}$ 控制优势估计。用 $\rho_t,\widehat A_t$ 做 PPO clipped 更新，价值头拟合相应回报目标。冻结的动作生成 token 不加入预算策略的 PPO loss。
 
-这与 MORE 的整批标准化回报、TAB 的同题组优势有明确区别。引入 critic 提供了更细的信用估计，也增加了价值学习误差；采用 PPO 本身不构成新贡献。
+SAR 已经在原文中采用 PPO，但其任务是单轮数学与逻辑；这里改为闭环预算决策，观察、动作和回报粒度都发生了变化。CogRouter 则提供了必须认真比较的多轮 CoPO 基线。引入 critic 增加了价值学习误差，采用 PPO 本身不构成新贡献。
 
 ### The Smallest Useful Comparison
 
@@ -425,7 +430,7 @@ $d_t$ 表示该轮后是否终止，$\gamma$ 是轮级折扣，$\lambda_{\mathrm
 ## References
 
 - Taehyeon Kim et al. **Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking.** ACL 2026. [Paper](https://aclanthology.org/2026.acl-long.816/). Methods §3.2–3.3; Tables 2–5.
-- Dianxing Shi et al. **MORE: Mode-Optimized Reasoning with Self-Adaptive Effort for Self-Evolving Agents.** arXiv:2610.33684v2, 2026-11-05. [Paper](https://arxiv.org/html/2610.33684v2). Methods §3; Appendix C.3 and D.
-- Neharika Jali et al. **Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents.** arXiv:2604.05164v4, 2026-11-15. [Paper](https://arxiv.org/html/2604.05164v4). Methods §3.3; transfer §4.3; Appendix A.
+- Peixuan Han et al. **Self-Aligned Reward: Towards Effective and Efficient Reasoners.** ICLR 2026. [Proceedings](https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html). Methods §3; Appendix B.1 and B.3. Preprint first released 2025-09-05.
+- Ruihan Yang et al. **Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents.** ICML 2026, PMLR 306. [Proceedings](https://proceedings.mlr.press/v306/yang26cz.html). Methods §3.3–3.4; Algorithm 1; Table 5.
 - Yiruo Cheng et al. **When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation.** arXiv:2610.12061v1, 2026-10-08. [Paper](https://arxiv.org/html/2610.12061v1). Methods §3.1–3.3; Table 2 and Figure 4.
 - Jinbiao Wei et al. **Step-level Optimization for Efficient Computer-use Agents.** arXiv:2604.27151v1, 2026-04-29. [Paper](https://arxiv.org/html/2604.27151v1). Methods §4; ablations §6; Appendix B.
