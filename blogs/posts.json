@@ -5,6 +5,6 @@
     "date": "2026-11-24",
     "published": "2026-11-25",
     "updated": "2026-11-25",
-    "summary": "从 Thinkless、TON 与 AdaCoT 出发，用图和公式理解动态推理的 RL 训练，以及 robot-use agent 的实验流程。"
+    "summary": "按 Thinkless、AdaCoT、TON、DEER、DyCon 分别解读动态推理的控制与 RL 训练，结合原论文插图讨论 robot-use agent 迁移。"
   }
 ]

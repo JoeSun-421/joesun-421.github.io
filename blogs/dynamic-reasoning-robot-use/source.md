@@ -1,19 +1,13 @@
 
 # 动态推理：让模型学会何时思考
 
-**动态推理根据当前问题、推理进度或执行反馈调整计算。** 核心控制只有三类：生成前选模式、生成中决定停止、收到反馈后重新分配预算。
+**动态推理根据当前问题、推理进度或执行反馈调整计算。** 常见控制包括：生成前选模式、生成中决定停止、收到反馈后重新分配预算。
 
-[![动态推理的三个控制位置：生成前选择模式，生成中判断是否继续，执行后根据新反馈分配预算。](assets/dynamic_reasoning/control-points.svg)](assets/dynamic_reasoning/control-points.svg)
-
-*图 1．控制位置示意；前两行对应已有方法，第三行对应机器人迁移设计。*
-
-## Mode Selection: Thinkless
+## Thinkless
 
 Thinkless 把模式选择放在首个控制 token 上。后续文本以该标记为条件生成。
 
-[![Thinkless 原论文 Figure 1：控制 token 选择长短推理，右侧给出不同任务的模式使用情况。](assets/dynamic_reasoning/thinkless-figure-1.png)](assets/dynamic_reasoning/thinkless-figure-1.png)
-
-*图 2．Fang、Ma、Wang，Thinkless，原论文 Figure 1，arXiv v2；裁剪，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。[原文 §3](https://arxiv.org/html/2505.13379v2#S3)。*
+[![Thinkless — Figure 1](assets/dynamic_reasoning/thinkless-figure-1.png)](assets/dynamic_reasoning/thinkless-figure-1.png)
 
 输入 $x$，模式 $m$，回答 $y=(y_1,\ldots,y_K)$，共享参数 $\theta$：
 
@@ -27,11 +21,11 @@ $$
 \end{aligned}
 $$
 
-### Cold Start → Reward → Advantage
+### Cold Start and Reward
 
-**成对长短回答 → 模式标记 SFT → 同题多次采样 → 任务奖励 → DeGRPO。**
+[![Thinkless — Figure 2](assets/dynamic_reasoning/thinkless-figure-2.png)](assets/dynamic_reasoning/thinkless-figure-2.png)
 
-冷启动保证两种模式可用，RL 学习何时选择。Thinkless 对正确长模式收取固定成本 $\kappa$，$0<\kappa<1$：
+冷启动保证两种模式可用，RL 学习何时选择。原图中的长模式成本 $\gamma$ 在下式记为 $\kappa$，$0<\kappa<1$：
 
 $$
 R_i=
@@ -93,13 +87,13 @@ $$
 
 $\alpha$ 固定模式项的相对权重；$D_i$ 是参考策略 KL 项，$\beta$ 为其系数。KL 参考策略与产生样本的 old policy 分别登记。[Thinkless，式 (1)–(4)](https://arxiv.org/html/2505.13379v2#S3.SS2)
 
-## AdaCoT: PPO and Selective Loss Masking
+## AdaCoT
 
 AdaCoT 用辅助模型标注 CoT 必要性，再依次进行 SFT、RL-Math 和 RL-General；两个 RL 阶段均使用 PPO。
 
-[![AdaCoT 训练阶段：必要性标注和 SFT，数学 PPO 阶段屏蔽决策 token 损失，通用 PPO 阶段调整漏触发、过触发和格式惩罚。](assets/dynamic_reasoning/adacot-training.svg)](assets/dynamic_reasoning/adacot-training.svg)
+[![AdaCoT — Figure 1](assets/dynamic_reasoning/adacot-figure-1.png)](assets/dynamic_reasoning/adacot-figure-1.png)
 
-*图 3．依据 AdaCoT v2 §2.2、§3.1 绘制的训练示意。*
+原图比较 15 个文本基准上的平均分与 CoT 触发率，橙色点对应不同 RL 惩罚设置。
 
 通用阶段在质量奖励上加入三类惩罚。将原文系数统一记为非负的 $\lambda$：
 
@@ -131,24 +125,31 @@ $\ell_{i,k}$ 为单 token 策略损失。共享参数仍会更新，所以 mask 
 
 Thinkless 单独加权模式项，AdaCoT 在偏置阶段屏蔽该项，分别处理两种训练失衡。AdaCoT 的必要性标注也属于额外监督，应与只使用任务终局回报的设置区分。
 
-## Skip or Continue: TON, DEER and DyCon
+## Think or Not? (TON)
 
-[![TON 原论文 Figure 1：简单视觉问题跳过思考，复杂问题保留推理；两侧是不同问题的输出对照。](assets/dynamic_reasoning/ton-figure-1.png)](assets/dynamic_reasoning/ton-figure-1.png)
+[![TON — Figure 1](assets/dynamic_reasoning/ton-figure-1.png)](assets/dynamic_reasoning/ton-figure-1.png)
 
-*图 4．Wang 等，Think or Not?，原论文 Figure 1，arXiv v3；裁剪，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。[原文 §4](https://arxiv.org/html/2505.16854v3#S4)。*
+TON 的 SFT 保留答案，随机将思考替换为空段，再通过 GRPO 学习选择。
 
+[![TON — Figure 3](assets/dynamic_reasoning/ton-figure-3.png)](assets/dynamic_reasoning/ton-figure-3.png)
 
-TON 的 SFT 保留答案，随机将思考替换为空段；GRPO 按格式和任务结果打分，主方法没有额外长度收费。同样正确的长短输出可以同分，因此效率收益需实测。[TON §4、附录 B](https://arxiv.org/html/2505.16854v3#S4)
+GRPO 按格式和任务结果打分，组内优势除以标准差，主方法没有额外长度收费。同样正确的长短输出可以同分，效率收益需实测。[TON §4、附录 B](https://arxiv.org/html/2505.16854v3#S4)
 
-DEER 根据试答决定退出；DyCon 调整反思触发词 logits，其难度标签与剩余推理长度有关。两者适合作为学习型预算控制的对照。[DEER §3](https://arxiv.org/html/2504.15895v3#S3)；[DyCon §3](https://arxiv.org/html/2606.07108v2#S3)
+## DEER
 
-## Robot-Use: A PPO Training Loop
+[![DEER — Figure 3](assets/dynamic_reasoning/deer-figure-3.png)](assets/dynamic_reasoning/deer-figure-3.png)
+
+在推理转折点生成试答，置信度足够时提前结束，否则继续思考。实验固定主模型，比较答案准确率、生成长度与压缩率；试答和分支开销需计入机器人迁移的成本。[DEER §3–4](https://arxiv.org/html/2504.15895v3#S3)
+
+## DyCon
+
+[![DyCon — Figure 3](assets/dynamic_reasoning/dycon-figure-3.png)](assets/dynamic_reasoning/dycon-figure-3.png)
+
+离线提取步骤表征，以剩余推理长度构造难度标签并拟合线性估计器；在线按预测难度调整反思词 logits。主模型冻结，估计器在约 600 条 MATH 训练问题上拟合后跨任务评测。[DyCon §3–4](https://arxiv.org/html/2606.07108v2#S3)
+
+## Robot-Use: Migration Design
 
 下面给出迁移实验设计。先共享一个已具备闭环控臂能力的 SFT 底座，**冻结动作模型，只训练预算选择器与价值头**，隔离调度的作用。
-
-[![路由 PPO 闭环：旧策略采样模式，生成并执行 JSON，记录奖励和旧价值，计算 GAE，重算概率，再更新路由器与价值头。](assets/dynamic_reasoning/router-ppo-loop.svg)](assets/dynamic_reasoning/router-ppo-loop.svg)
-
-*图 5．路由 PPO 实验的训练闭环。观测、执行反馈和强制标记作为条件，只有采样模式进入此阶段的 actor loss。*
 
 ### 1. Sample a Budget
 
@@ -216,9 +217,11 @@ $c_V$ 为价值损失权重。有限轮更新后刷新采样快照，收集新�
 
 先导采用 LIBERO-Long 的三类任务：**碗入抽屉并关闭、杯子入微波炉并关闭、双物体入篮**。以下流程与参数为拟议设置。
 
-[![分阶段实验：E0 数据和接口，E1 双模式冷启动，E2 PPO 链路探针，E3 统一预算训练，E4 冻结测试，分别记录正常与扰动任务结果。](assets/dynamic_reasoning/experiment-protocol.svg)](assets/dynamic_reasoning/experiment-protocol.svg)
-
-*图 6．从数据到判别证据的实验流程，未包含实测结果。*
+1. **E0 · 接口**：重放开发演示，核对观测时序、坐标系与成功判定。
+2. **E1 · 冷启动**：相同动作标签派生长短说明，确认两种模式都能执行。
+3. **E2 · PPO 探针**：核对旧概率、奖励、GAE 与更新后的数值。
+4. **E3 · 对照训练**：固定采样预算，在开发集选配置。
+5. **E4 · 测试**：冻结模型与超参，分别测试正常任务和预定义扰动。
 
 ### Shared Settings
 
@@ -246,11 +249,10 @@ $$
 
 ### Budget and Loss Ablations
 
-[![冻结底座下比较固定短、固定长、随机、置信或难度、无反馈 PPO、有反馈 PPO；联合语言策略阶段比较普通平均、模式项加权和阶段决策 mask。](assets/dynamic_reasoning/comparison-design.svg)](assets/dynamic_reasoning/comparison-design.svg)
-
-*图 7．先隔离预算与反馈，再比较 token 策略的损失处理。*
-
-随机预算在开发集匹配平均算量，测试报告实际偏差。E 与 F 仅改变执行反馈输入。
+- **固定短／固定长**：检验统一预算的质量与成本。
+- **随机预算**：开发集匹配平均算量，测试报告实际偏差。
+- **置信度／难度规则**：以 DEER、DyCon 的控制思路作迁移对照。
+- **有反馈／无反馈 PPO**：相同路由器仅改变执行反馈输入。
 
 联合语言策略阶段固定输出格式与决策位置，再比较普通平均、DeGRPO 风格加权和 AdaCoT 风格阶段 mask，保持数据、奖励与训练预算一致。这里迁移的是损失处理，并非完整复现原算法；SLM 不用于只训练独立路由器的先导阶段。
 
@@ -273,7 +275,6 @@ $N_{\mathrm{eval}}$ 为评测回合数；成功数为 0 时不报告虚假的有
 
 **判据**：更新前核对概率比接近 1，再扩大训练；通过随机预算、移除反馈和零成本权重定位收益来源。
 
-
 按任务和初态处理重复测量，开发集选 checkpoint。若固定短预算或随机分配达到同等结果，复杂选择器的必要性缺乏支持。
 
 ## References
@@ -287,8 +288,12 @@ $N_{\mathrm{eval}}$ 为评测回合数；成功数为 0 时不报告虚假的有
 - [LIBERO](https://github.com/Lifelong-Robot-Learning/LIBERO)；[官方演示数据 libero_10](https://huggingface.co/datasets/yifengzhu-hf/LIBERO-datasets/tree/f13aa24a3da8c43c7225569f28c562979fa0e35a/libero_10)。
 - [The Value of Thinking v1](https://arxiv.org/html/2611.16961v1)，§2.2、附录 F：冻结骨干路由与整回合回报的近邻工作。
 
-## Figure Sources
 
-图 1、3、5、6、7 为流程示意图，未填入模拟或实测性能数据。图 3 依据 AdaCoT v2 §2.2、§3.1 绘制。
+## Image Credits
 
-图 2 来自 Fang、Ma、Wang 的 Thinkless v2 Figure 1；图 4 来自 Wang 等的 Think or Not? v3 Figure 1。两图由 PDF 裁剪，保留原图标签，按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用。逐项来源见[图片记录](assets/dynamic_reasoning/figure-sources.json)。
+- Thinkless：Fang、Ma、Wang，v2，Figures 1、2。
+- TON：Wang 等，v3，Figures 1、3。
+- DEER：Yang 等，v3，Figure 3。
+- DyCon：Tu 等，v2，Figure 3。
+
+以上原图按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用，仅截取图示区域。AdaCoT v2 Figure 1 归 Lou 等作者所有，来源为论文原文。逐项版本、来源和图片记录见[图源](assets/dynamic_reasoning/figure-sources.json)。
