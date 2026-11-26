@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>intern daily report · Daily Report</title><style>
+:root { color-scheme:light; --paper:#f3f2ed; --ink:#191917; --muted:#5c5b55;
+  --line:#cecdc4; --white:#fdfdfa;
+  --serif:Georgia,"Noto Serif CJK SC",serif;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"Noto Sans Mono CJK SC",monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:.9rem/1.75 var(--mono); }
+main { width:min(48rem,100%); padding:clamp(1.25rem,3.5vw,3rem); }
+.masthead { display:flex; justify-content:space-between; align-items:baseline;
+  gap:.5rem 1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+.brand { font:400 clamp(1.75rem,4vw,2.25rem)/1.2 var(--serif); text-decoration:none; }
+nav { display:flex; gap:.45rem 1rem; flex-wrap:wrap; font-size:.85rem; }
+header { margin-bottom:2rem; }
+.meta, .topic { font-size:.8rem; color:var(--muted); }
+.topic { margin:0 0 .3rem; }
+h1,h2,h3 { line-height:1.4; }
+h1,h2 { font-family:var(--serif); font-weight:400; }
+h1 { font-size:clamp(1.8rem,5vw,2.6rem); margin:.55rem 0 .25rem; }
+h2 { font-size:1.38rem; margin:0; }
+h3 { font-size:1rem; margin:0; overflow-wrap:anywhere; }
+a { color:inherit; text-underline-offset:.3em; overflow-wrap:anywhere; }
+a:hover { text-decoration-thickness:2px; }
+a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+section { display:grid; gap:.9rem; margin-bottom:2.25rem; }
+.timeline { display:grid; gap:1rem; margin-left:.3rem; padding-left:1.1rem;
+  border-left:1px solid var(--line); }
+.entry { position:relative; display:grid; gap:.45rem; min-width:0; padding:.75rem;
+  border:1px solid var(--line); background:var(--white); }
+.entry::before { content:""; position:absolute; width:.4rem; height:.4rem;
+  top:1.1rem; left:calc(-1.1rem - .24rem); background:var(--ink);
+  border-radius:50%; }
+.reading .entry:first-child { border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.entry-head { display:flex; justify-content:space-between; align-items:baseline;
+  flex-wrap:wrap; gap:.1rem .85rem; }
+time { font-variant-numeric:tabular-nums; }
+p { margin:0; max-width:65ch; }
+ul { margin:0; padding-inline-start:1.2rem; }
+li+li { margin-top:.5rem; }
+.archive { list-style:none; padding-inline-start:1.1rem; }
+.archive li { margin:0; }
+@media print { :root { --paper:#fff; } article { break-inside:avoid; } }
+</style></head>
+<body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
+<nav aria-label="日报导航"><a href="../">最新一期</a><a href="../archive/">日报归档</a></nav></div>
+<header>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-26">2026-11-26</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">扩写并发布 Agent 效率推理综述</a></strong>。将综述扩展为八篇论文、四类机制，按原始摘要重写问题介绍，展开训练流程，并重新整理 27 张原图。更新后的文章已上线，机器人迁移集中在结尾讨论，公式与桌面、手机排版已检查。</li><li><strong><a href="https://github.com/JoeSun-421/personal-skills/tree/main/skills/research-review-template">创建可复用的研究综述 Skill</a></strong>。提炼并安装 research-review-template，明确机制分组、原始训练配方、图示与证据核查要求，同步至个人 Skills 仓库，供后续综述复用。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:03，本机 Codex 已结束轮次累计运行 1 小时 9 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
+<div class="timeline reading"><article class="entry"><p class="topic">多模态评测 / 指令遵循可靠性</p>
+<div class="entry-head"><h3>Humanity’s First Exam: Measuring the Reliability Floor of LLMs</h3>
+<time class="meta" datetime="2026-11-24">2026-11-24</time></div><p class="meta">Google DeepMind / Google Cloud / Google Research · 官方技术报告 · 文本与图像评测</p>
+<p><strong>方法与结果</strong>　HFE 用 544 道基础题组成 136 个四题变体组，区分偶尔答对与持续答对。报告表 4 中，GPT-6.2 Astra 在 xhigh 设置的 pass@1 为 97.8%；要求四种变体各四次回答均正确的 family pass⁴ 估计为 92.4%（95% 区间 ±4.3 个百分点）。对长任务评测的启发是：单步高准确率仍可能掩盖重复执行与轻微条件变化下的失误。</p>
+<p><strong>证据范围</strong>　每题实际采样六次，用来估计相应概率；并非直接观测所有部署流程的成功率。任务为零样本、无外部工具的单轮回答，题目有意收集基础能力盲点，不能把分数当成日常总体错误率，更不能直接外推到机器人闭环长任务。数值来自报告快照，不是实时榜单。</p>
+<p><a href="https://storage.googleapis.com/deepmind-media/papers/hfe_tech_paper.pdf">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://blog.google/innovation-and-ai/models-and-research/google-deepmind/humanitys-first-exam/">实验室官方来源</a></p></article><article class="entry"><p class="topic">自适应推理 / 低成本策略优化 · 回顾</p>
+<div class="entry-head"><h3>Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking</h3>
+<time class="meta" datetime="2026-10-13">2026-10-13</time></div><p class="meta">LG AI Research / UNIST / 伊利诺伊大学芝加哥分校 · ACL 2026 主会长文 · 语言推理评测</p>
+<p><strong>方法与结果</strong>　RPO 先让模型具备短、长两种回答模式，再把 RL 策略损失集中在起始分支 token，用分组回报学习何时进入长推理。论文在 8B 参考模型的匹配核算中，训练计算量约为 AdaptThink 的 0.02 倍；Qwen3-8B 的长推理比例从 57.3% 降至 44.8%，平均 Pass@1 从 63.8% 变为 62.0%，体现了可量化的成本与准确率折中。</p>
+<p><strong>证据范围</strong>　ACL Anthology 正式长文集确认主会身份；所列日期为 arXiv 首次上传日。约 2% 指特定训练核算，不是通用推理加速比；准确率也并非总能保持。它在回答开始时选择模式，尚未证明能在多轮工具或机器人执行中依据实际反馈动态分配计算。</p>
+<p><a href="https://arxiv.org/abs/2610.17767">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://aclanthology.org/2026.acl-long.816/">会议录用依据</a></p></article><article class="entry"><p class="topic">奖励设计 / 高效推理 · 回顾</p>
+<div class="entry-head"><h3>Self-Aligned Reward: Towards Effective and Efficient Reasoners</h3>
+<time class="meta" datetime="2026-04-16">2026-04-16</time></div><p class="meta">伊利诺伊大学厄巴纳—香槟分校 / Amazon Web Services · ICLR 2026 主会论文 · 数学与逻辑推理</p>
+<p><strong>方法与结果</strong>　SAR 比较答案在有题目条件和无题目条件下的相对困惑度差，奖励利用题目信息的回答，并与可验证正确性奖励结合，而非只按长度惩罚。作者在四个模型、七个基准中结合 PPO 与 GRPO 评测，摘要汇总为回答长度减少约 30%、准确率改善约 4%；具体配置并非都有相同收益。</p>
+<p><strong>证据范围</strong>　主会身份由 ICLR 正式论文集确认；日期对应 arXiv v2，首版发布于 2025 年。该信号仍由模型自身概率构成，不能替代外部正确性验证。原实验是数学与逻辑任务，减少回答 token 不等于减少含工具、感知和执行开销的总时长，也尚未验证 VLA 动作质量。</p>
+<p><a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html">会议录用依据</a></p></article></div></section>
+</main></body></html>
