@@ -19,6 +19,7 @@ function frame(title, description, canonical, body, math, structured) {
     '<meta property="og:description" content="' + escape(description) + '">',
     '<meta property="og:url" content="' + canonical + '">',
     '<title>' + escape(title) + '</title><link rel="canonical" href="' + canonical + '">',
+    math ? '<link rel="stylesheet" href="/assets/vendor/cormorant-garamond/font.css">' : "",
     '<link rel="stylesheet" href="/blogs/blog.css">',
     math ? '<link rel="stylesheet" href="/assets/vendor/katex-0.19.1/katex.min.css">' : "",
     structured ? '<script type="application/ld+json">' +
@@ -80,7 +81,7 @@ for (const post of posts) {
     "</ol></details>";
   const body = [
     '<main><header class="post-header"><div class="eyebrow">Research notes · Adaptive reasoning</div>',
-    "<h1>" + escape(post.title) + "</h1>",
+    "<h1>" + escape(post.title).replace(/Efficient Reasoning$/, '<span class="title-outline">Efficient Reasoning</span>') + "</h1>",
     '<div class="post-meta"><time datetime="' + post.date + '">' + post.date + "</time>",
     "<span>Zhaoyuan Sun</span>",
     '<a href="https://github.com/JoeSun-421/joesun-421.github.io/blob/main/blogs/' + post.slug + '/source.md">Markdown source</a></div></header>',

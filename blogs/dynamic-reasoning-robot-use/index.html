@@ -7,6 +7,7 @@
 <meta property="og:description" content="按上下文管理、计算分配、推理削减与模型协作解读八篇近期工作，结合原图与公式讲解训练流程、效率证据及 robot-use 迁移。">
 <meta property="og:url" content="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">
 <title>Towards Efficient Robot-Use Agents via Efficient Reasoning — Zhaoyuan Sun</title><link rel="canonical" href="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">
+<link rel="stylesheet" href="/assets/vendor/cormorant-garamond/font.css">
 <link rel="stylesheet" href="/blogs/blog.css">
 <link rel="stylesheet" href="/assets/vendor/katex-0.19.1/katex.min.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Towards Efficient Robot-Use Agents via Efficient Reasoning","datePublished":"2026-11-25","dateModified":"2026-11-25","inLanguage":"zh-CN","author":{"@type":"Person","name":"Zhaoyuan Sun","url":"https://joesun-421.github.io"},"mainEntityOfPage":"https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/"}</script>
@@ -14,14 +15,15 @@
 <header class="topbar"><a class="brand" href="/" aria-label="Zhaoyuan Sun, home">ZS.</a>
 <nav class="nav" aria-label="Main navigation"><a href="/">Home</a><a href="/blogs/">Blogs</a><a href="/ideas.html">Ideas</a></nav></header>
 <main><header class="post-header"><div class="eyebrow">Research notes · Adaptive reasoning</div>
-<h1>Towards Efficient Robot-Use Agents via Efficient Reasoning</h1>
+<h1>Towards Efficient Robot-Use Agents via <span class="title-outline">Efficient Reasoning</span></h1>
 <div class="post-meta"><time datetime="2026-11-25">2026-11-25</time>
 <span>Zhaoyuan Sun</span>
 <a href="https://github.com/JoeSun-421/joesun-421.github.io/blob/main/blogs/dynamic-reasoning-robot-use/source.md">Markdown source</a></div></header>
 <details class="toc"><summary>Contents</summary><ol><li><a href="#why-robot-use-agents-need-efficient-reasoning">Why Robot-Use Agents Need Efficient Reasoning</a></li><li><a href="#four-routes-to-efficient-reasoning">Four Routes to Efficient Reasoning</a></li><li><a href="#context-management">Context Management</a></li><li><a href="#adaptive-compute-allocation">Adaptive Compute Allocation</a></li><li><a href="#reasoning-reduction-and-reuse">Reasoning Reduction and Reuse</a></li><li><a href="#model-collaboration-and-execution">Model Collaboration and Execution</a></li><li><a href="#transfer-to-robot-use">Transfer to Robot Use</a></li><li><a href="#references">References</a></li></ol></details>
 <article class="prose"><h2 id="why-robot-use-agents-need-efficient-reasoning">Why Robot-Use Agents Need Efficient Reasoning</h2>
-<p>在直接输出末端位姿的 robot-use 闭环中，模型读取图像与机器人状态，生成动作 JSON，控制器执行后返回新观察。抓取失败和物体位移会改变后续决策所需的信息。</p>
-<p>推理调度的目标是根据执行状态分配计算，同时保持完整任务的成功率。computer-use 与 robot-use 都通过“观察 → 决策 → 执行 → 新观察”推进任务；机器人还受到接触、动力学和感知误差的影响。</p>
+<p>我们关注由 LLM/VLM 直接生成动作的 robot-use agent：模型读取图像与机器人状态，输出末端位姿等动作指令，控制器执行后返回新观察。一次动作会改变环境，新的反馈又会改变下一步决策所需的信息。长任务因此需要持续分配推理计算，而每一步的推理需求并不相同。</p>
+<p>在这篇文章中，我们从多轮 agent，尤其是 computer-use 的研究中整理可以借鉴的机制。两者都通过“观察 → 决策 → 执行 → 新观察”推进任务；computer-use 已围绕上下文管理、计算分配和模型协作形成具体方案。我们先讲清这些方案在原任务中的运行方式、训练信号与实验证据，最后讨论迁移到机器人时需要重新验证的条件。</p>
+<p>我们的关注点是完整任务的效率：推理节省的时间，需要与摘要、调度、核验及执行等开销一起计算，并与任务成功率共同评价。减少 token、降低计算量和缩短总耗时分别对应不同证据。</p>
 <h2 id="four-routes-to-efficient-reasoning">Four Routes to Efficient Reasoning</h2>
 <p>上下文长度、推理预算、重复思考和模型分工对应四类资源开销：</p>
 <ol>
@@ -30,12 +32,16 @@
 <li><strong>Reasoning Reduction and Reuse：</strong> PUMA、RACE。截去冗余生成，保留对当前及后续动作有用的思考。</li>
 <li><strong>Model Collaboration and Execution：</strong> STEPWISE、SpecAgent。按事件升级模型，或让强模型批量核验小模型草稿。</li>
 </ol>
-<p>工具 agent 的上下文、调用、推理和执行环节划分见文末综述。分类按主要作用位置组织；上下文窗口、生成 token、模型调用和端到端耗时分别统计。</p>
+<p>我们按主要干预位置组织这四类方法。上下文管理改变模型每轮读取的信息；计算分配决定当前投入多少思考；推理削减与复用减少重复生成；模型协作调整生成和核验的分工。这些机制可以组合，但各自报告的窗口容量、token 数、模型调用和真实耗时仍需分别理解。文末综述提供了工具 agent 的上下文、调用、推理与执行视角。</p>
+<p>下文各节的 Abstract 为原论文摘要的中文转述，其中“我们”沿用论文作者的口吻；方法解读和最后的迁移讨论另行展开。</p>
 <h2 id="context-management">Context Management</h2>
 <p>这一类改变交互历史的保存方式。CompactionRL 将摘要与执行联合训练，ContextBudget 将剩余容量和新观察长度纳入压缩决策。</p>
 <h3 id="compactionrl-jointly-learn-execution-and-compaction">CompactionRL — Jointly Learn Execution and Compaction</h3>
-<h4>Problem</h4>
-<p>长任务尚未完成，交互轨迹就可能超过上下文窗口。将历史压缩成摘要可以延续执行，但如何把上下文压缩纳入强化学习，仍缺少充分研究。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>长任务 agent 的交互轨迹可能在任务完成前超过上下文上限。将已有交互压缩为摘要，再从压缩上下文继续执行，是延长任务轨迹的自然途径；但如何把这一过程纳入强化学习，仍缺少充分研究。</p>
+<p>在这篇文章中，我们提出 CompactionRL，将任务执行与摘要生成联合优化。训练结合 token 级损失归一化和跨段广义优势估计，使策略能够从包含多次上下文压缩的长轨迹中学习。在两个规模的开放底座上，实验均显示 agent 编程任务的表现优于仅在推理时压缩的底座，说明压缩行为本身也可以通过训练得到改善。</p>
+</blockquote>
 <h4>Method and RL Recipe</h4>
 <p>CompactionRL 联合优化任务执行与摘要生成，两者共享最终任务回报。</p>
 <p><img src="assets/efficient_agents_2026/compactionrl-overview.png" alt="CompactionRL context compaction and benchmark results"></p>
@@ -79,8 +85,11 @@ c-1 5-5 9-11 9h-2L532 67 19 159h-2c-5 0-9-4-11-9l-5-22c-1-6 2-12 8-13z"/></svg><
 <p><img src="assets/efficient_agents_2026/compactionrl-dynamics.png" alt="CompactionRL summary and execution training dynamics"></p>
 <p>摘要参与训练后变得更详细，任务成功率随训练提升。去掉摘要损失、token 归一化或跨段修正的消融用于检验各部分作用。这些结果支持固定窗口下的长任务质量提升，尚未给出逐步推理的延迟收益。</p>
 <h3 id="contextbudget-manage-history-before-loading-observations">ContextBudget — Manage History Before Loading Observations</h3>
-<h4>Problem</h4>
-<p>部署时的显存、延迟与成本限制了 agent 的上下文预算。随着交互历史增长，agent 需要在保留过去的信息与遵守窗口限制之间权衡，决定何时压缩、压缩多少历史。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>LLM agent 能够执行长程推理，但部署时的显存、延迟和成本限制了可用上下文。随着交互历史不断增长，保留既有信息与遵守窗口限制之间的矛盾日益突出，压缩决策需要考虑当前还剩多少容量，以及新的观察将占用多少空间。</p>
+<p>在这篇文章中，我们提出预算感知的上下文管理框架 BACM，将历史压缩建模为受上下文预算约束的序贯决策。agent 在载入新观察前评估剩余预算，决定何时压缩、压缩多少历史。进一步提出的 BACM-RL 通过端到端课程强化学习，在逐渐变化的上下文预算下学习压缩策略。组合多目标问答和长程网页浏览实验显示，该方法在不同模型规模、任务复杂度与窗口预算下均具有优势。</p>
+</blockquote>
 <h4>Method and RL Recipe</h4>
 <p><img src="assets/efficient_agents_2026/contextbudget-framework.png" alt="ContextBudget deferred observation loading and GRPO"></p>
 <p>在读取新观察的内容前，agent 先获得当前剩余容量与新观察的 token 长度，再决定如何处理旧历史。设上下文窗口为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span>，历史缓冲区为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">C</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">\mathcal C_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal" style="margin-right:0.0583em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0583em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，待加载观察为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">o_t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">o</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>：</p>
@@ -128,8 +137,11 @@ c-1 5-5 9-11 9h-2L532 67 19 159h-2c-5 0-9-4-11-9l-5-22c-1-6 2-12 8-13z"/></svg><
 <h2 id="adaptive-compute-allocation">Adaptive Compute Allocation</h2>
 <p>这一类决定当前轮次使用多少推理。TAB 输出外部预算，CogRouter 在同一策略中选择认知层级并生成动作。</p>
 <h3 id="tab-allocate-budgets-across-turns">TAB — Allocate Budgets Across Turns</h3>
-<h4>Problem</h4>
-<p>简单问题也可能产生过长的思考，增加推理开销。已有长度正则、动态路由和难度预算方法主要关注单轮任务，未充分处理多轮推理中的序贯依赖：当前轮次的计算分配还需要兼顾后续轮次。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>长推理模型在简单问题上也会生成过多思考，带来额外 token 与延迟。已有长度正则、动态路由和按难度分配预算的方法主要面向单轮任务，难以直接处理多轮交互的序贯依赖：某一轮花费多少计算，还会影响后续关键步骤能够获得的预算。</p>
+<p>为此，我们提出 TAB，将多轮推理建模为带有全局 token 约束的序贯计算分配问题。预算策略根据交互历史，为不同轮次分配思考预算，在任务准确率与总计算开销之间权衡。我们先在分层规划与执行的数学推理系统上训练，再将同一策略直接用于工具调用、模拟对话和终端任务。数学实验最多节省 35% token 与 30% 延迟，迁移实验最多节省 20% token 与 15% 延迟，同时保持任务准确率。</p>
+</blockquote>
 <h4>Method and RL Recipe</h4>
 <p><img src="assets/efficient_agents_2026/tab-overview.png" alt="TAB budget allocator and solver loop"></p>
 <p>TAB 分开使用 Budgeter 和 Solver。每轮 Budgeter 根据历史与当前输入输出难度档位，再映射成 Solver 的 token 预算或 reasoning-effort 设置。Solver 在这个设置下生成回答，新的反馈进入下一轮。</p>
@@ -161,8 +173,11 @@ c-1 5-5 9-11 9h-2L532 67 19 159h-2c-5 0-9-4-11-9l-5-22c-1-6 2-12 8-13z"/></svg><
 <p><img src="assets/efficient_agents_2026/tab-latency.png" alt="TAB transfer accuracy versus end-to-end latency"></p>
 <p>迁移实验最多节省约 20% token 与 15% 延迟，计时包含 Budgeter 开销。两张图分别给出准确率与总 token、准确率与端到端延迟的关系。</p>
 <h3 id="cogrouter-choose-cognitive-depth-at-each-step">CogRouter — Choose Cognitive Depth at Each Step</h3>
-<h4>Problem</h4>
-<p>现有 agent 常采用固定认知模式：每步直接响应，或每步都进行深度推理。长任务中，不同步骤的认知需求差异很大，从常规执行到战略规划，统一的推理深度会浪费计算。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>现有多轮 agent 往往采用固定的认知模式：非思考模型每步立即响应，思考模型每步都进行深度推理。长任务中，不同步骤的需求却差异很大，既包含常规执行，也包含反思与战略规划；固定模式难以让计算投入与当前步骤的需求相匹配。</p>
+<p>在这篇文章中，我们提出 CogRouter，使 agent 逐步调整认知深度。基于 ACT-R 理论，我们设计从直觉响应到战略规划的四个层级，先用 CoSFT 建立稳定的层级行为，再用 CoPO 根据动作置信度重分配优势，进行步骤级信用分配。其核心依据是：合适的认知深度应当提高后续动作的置信度。ALFWorld 与 ScienceWorld 的实验显示，这种训练能够同时改善任务表现与推理效率。</p>
+</blockquote>
 <h4>Method and RL Recipe</h4>
 <p><img src="assets/efficient_agents_2026/cogrouter-framework.png" alt="CogRouter balanced SFT and cognition-aware optimization"></p>
 <p>四个层级依次对应直接响应、当前状态分析、结合执行历史的反思、评价候选动作未来影响。每轮按 <code>&lt;level&gt;</code>、<code>&lt;think&gt;</code>、<code>&lt;action&gt;</code> 的结构生成。</p>
@@ -214,8 +229,11 @@ c-1 5-5 9-11 9h-2L532 67 19 159h-2c-5 0-9-4-11-9l-5-22c-1-6 2-12 8-13z"/></svg><
 <h2 id="reasoning-reduction-and-reuse">Reasoning Reduction and Reuse</h2>
 <p>PUMA 处理单次生成中的语义冗余，RACE 检查已有思考对后续动作的持续支持。</p>
 <h3 id="puma-stop-when-reasoning-converges">PUMA — Stop When Reasoning Converges</h3>
-<h4>Problem</h4>
-<p>长推理模型在解法稳定后仍可能继续思考，浪费 token 并增加延迟。现有早停方法主要依赖答案置信度或试答一致性；这些信号可能在模型完成探索、自我修正前触发，损害答案正确性与保留推理链的语义完整性。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>长推理模型经常在解法已经稳定后继续生成，增加 token 消耗与等待时间。已有早停方法主要依赖答案置信度或试答一致性；这些信号反映答案是否就绪，却可能在探索和自我修正完成前触发，损害最终正确性与保留推理链的语义完整性。</p>
+<p>我们将推理步骤的语义冗余作为补充信号：当连续步骤不再带来新进展，而是反复验证已有结论时，推理更可能已经收敛。基于这一观察，PUMA 用轻量冗余检测器寻找候选退出点，再用答案级核验确认停止条件。在五个推理模型和五个基准上的实验中，该方法平均减少 26.2% token，同时保持答案正确性与保留 CoT 的质量。代码生成和视觉语言推理实验进一步检验了这一信号的适用范围。</p>
+</blockquote>
 <p><img src="assets/efficient_agents_2026/puma-readiness.png" alt="PUMA answer readiness and reasoning convergence"></p>
 <h4>Method and Training Recipe</h4>
 <p>PUMA 用推理步骤的语义冗余定位候选退出点，再核验答案，截去收敛之后的重复生成。</p>
@@ -259,8 +277,11 @@ c-1 5-5 9-11 9h-2L532 67 19 159h-2c-5 0-9-4-11-9l-5-22c-1-6 2-12 8-13z"/></svg><
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">c_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 表示答案正确性，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">ℓ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\ell_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord">ℓ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是该前缀之后的 completion 长度，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>b</mi><mi>i</mi><mrow><mi mathvariant="normal">r</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">k</mi></mrow></msubsup></mrow><annotation encoding="application/x-tex">b_i^{\mathrm{rank}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1078em;vertical-align:-0.2587em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-2.4413em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathrm mtight">rank</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2587em;"><span></span></span></span></span></span></span></span></span></span> 是组内排序奖励，取值为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">{</mo><mn>0.5</mn><mo separator="true">,</mo><mn>0.25</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mo>−</mo><mn>0.25</mn><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\{0.5,0.25,0,-0.25\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0.5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.25</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">0.25</span><span class="mclose">}</span></span></span></span>，偏好更短的正确 completion。原文用 GRPO 更新，比较相同 recipe 下的固定位置前缀。</p>
 <p>GRPO 训练最多 1,500 个更新，学习率 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></span>，completion 上限为 4,096 token。训练后的变体直接用 vLLM 推理，不调用冗余检测器和答案核验模块。训练中的长度项统计给定前缀之后的答案阶段。</p>
 <h3 id="race-preserve-cross-turn-reasoning-support">RACE — Preserve Cross-Turn Reasoning Support</h3>
-<h4>Problem</h4>
-<p>agent 通常在每次行动前推理，但已有思考能够继续支持后续动作，因此每轮重新思考并非总有必要。难点在于判断已有思考何时足够、何时需要补充，同时避免昂贵的生成式核验。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>LLM agent 通常在每次行动前推理，但较早轮次的思考能够继续支持后续动作，因此每轮重新思考并非总有必要。关键在于判断已有思考何时仍然充分、何时需要补充，同时避免逐次生成动作进行验证所带来的高开销。</p>
+<p>在这篇文章中，我们观察到，删除额外思考后，后续参考动作的似然下降与这些动作能否被恢复密切相关。基于这一轻量信号，我们提出 RACE：先用 LoGiC 渐进识别对当前及后续参考动作影响较小的可删除思考，再将删除信号用于 SFT 和 agentic RL，使策略学会选择思考或直接行动。四个 agent 基准上的实验显示，该方法能够显著降低推理 token 开销，同时保持或改善任务表现。</p>
+</blockquote>
 <h4>Method and RL Recipe</h4>
 <p>原文先删除部分思考，检查后续参考动作是否仍能生成，再比较动作恢复率与似然下降的关系。</p>
 <p><img src="assets/efficient_agents_2026/race-support.png" alt="RACE cross-turn support and action likelihood"></p>
@@ -318,12 +339,16 @@ d_j^{(t)}&amp;=
  4.35-2 7.613-5 9.788l-19 13.05c-92 63.077-116.937 75.308-183 76.128
 -68.267.847-113-73.952-191-73.952z"/></svg></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 是对应压缩上下文。closure 使用目标 token 的交叉熵。其权重在 ScienceWorld、WebShop、AppWorld 中设为 0.02，在 DeepSearch 中设为 0.01。RL 学习率为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span></span>，每批 rollout 更新 1 epoch。</p>
 <p><img src="assets/efficient_agents_2026/race-ablation.png" alt="RACE success and reasoning-token ablation"></p>
+<p>与标准 SFT＋GRPO 相比，RACE-SFT-RL 在四个基准上的任务表现差距均不超过 1.40 个百分点，推理 token 分别减少 32.3%、80.2%、46.4% 和 62.0%。这里统计的是整条轨迹的推理 token，不能直接换算为机器人任务的时间收益。</p>
 <p>在相同底座的消融中，RACE 相对普通 SFT＋GRPO 减少约 32%–80% 的推理 token，四个基准上的成功率变化不超过 1.4 个百分点。效率指标是推理 token 数。</p>
 <h2 id="model-collaboration-and-execution">Model Collaboration and Execution</h2>
 <p>这一类调整大小模型的执行分工。STEPWISE 用事件触发升级和核验，SpecAgent 用片段核验减少强模型串行生成。</p>
 <h3 id="stepwise-escalate-at-events">STEPWISE — Escalate at Events</h3>
-<h4>Problem</h4>
-<p>computer-use agent 几乎每步都调用大型多模态模型，成本高、速度慢。GUI 长任务包含大量常规步骤，错误则集中在少数高风险时刻，主要表现为进展停滞，以及动作局部合理却已偏离用户目标的语义漂移。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>computer-use agent 可以直接操作 GUI，但强模型几乎参与每一步，使实际部署仍然昂贵且缓慢。长程 GUI 轨迹包含大量常规步骤，错误则往往集中在少数高风险时刻，主要表现为进展停滞，以及动作局部合理却已偏离任务目标的语义漂移。统一分配计算难以适应这种步骤间差异。</p>
+<p>我们提出事件驱动的步骤级级联框架：默认由小策略执行，轻量学习式监测器发现风险后，再调用强模型。Stuck Monitor 检测进展恶化并触发恢复，Milestone Monitor 选择适合稀疏核验的语义检查点。框架可以叠加在现有 agent 上，无需重新训练大型策略模型。OSWorld 与 WebArena 的实验显示，它能恢复始终使用强模型的大部分任务表现，并减少强模型调用、延迟与费用。</p>
+</blockquote>
 <p><img src="assets/efficient_agents_2026/stepwise-failures.png" alt="STEPWISE stalls and silent semantic drift"></p>
 <h4>Method and Training Recipe</h4>
 <p>小模型默认执行，两个 ModernBERT 监测器分析最近的推理与动作记录：</p>
@@ -346,8 +371,11 @@ d_j^{(t)}&amp;=
 <p><img src="assets/efficient_agents_2026/stepwise-ablation.png" alt="STEPWISE monitor ablation"></p>
 <p>OSWorld 与 WebArena 的消融分别启用 stuck、milestone 和两种监测器，完整配置取得最高成功率。原文还比较固定间隔核验；成本表中的延迟按单次请求统计。</p>
 <h3 id="specagent-draft-verify-and-repair">SpecAgent — Draft, Verify, and Repair</h3>
-<h4>Problem</h4>
-<p>工具 agent 通常由单个强模型生成每一步，即使许多常规步骤可由小模型完成。现有路由与协作方法仍按查询或步骤分配生成工作；推测方法通常逐步核验小模型草稿，且常以强模型自身的动作为参照，未充分减少强模型的串行生成。</p>
+<h4>Abstract</h4>
+<blockquote>
+<p>工具 agent 的长交互通常由单个强模型逐步生成，尽管大量常规步骤可以由小模型处理。已有路由和协作方法仍按查询或步骤分配生成工作；推测方法通常逐步核验草稿，并以强模型自身的动作为参照，强模型仍承担较多串行生成。</p>
+<p>我们提出 SpecAgent，让小模型起草、强模型审核多步片段。小模型可以执行只读调用，取得真实观察，遇到会修改环境的动作时暂停；强模型一次读入整段，接受语义上有效的最长前缀，并修复首个错误。并行 prefill 因而替代了一部分自回归解码，强模型只需生成短判定与必要修复。在 τ²-Bench 上，成功率与强模型相差不到一个百分点，内存流量和耗时约减半；其他基准则在降低开销的同时恢复了部分大小模型间的质量差距。</p>
+</blockquote>
 <h4>Execution Protocol</h4>
 <p>SpecAgent 让小模型起草多步片段，由强模型一次读入并核验。强模型只生成短判定与必要修复，以并行 prefill 替代一部分自回归解码。</p>
 <p><img src="assets/efficient_agents_2026/specagent-protocol.png" alt="SpecAgent draft verify and repair protocol"></p>
@@ -374,9 +402,11 @@ d_j^{(t)}&amp;=
 <p>FLOPs 和 HBM-read 按请求 token 与模型架构估算，耗时实际计量。SpecAgent 的估算 FLOPs 可以上升：强模型对草稿做较大的并行 prefill，同时减少反复读取权重的逐 token 解码。下图进一步改变核验边界、修复方式和语义接受标准：额外核验每个片段会增加开销，取消融合修复或语义核验也会降低成功率。</p>
 <p><img src="assets/efficient_agents_2026/specagent-ablation.png" alt="SpecAgent verification and repair ablation"></p>
 <h2 id="transfer-to-robot-use">Transfer to Robot Use</h2>
-<p>四类机制分别改变历史表示、每轮计算、思考保留和模型分工。迁移到 robot-use 时，输入扩展为图像、本体状态与执行反馈，输出对应实际动作。</p>
-<p>上下文摘要需要保留任务约束、已执行动作和当前物体状态；停止与复用信号需要结合后续执行结果评价。机械臂动作改变环境，后续观察依赖真实执行，批量草稿的深度受到物理状态变化限制。</p>
-<p>采用 PPO 训练调度策略时，需要明确调度动作、可见反馈、任务回报及计算成本。统一报告完整任务成功率、异常恢复率和总耗时，并计入摘要、调度、核验、重试及失败轨迹的成本。</p>
+<p>这些工作分别改变历史表示、每轮计算、思考保留和模型分工。我们希望迁移的是这些控制计算的机制，而迁移后的收益需要在图像、本体状态、执行反馈与实际动作构成的闭环中重新验证。</p>
+<p>首先，上下文压缩需要保留任务约束、已完成步骤和最新物体状态。我们应检查压缩后能否继续完成任务，以及摘要本身花费的时间。Context Management 中的结果主要支持有限窗口下的任务质量，部署时还需要单独测量总耗时。</p>
+<p>其次，预算分配、早停与跨轮复用都依赖对当前信息是否充分的判断。我们需要把这类判断与执行结果联系起来：停止思考后，动作是否仍正确；复用过去的推理时，环境变化是否使其中的依据失效。原论文中的动作似然与语义冗余是可借鉴的信号，其在机器人闭环中的可靠性仍需实验验证。</p>
+<p>最后，模型协作受到动作可执行性的约束。机械臂动作会改变环境，后续观察依赖真实执行；因此，SpecAgent 中连续执行只读调用的条件不能直接套用于连续物理操作。我们可以比较事件触发的强模型介入与固定频率介入，检验恢复能力和额外核验开销。</p>
+<p>如果后续采用 PPO，我们需要先明确更新的是推理调度策略、动作策略，还是二者。调度动作、可见反馈、任务回报和计算成本确定后，再设计对应的优势估计与更新。评测在相同动作接口和环境预算下进行，同时报告完整任务成功率、异常恢复率和总耗时，并计入摘要、调度、核验、重试及失败轨迹的成本。</p>
 <h2 id="references">References</h2>
 <ul>
 <li>Yujiang Li et al. <strong>CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents.</strong> First released 2026-07-06; version 2607.05378v2, 2026-10-01. <a href="https://arxiv.org/html/2607.05378v2">Paper</a>. §3.1–3.2, Table 2, §4.3, Appendix A.2.</li>
