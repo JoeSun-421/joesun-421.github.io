@@ -1,42 +1,171 @@
 ---
-title: "Adaptive Reasoning: From Computer Use to Robot Use"
+title: "Towards Efficient Robot-Use Agents via Efficient Reasoning"
 date: 2026-11-25
-description: "按加速机制解读五篇近期工作：预算分配、生成中早停、跨轮推理复用、事件升级与推测式核验，追踪训练配方与真实耗时。"
+description: "八篇近期工作，按上下文管理、预算分配、推理削减与模型协作四类讲解原文流程、强化学习配方和实验。"
 tags: [dynamic-reasoning, efficient-agents, computer-use, robot-use, reinforcement-learning]
 slug: dynamic-reasoning-robot-use
 ---
 
-# Adaptive Reasoning: From Computer Use to Robot Use
+# Towards Efficient Robot-Use Agents via Efficient Reasoning
 
-## Why Robot Use Needs Adaptive Reasoning
+## Why Robot-Use Agents Need Efficient Reasoning
 
 在直接输出末端位姿的 robot-use 闭环中，模型读取图像与机器人状态，生成动作 JSON，控制器执行后返回新观察。抓取失败和物体位移会改变后续决策所需的信息。
 
-推理调度的目标是根据执行状态分配计算，同时保持完整任务的成功率。
+推理调度的目标是根据执行状态分配计算，同时保持完整任务的成功率。computer-use 与 robot-use 都通过“观察 → 决策 → 执行 → 新观察”推进任务；机器人还受到接触、动力学和感知误差的影响。
 
-computer-use 与 robot-use 都通过“观察 → 决策 → 执行 → 新观察”推进任务。机器人还受到接触、动力学和感知误差的影响，动作结果需要通过新的观察确认。
+## Four Routes to Efficient Reasoning
 
-## Where Acceleration Comes From
+上下文长度、推理预算、重复思考和模型分工对应四类资源开销：
 
-- **Adaptive Budgets — TAB：** 根据交互历史分配每轮推理预算。
-- **Early Exit — PUMA：** 检测推理冗余，在答案通过核验后提前停止。
-- **Cross-Turn Reuse — RACE：** 利用历史推理对后续动作的支持，省略重复思考。
-- **Selective Escalation — STEPWISE：** 小模型执行常规步骤，强模型处理异常与关键核验。
-- **Speculative Verification — SpecAgent：** 小模型起草多步，强模型批量审核。
+1. **Context Management：** CompactionRL、ContextBudget。压缩交互历史，在有限上下文窗口中继续执行长任务。
+2. **Adaptive Compute Allocation：** TAB、CogRouter。根据当前交互选择推理预算或认知深度。
+3. **Reasoning Reduction and Reuse：** PUMA、RACE。截去冗余生成，保留对当前及后续动作有用的思考。
+4. **Model Collaboration and Execution：** STEPWISE、SpecAgent。按事件升级模型，或让强模型批量核验小模型草稿。
 
-TAB、PUMA、RACE 减少重复或过量推理；STEPWISE、SpecAgent 调整大小模型的分工。生成量、成功率与耗时共同决定加速收益。
+工具 agent 的上下文、调用、推理和执行环节划分见文末综述。分类按主要作用位置组织；上下文窗口、生成 token、模型调用和端到端耗时分别统计。
 
-## Adaptive Budgets — TAB
+## Context Management
 
-### Problem
+这一类改变交互历史的保存方式。CompactionRL 将摘要与执行联合训练，ContextBudget 将剩余容量和新观察长度纳入压缩决策。
 
-多轮任务中，一轮预算会影响回答质量，也会影响后续交互。TAB 将这些依赖建模为序贯决策，用整条轨迹的终局结果评价预算分配。
+### CompactionRL — Jointly Learn Execution and Compaction
 
-TAB 将整条交互视为预算分配问题，优化**完成任务与总预算之间的折中**。
+#### Problem
+
+长任务尚未完成，交互轨迹就可能超过上下文窗口。将历史压缩成摘要可以延续执行，但如何把上下文压缩纳入强化学习，仍缺少充分研究。
+
+#### Method and RL Recipe
+
+CompactionRL 联合优化任务执行与摘要生成，两者共享最终任务回报。
+
+![CompactionRL context compaction and benchmark results](assets/efficient_agents_2026/compactionrl-overview.png)
+
+上下文剩余容量低于阈值时，同一个策略生成摘要，再从“摘要＋最近交互”继续执行。每个动作与工具反馈作为完整单元保留，默认逐字保留最近两轮。
+
+![CompactionRL trainable segments and cross-segment credit](assets/efficient_agents_2026/compactionrl-training.png)
+
+训练按 §3.1–3.2 的顺序进行：
+
+1. 每个问题采样一条完整 rollout，执行过程中允许触发多次 compaction。
+2. 将 rollout 切成执行段与摘要段，保存各段生成 token、old log-probability 和 loss mask。
+3. 用最终任务正确性给整条 rollout 计分，执行段和摘要段共享该回报。
+4. critic 在各段上下文上预测价值，计算本段的局部 GAE，再按后续段的 token 数做位置修正。
+5. 汇总执行与摘要的有效生成 token，计算 PPO actor loss 和 critic loss。观察、重复的上下文前缀不参与策略损失。
+
+设 $s$ 为分段编号，$k$ 为段内 token 位置，$n_s$ 为本段参与优化的 token 数。后续段的 token 总数为 $N_{>s}$：
+
+$$
+\begin{aligned}
+N_{>s}&=\sum_{j>s}n_j,\\
+\widehat A_{s,k}
+&=(\gamma\lambda)^{N_{>s}}A^{\mathrm{loc}}_{s,k}.
+\end{aligned}
+$$
+
+$A^{\mathrm{loc}}_{s,k}$ 是用本段价值估计和 TD residual 得到的局部 GAE；$\gamma$ 为折扣，$\lambda$ 为 GAE 参数。位置修正让较早段的终局回报按实际距离衰减。它是便于各段并行处理的近似，不递归重建后续各段的全部 TD residual。
+
+PPO 更新对所有有效 token 统一归一化：
+
+$$
+\begin{aligned}
+\rho_{s,k}
+&=\frac{\pi_\theta(y_{s,k}\mid x_{s,k})}
+{\pi_{\mathrm{old}}(y_{s,k}\mid x_{s,k})},\\
+\overline\rho_{s,k}
+&=\operatorname{clip}(\rho_{s,k},1-\epsilon,1+\epsilon),\\
+\ell_{s,k}
+&=\min(\rho_{s,k}\widehat A_{s,k},
+\overline\rho_{s,k}\widehat A_{s,k}),\\
+\mathcal L_\pi
+&=-\frac1{|\mathcal M|}\sum_{(s,k)\in\mathcal M}\ell_{s,k}.
+\end{aligned}
+$$
+
+$x_{s,k}$ 是该 token 的上下文，$\mathcal M$ 包含执行段和摘要段的有效 assistant token，$\epsilon$ 是裁剪宽度。按 token 归一化，避免分段数量直接决定一条 rollout 的权重。
+
+Appendix A.2 中，actor 与 critic 从同一底座初始化，critic 增加标量价值头。actor 学习率为 $2\times10^{-6}$，critic 为 $3\times10^{-6}$，每次策略更新配两次 critic 更新。
+
+#### Results
+
+v2 在相同峰值上下文下比较训练与推理 compaction。GLM-4.7-Flash 使用 64K 窗口，相对仅在推理时压缩的底座，SWE-bench Verified 的 200 题子集由 50.5% 提高到 56.0%，Terminal-Bench 2.0 由 13.5% 提高到 20.2%。
+
+![CompactionRL summary and execution training dynamics](assets/efficient_agents_2026/compactionrl-dynamics.png)
+
+摘要参与训练后变得更详细，任务成功率随训练提升。去掉摘要损失、token 归一化或跨段修正的消融用于检验各部分作用。这些结果支持固定窗口下的长任务质量提升，尚未给出逐步推理的延迟收益。
+
+### ContextBudget — Manage History Before Loading Observations
+
+#### Problem
+
+部署时的显存、延迟与成本限制了 agent 的上下文预算。随着交互历史增长，agent 需要在保留过去的信息与遵守窗口限制之间权衡，决定何时压缩、压缩多少历史。
+
+#### Method and RL Recipe
+
+![ContextBudget deferred observation loading and GRPO](assets/efficient_agents_2026/contextbudget-framework.png)
+
+在读取新观察的内容前，agent 先获得当前剩余容量与新观察的 token 长度，再决定如何处理旧历史。设上下文窗口为 $B$，历史缓冲区为 $\mathcal C_t$，待加载观察为 $o_t$：
+
+$$
+\begin{aligned}
+r_t&=B-|\mathcal C_t|,\\
+u_t&\sim\pi_\theta(\cdot\mid s_t,r_t,|o_t|),\\
+\mathcal C_{t+1}&=\mathcal C'_t\oplus o_t,\\
+|\mathcal C'_t|&\le B-|o_t|.
+\end{aligned}
+$$
+
+$s_t$ 是当前推理状态，$r_t$ 是剩余 token 容量；$u_t$ 选择不压缩、聚合部分历史块或聚合全部历史块。$\mathcal C'_t$ 是处理后的历史，$\oplus$ 表示追加观察。选择要聚合的历史块后，模型生成合并摘要替换这些块。决策时可见观察长度，内容要等处理完成后才载入。
+
+BACM-RL 用多轮 GRPO 联合更新压缩决策与任务生成：
+
+1. 用二目标组合 QA 构造训练任务，采样同题的多条完整交互轨迹。
+2. 计算最终答案的 F1；若轨迹任一轮超过当前阶段窗口限制，将该轨迹奖励置为 0。
+3. 在同题 rollout 组内标准化奖励，将同一轨迹优势分配给各轮生成 token。
+4. 使用 clipped policy objective 与参考策略 KL 更新模型。
+5. 逐阶段收紧窗口，沿用当前模型继续训练。
+
+在课程阶段 $j$，奖励为：
+
+$$
+\begin{aligned}
+\widetilde R_i^{(j)}
+&=\begin{cases}
+R_i,&\forall t:\ |\mathcal C_{i,t}|\le B^{(j)},\\
+0,&\text{otherwise},
+\end{cases}\\
+\widehat A_i^{(j)}
+&=\frac{\widetilde R_i^{(j)}-\mu_j}{\sigma_j+\varepsilon}.
+\end{aligned}
+$$
+
+$R_i$ 是答案 F1，$\mu_j,\sigma_j$ 由当前同题组的预算约束奖励计算，$\varepsilon$ 用于数值稳定。模型同时生成压缩操作与任务响应，两类 token 都参与训练。
+
+Appendix A.5 的课程共有 300 个更新，每阶段 60 个，窗口依次为 8,192、7,168、6,144、5,120、4,096 token；组内采样 5 条 rollout，actor 学习率为 $10^{-6}$。评测扩展到更多目标的组合题与 BrowseComp-Plus。
+
+#### Results
+
+![ContextBudget performance across context windows](assets/efficient_agents_2026/contextbudget-budgets.png)
+
+组合题的累计 F1 为各子目标 F1 之和，取值上限等于目标数。实验在 16K–4K 窗口下比较该指标，并分别去掉预算信息、延迟加载和递减窗口课程。指标同时反映任务完成质量与受限窗口下的信息保留。
+
+![ContextBudget answer quality and compression calls](assets/efficient_agents_2026/contextbudget-compressions.png)
+
+固定 8K 窗口时，二目标任务相对 MEM1 的平均压缩调用从 1.92 降到 1.12，累计 F1 从约 0.84 提高到 0.91。目标数增多后，方法增加压缩调用以维持任务表现；节省资源与保留信息随任务负载共同变化。
+
+## Adaptive Compute Allocation
+
+这一类决定当前轮次使用多少推理。TAB 输出外部预算，CogRouter 在同一策略中选择认知层级并生成动作。
+
+### TAB — Allocate Budgets Across Turns
+
+#### Problem
+
+简单问题也可能产生过长的思考，增加推理开销。已有长度正则、动态路由和难度预算方法主要关注单轮任务，未充分处理多轮推理中的序贯依赖：当前轮次的计算分配还需要兼顾后续轮次。
+
+#### Method and RL Recipe
 
 ![TAB budget allocator and solver loop](assets/efficient_agents_2026/tab-overview.png)
-
-### Method and RL Recipe
 
 TAB 分开使用 Budgeter 和 Solver。每轮 Budgeter 根据历史与当前输入输出难度档位，再映射成 Solver 的 token 预算或 reasoning-effort 设置。Solver 在这个设置下生成回答，新的反馈进入下一轮。
 
@@ -87,24 +216,85 @@ Qwen3-4B Budgeter 使用 LoRA rank 64、学习率 $10^{-5}$，训练 125 个更�
 
 迁移实验最多节省约 20% token 与 15% 延迟，计时包含 Budgeter 开销。两张图分别给出准确率与总 token、准确率与端到端延迟的关系。
 
+### CogRouter — Choose Cognitive Depth at Each Step
 
-## Early Exit — PUMA
+#### Problem
 
-### Problem
+现有 agent 常采用固定认知模式：每步直接响应，或每步都进行深度推理。长任务中，不同步骤的认知需求差异很大，从常规执行到战略规划，统一的推理深度会浪费计算。
 
-PUMA 观察到，高置信度和重复出现的答案可以早于推理收敛。模型此时仍在探索或自我修正，直接截断会损失后续推理。
+#### Method and RL Recipe
 
-原文用示意图区分答案就绪与推理收敛：置信度和答案一致性可能较早变高，步骤语义相似度则在重复验证阶段持续升高。
+![CogRouter balanced SFT and cognition-aware optimization](assets/efficient_agents_2026/cogrouter-framework.png)
+
+四个层级依次对应直接响应、当前状态分析、结合执行历史的反思、评价候选动作未来影响。每轮按 `<level>`、`<think>`、`<action>` 的结构生成。
+
+CoSFT 使用 GPT-4o 的成功轨迹。在每步均衡随机指定一个层级，再让专家根据历史和固定参考动作补写该层级的思考，对完整结构化输出做交叉熵训练。
+
+CoPO 随后执行：
+
+1. 当前策略与环境交互，采样同题多条完整轨迹。
+2. 计算任务成功与格式奖励，再得到组相对优势。
+3. 对成功轨迹的每一步，固定观察与动作，补生成四种层级的思考。
+4. 对同一个参考动作做 teacher-forced scoring，比较四种思考下的平均动作 token log-probability。
+5. 将分数标准化并转换成 softmax 权重，重新分配该步优势，再用 clipped policy loss 更新层级、思考与动作 token。
+
+轨迹奖励为任务成功与格式检查的乘积：
+
+$$
+R_i=R_i^{\mathrm{task}}R_i^{\mathrm{format}}.
+$$
+
+两个因子均为 0/1；任何一步格式不符合要求，格式项就为 0。$\widehat A_i$ 由同题轨迹组的奖励计算。
+
+在成功轨迹 $i$ 的第 $t$ 步，层级 $c$ 的思考与历史构成 $h_{i,t}^{(c)}$。固定参考动作 $a_{i,t}$ 有 $M_{i,t}$ 个 token，其置信度为：
+
+$$
+C_{i,t}^{(c)}=\frac1{M_{i,t}}
+\sum_{k=1}^{M_{i,t}}
+\log\pi_\theta\!\left(a_{i,t,k}\mid h_{i,t}^{(c)},a_{i,t,<k}\right).
+$$
+
+$c\in\{1,2,3,4\}$ 是层级编号。对同一步四个分数标准化，再计算权重：
+
+$$
+\begin{aligned}
+\widetilde C_{i,t}^{(c)}
+&=\frac{C_{i,t}^{(c)}-\mu_{i,t}}{\sigma_{i,t}},\\
+w_{i,t}^{(c)}
+&=\frac{\exp(\eta\widetilde C_{i,t}^{(c)})}
+{\sum_{b=1}^{4}\exp(\eta\widetilde C_{i,t}^{(b)})},\\
+\widehat A_{i,t}^{(c)}
+&=w_{i,t}^{(c)}\widehat A_i.
+\end{aligned}
+$$
+
+$\mu_{i,t},\sigma_{i,t}$ 仅由该步四个层级的置信度计算；$\eta$ 控制分布尖锐程度，原文设为 2。失败轨迹不扩展四组思考，继续使用原轨迹优势。CoPO 保留组相对优势，没有 learned critic。
+
+#### Results
+
+![CogRouter cognitive levels across progress and difficulty](assets/efficient_agents_2026/cogrouter-adaptation.png)
+
+ALFWorld、ScienceWorld 的实验同时比较任务表现、token 数和层级分布。图中 CoPO 随任务进度及复杂度调整层级；标准 GRPO 更集中于最深层。四种思考是在固定参考动作上比较置信度，未分别重新执行为四条环境分支。
+
+## Reasoning Reduction and Reuse
+
+PUMA 处理单次生成中的语义冗余，RACE 检查已有思考对后续动作的持续支持。
+
+### PUMA — Stop When Reasoning Converges
+
+#### Problem
+
+长推理模型在解法稳定后仍可能继续思考，浪费 token 并增加延迟。现有早停方法主要依赖答案置信度或试答一致性；这些信号可能在模型完成探索、自我修正前触发，损害答案正确性与保留推理链的语义完整性。
 
 ![PUMA answer readiness and reasoning convergence](assets/efficient_agents_2026/puma-readiness.png)
 
-PUMA 据此用语义冗余定位候选退出点，再核验答案，截去收敛之后的重复生成。
+#### Method and Training Recipe
 
-### Method and Training Recipe
+PUMA 用推理步骤的语义冗余定位候选退出点，再核验答案，截去收敛之后的重复生成。
 
 ![PUMA redundancy detection and verified early exit](assets/efficient_agents_2026/puma-framework.png)
 
-#### Redundancy Detector Training
+**Redundancy Detector Training**
 
 PUMA 的主推理模型保持冻结，另行训练 Qwen3-Embedding-0.6B 冗余检测器。Appendix B.2 的数据与训练流程为：
 
@@ -114,7 +304,7 @@ PUMA 的主推理模型保持冻结，另行训练 Qwen3-Embedding-0.6B 冗余�
 4. 整理为 anchor、冗余正样本、新颖负样本，去重后得到 701,641 条对比训练数据。
 5. 用 InfoNCE 训练检测器：LoRA rank 32、学习率 $10^{-4}$、5 epochs。冗余步骤被拉近，有新进展的步骤被拉远。
 
-#### Inference-Time Exit
+**Inference-Time Exit**
 
 在线流程是：
 
@@ -141,7 +331,7 @@ $s_t$ 超过相似度阈值时，只产生候选退出点。原文默认 $k=1$�
 
 退出行为进一步分为核验通过、Loop Breaker 和完整生成。上图同时比较各分组的答案正确性，检查早停是否打断自我修正。
 
-#### Model Internalization
+**Model Internalization**
 
 §6.2 与 Appendix F 使用 12K 道数学训练题，让底座生成完整 CoT，再运行 PUMA 记录候选退出点与通过核验的停止点。随后分别构造：
 
@@ -160,20 +350,19 @@ $c_i$ 表示答案正确性，$\ell_i$ 是该前缀之后的 completion 长度�
 
 GRPO 训练最多 1,500 个更新，学习率 $10^{-6}$，completion 上限为 4,096 token。训练后的变体直接用 vLLM 推理，不调用冗余检测器和答案核验模块。训练中的长度项统计给定前缀之后的答案阶段。
 
+### RACE — Preserve Cross-Turn Reasoning Support
 
-## Cross-Turn Reuse — RACE
+#### Problem
 
-### Problem
+agent 通常在每次行动前推理，但已有思考能够继续支持后续动作，因此每轮重新思考并非总有必要。难点在于判断已有思考何时足够、何时需要补充，同时避免昂贵的生成式核验。
 
-RACE 研究推理的跨轮支持：一轮思考会持续影响后续动作，删减时需要同时检查这些动作。逐个上下文重新采样动作验证，会增加训练成本。
+#### Method and RL Recipe
 
 原文先删除部分思考，检查后续参考动作是否仍能生成，再比较动作恢复率与似然下降的关系。
 
 ![RACE cross-turn support and action likelihood](assets/efficient_agents_2026/race-support.png)
 
 似然下降较小时，参考动作通常仍可恢复。RACE 用这个关系构造跨轮推理删减信号。
-
-### Method and RL Recipe
 
 LoGiC 从已有轨迹出发，保留第一轮思考，从第二轮起依次尝试删除。一次删除需要同时通过当前及后续参考动作的检查；已接受的删除会进入下一次评估的上下文。
 
@@ -205,14 +394,14 @@ before、after 分别表示本次删除前后的上下文，后续参考动作�
 
 ![RACE supervised and reinforcement-learning stages](assets/efficient_agents_2026/race-training.png)
 
-#### Supervised Fine-Tuning
+**Supervised Fine-Tuning**
 
 1. 使用 DeepSeek-V4-Pro-0813 标注的成功轨迹。
 2. 由 Qwen3.5-9B 运行 LoGiC，似然下降阈值设为 $0.001$。
 3. 删除通过检查的思考，保留动作和观察，构成 THINK／SKIP 混合轨迹。
 4. 对模型生成的思考与动作 token 计算交叉熵，得到 RACE-SFT checkpoint。
 
-#### Agentic Reinforcement Learning
+**Agentic Reinforcement Learning**
 
 1. 从 RACE-SFT 初始化，在同一任务上采样多条完整轨迹。每批 16 个任务、每个任务 8 条，共 128 条轨迹。
 2. 计算任务回报和组相对优势。对成功轨迹运行 LoGiC，得到 SKIP 轮次；失败轨迹沿用普通 GRPO。
@@ -220,7 +409,7 @@ before、after 分别表示本次删除前后的上下文，后续参考动作�
 4. **Reasoning closure：** 在 SKIP 轮次的压缩上下文上，将结束思考 token 作为监督目标，提高立即结束当前思考段的概率，随后继续生成动作。
 5. 联合计算 masked GRPO 与 closure 损失，更新同一策略模型。
 
-仅仅 mask 会停止强化冗余思考，closure 则提供主动结束它的信号：
+mask 移除 SKIP 思考 token 的策略梯度项；closure 在同一压缩上下文上监督结束思考的 token，使模型学会直接进入动作生成：
 
 $$
 \begin{aligned}
@@ -241,18 +430,19 @@ $T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\m
 
 在相同底座的消融中，RACE 相对普通 SFT＋GRPO 减少约 32%–80% 的推理 token，四个基准上的成功率变化不超过 1.4 个百分点。效率指标是推理 token 数。
 
+## Model Collaboration and Execution
 
-## Selective Escalation — STEPWISE
+这一类调整大小模型的执行分工。STEPWISE 用事件触发升级和核验，SpecAgent 用片段核验减少强模型串行生成。
 
-### Problem
+### STEPWISE — Escalate at Events
 
-computer-use 的失败经常表现为两类：重复操作却没有进展，或操作看起来连贯，最终结果却偏离用户目标。每步都调用强模型核验很贵，等终局才发现错误又可能太晚。
+#### Problem
+
+computer-use agent 几乎每步都调用大型多模态模型，成本高、速度慢。GUI 长任务包含大量常规步骤，错误则集中在少数高风险时刻，主要表现为进展停滞，以及动作局部合理却已偏离用户目标的语义漂移。
 
 ![STEPWISE stalls and silent semantic drift](assets/efficient_agents_2026/stepwise-failures.png)
 
-STEPWISE 用轻量监测器寻找值得增加计算的时刻。
-
-### Method and Training Recipe
+#### Method and Training Recipe
 
 小模型默认执行，两个 ModernBERT 监测器分析最近的推理与动作记录：
 
@@ -279,16 +469,15 @@ Appendix B 使用 300 条 GUI 执行轨迹训练两个 ModernBERT-base 分类器
 
 OSWorld 与 WebArena 的消融分别启用 stuck、milestone 和两种监测器，完整配置取得最高成功率。原文还比较固定间隔核验；成本表中的延迟按单次请求统计。
 
+### SpecAgent — Draft, Verify, and Repair
 
-## Speculative Verification — SpecAgent
+#### Problem
 
-### Problem
+工具 agent 通常由单个强模型生成每一步，即使许多常规步骤可由小模型完成。现有路由与协作方法仍按查询或步骤分配生成工作；推测方法通常逐步核验小模型草稿，且常以强模型自身的动作为参照，未充分减少强模型的串行生成。
 
-长工具链中，强模型逐步生成动作会累积串行解码时间。小模型成本较低，但任务成功率低于强模型。SpecAgent 利用强模型的核验与修复能力保留小模型的有效进展。
+#### Execution Protocol
 
-SpecAgent 把强模型的主要工作改为**审核小模型已经写出的多步片段**。核验一次读入整段，强模型只需生成短判定与必要修复，因而有机会减少串行解码。
-
-### Execution Protocol
+SpecAgent 让小模型起草多步片段，由强模型一次读入并核验。强模型只生成短判定与必要修复，以并行 prefill 替代一部分自回归解码。
 
 ![SpecAgent draft verify and repair protocol](assets/efficient_agents_2026/specagent-protocol.png)
 
@@ -329,19 +518,23 @@ FLOPs 和 HBM-read 按请求 token 与模型架构估算，耗时实际计量。
 
 ![SpecAgent verification and repair ablation](assets/efficient_agents_2026/specagent-ablation.png)
 
-
 ## Transfer to Robot Use
 
-五种机制分别作用于预算、停止位置、跨轮推理、模型升级和批量核验。迁移到 robot-use 时，输入扩展为图像、本体状态与执行反馈，输出对应实际动作。
+四类机制分别改变历史表示、每轮计算、思考保留和模型分工。迁移到 robot-use 时，输入扩展为图像、本体状态与执行反馈，输出对应实际动作。
 
-动作置信度、文本冗余和 JSON 一致性需要与物理执行结果共同评价。机械臂动作改变环境，后续观察依赖真实执行；SpecAgent 连续执行只读工具调用的条件因此受到限制。
+上下文摘要需要保留任务约束、已执行动作和当前物体状态；停止与复用信号需要结合后续执行结果评价。机械臂动作改变环境，后续观察依赖真实执行，批量草稿的深度受到物理状态变化限制。
 
-采用 PPO 训练调度策略时，需要明确调度动作、可见反馈、任务回报及计算成本。评测统一报告完整任务成功率、异常恢复率和总耗时，并计入调度、核验、重试及失败轨迹的成本。
+采用 PPO 训练调度策略时，需要明确调度动作、可见反馈、任务回报及计算成本。统一报告完整任务成功率、异常恢复率和总耗时，并计入摘要、调度、核验、重试及失败轨迹的成本。
 
 ## References
 
-- Neharika Jali et al. **Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents.** First released 2026-04-06; reviewed version 2604.05164v4, 2026-11-15. [Paper](https://arxiv.org/html/2604.05164v4). §3.3, §4.3, Appendix A.
+- Yujiang Li et al. **CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents.** First released 2026-07-06; version 2607.05378v2, 2026-10-01. [Paper](https://arxiv.org/html/2607.05378v2). §3.1–3.2, Table 2, §4.3, Appendix A.2.
+- Yong Wu et al. **ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents.** 2604.01664v1, 2026-04-02. [Paper](https://arxiv.org/html/2604.01664v1). §3.1–3.3, §4.4–4.5, Appendix A.5.
+- Neharika Jali et al. **Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents.** First released 2026-04-06; version 2604.05164v4, 2026-11-15. [Paper](https://arxiv.org/html/2604.05164v4). §3.3, §4.3, Appendix A.
+- Ruihan Yang et al. **Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents.** First released 2026-02-13; reviewed ICML 2026 proceedings, PMLR 306. [Proceedings](https://proceedings.mlr.press/v306/yang26cz.html). §3.3–3.4, Algorithm 1, Figure 5, Table 5.
 - Dehai Min et al. **Stop When Reasoning Converges: Semantic-Preserving Early Exit for Reasoning Models.** 2605.17672v1, 2026-05-17. [Paper](https://arxiv.org/html/2605.17672v1). §3, §5.2, §6.2, Appendix F.
 - Yiruo Cheng et al. **When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation.** 2610.12061v1, 2026-10-08. [Paper](https://arxiv.org/html/2610.12061v1). §3.1–3.3, Table 2, Figure 4.
 - Jinbiao Wei et al. **Step-level Optimization for Efficient Computer-use Agents.** 2604.27151v1, 2026-04-29. [Paper](https://arxiv.org/html/2604.27151v1). §4, §6, Appendix B.
 - Zilin Wang et al. **Trajectory-Level Speculation with Semantic Verification for Tool-Using Agents.** 2610.21463v1, 2026-10-15. [Paper](https://arxiv.org/html/2610.21463v1). §3.2–3.3, Table 2, §5.
+
+Taxonomy reference: Yunuo Hu et al. **How to Make Tool-Using LLM Agents Efficient? A Survey.** Preprints.org v1, posted 2026-08-06. [Survey](https://www.preprints.org/manuscript/202608.0365). §3: tool context, calling, reasoning, and execution.

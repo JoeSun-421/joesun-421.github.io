@@ -1,10 +1,10 @@
 [
   {
     "slug": "dynamic-reasoning-robot-use",
-    "title": "Adaptive Reasoning: From Computer Use to Robot Use",
+    "title": "Towards Efficient Robot-Use Agents via Efficient Reasoning",
     "date": "2026-11-25",
     "published": "2026-11-25",
     "updated": "2026-11-25",
-    "summary": "按预算分配、生成中早停、跨轮复用、事件升级与推测式核验解读五篇近期工作，核对 RL recipe、实际耗时与机器人迁移。"
+    "summary": "按上下文管理、计算分配、推理削减与模型协作解读八篇近期工作，结合原图与公式讲解训练流程、效率证据及 robot-use 迁移。"
   }
 ]

@@ -405,15 +405,23 @@
       543,
       284
     ],
-    "sha256": "6374b838a1e82c8cbae30fae635cf748702f4485199dcf0a0cf258d51d2ebef8",
-    "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": false,
+    "sha256": "f74ec14c5685c53bc31de798f1ff0a6ee0ef72b1b1c8d6f8144b97e6993f1461",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "active_in_blog": true,
     "version": "ICML 2026 proceedings",
     "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
     "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
     "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
     "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
-    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents"
+    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
+    "render_scale": 4,
+    "trim_pixels": [
+      67,
+      2,
+      1905,
+      856
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "cogrouter-adaptation.png",
@@ -426,15 +434,23 @@
       543,
       251
     ],
-    "sha256": "60130a2d97e5259c4ec5366e1fd81e3c41763b160561c3514d692711b04a1321",
-    "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": false,
+    "sha256": "3317896ad5f6ab079582fc153da94f570e2269220052754650d9dcb53af942bb",
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "active_in_blog": true,
     "version": "ICML 2026 proceedings",
     "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
     "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
     "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
     "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
-    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents"
+    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
+    "render_scale": 4,
+    "trim_pixels": [
+      49,
+      28,
+      890,
+      749
+    ],
+    "outer_padding_pixels": 24
   },
   {
     "asset": "puma-framework.png",
@@ -707,5 +723,173 @@
       461
     ],
     "outer_padding_pixels": 24
+  },
+  {
+    "asset": "compactionrl-overview.png",
+    "source_pdf": "CompactionRL_2607.05378v2.pdf",
+    "page": 2,
+    "figure": 1,
+    "crop_points": [
+      108,
+      78,
+      506,
+      237
+    ],
+    "version": "2607.05378v2",
+    "render_scale": 4,
+    "trim_pixels": [
+      38,
+      15,
+      1550,
+      598
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "fe97c3e17cd83e6a250cbfc518f2ad08da90464d686d62a27db6324cbddd3081",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2607.05378v2",
+    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
+    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
+    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
+  },
+  {
+    "asset": "compactionrl-training.png",
+    "source_pdf": "CompactionRL_2607.05378v2.pdf",
+    "page": 4,
+    "figure": 2,
+    "crop_points": [
+      108,
+      78,
+      506,
+      246
+    ],
+    "version": "2607.05378v2",
+    "render_scale": 4,
+    "trim_pixels": [
+      2,
+      22,
+      1575,
+      627
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "37a60e799c674351fba6d41783fd39ffcd7ce737e9c705580afd8da9b05b2bdc",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2607.05378v2",
+    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
+    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
+    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
+  },
+  {
+    "asset": "compactionrl-dynamics.png",
+    "source_pdf": "CompactionRL_2607.05378v2.pdf",
+    "page": 9,
+    "figure": 4,
+    "crop_points": [
+      108,
+      276,
+      506,
+      399
+    ],
+    "version": "2607.05378v2",
+    "render_scale": 4,
+    "trim_pixels": [
+      25,
+      29,
+      1573,
+      471
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "7776d7f83b58c71f8be9697f8fb735e77ff2da9bced9f5d6580871dec27346ee",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2607.05378v2",
+    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
+    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
+    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
+  },
+  {
+    "asset": "contextbudget-framework.png",
+    "source_pdf": "ContextBudget_2604.01664v1.pdf",
+    "page": 3,
+    "figure": 1,
+    "crop_points": [
+      108,
+      76,
+      506,
+      329
+    ],
+    "version": "2604.01664v1",
+    "render_scale": 4,
+    "trim_pixels": [
+      0,
+      31,
+      1581,
+      927
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "a2569dafed656c9049d9a079b83e0004b9dc89c3f4a004ec6797061ca4db69cc",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2604.01664v1",
+    "license": "CC BY 4.0",
+    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
+    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
+  },
+  {
+    "asset": "contextbudget-budgets.png",
+    "source_pdf": "ContextBudget_2604.01664v1.pdf",
+    "page": 8,
+    "figure": 2,
+    "crop_points": [
+      108,
+      78,
+      506,
+      208
+    ],
+    "version": "2604.01664v1",
+    "render_scale": 4,
+    "trim_pixels": [
+      20,
+      24,
+      1583,
+      496
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "e1757296679a782fad22586a51bdc3c6387052034ee1db9a67ee5027de5a692c",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2604.01664v1",
+    "license": "CC BY 4.0",
+    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
+    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
+  },
+  {
+    "asset": "contextbudget-compressions.png",
+    "source_pdf": "ContextBudget_2604.01664v1.pdf",
+    "page": 8,
+    "figure": 3,
+    "crop_points": [
+      345,
+      418,
+      506,
+      533
+    ],
+    "version": "2604.01664v1",
+    "render_scale": 6,
+    "trim_pixels": [
+      19,
+      29,
+      939,
+      667
+    ],
+    "outer_padding_pixels": 24,
+    "sha256": "6016a64648f1f31f570f36dd893c01c41d89f5e53898a4cb58afd52a8e684b2f",
+    "active_in_blog": true,
+    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "url": "https://arxiv.org/pdf/2604.01664v1",
+    "license": "CC BY 4.0",
+    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
+    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
   }
 ]
