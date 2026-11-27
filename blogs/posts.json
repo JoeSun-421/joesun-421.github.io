@@ -4,7 +4,7 @@
     "title": "Towards Efficient Closed-Loop Agents via Hybrid Reasoning",
     "date": "2026-11-27",
     "published": "2026-11-25",
-    "updated": "2026-11-27",
-    "summary": "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链思考带来的延迟开销迅速成为瓶颈。本文聚焦一个核心问题：LLM、VLM 与桌面 CUA 领域的高效混合推理方法能否迁移到 RUA？围绕五条代表性路线，逐篇拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 的问题建模与核心机制。"
+    "updated": "2026-11-28",
+    "summary": "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链思考带来的延迟开销迅速成为瓶颈。本文聚焦一个核心问题：LLM、VLM 与桌面 CUA 领域的高效混合推理方法能否迁移到 RUA？围绕五条代表性路线，逐篇拆解 RACE、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 的问题建模与核心机制。"
   }
 ]

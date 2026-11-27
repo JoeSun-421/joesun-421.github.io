@@ -36,24 +36,6 @@
     "active_in_blog": true
   },
   {
-    "asset": "cogrouter-overview.png",
-    "paper": "CogRouter",
-    "arxiv_id": "2602.12662v1",
-    "source_pdf": "2602.12662v1.pdf",
-    "page": 4,
-    "figure": 2,
-    "width": 1953,
-    "height": 922,
-    "sha256": "84135110375b7e9144142484cea865c27c9476ea35be3c83e3d8490513dd5bab",
-    "description": "Overview of CogRouter: four ACT-R-grounded cognitive levels (L1-L4), balanced Cognition-Aware SFT cold start, and Cognition-Aware Policy Optimization (CoPO) with counterfactual cognitive-group expansion and confidence-aware advantage reweighting.",
-    "modification": "High-DPI crop of original PDF Figure 2 region at 320 DPI with clean white margins; no overlays or edits.",
-    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
-    "version": "2602.12662v1 (ICML 2026)",
-    "url": "https://arxiv.org/pdf/2602.12662v1",
-    "license": "arXiv perpetual non-exclusive license 1.0",
-    "active_in_blog": true
-  },
-  {
     "asset": "r4b-curation.png",
     "paper": "R-4B",
     "arxiv_id": "2508.21113v2",

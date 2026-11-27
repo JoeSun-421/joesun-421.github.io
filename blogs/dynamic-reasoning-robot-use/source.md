@@ -2,9 +2,9 @@
 title: "Towards Efficient Closed-Loop Agents via Hybrid Reasoning"
 date: "2026-11-27"
 published: "2026-11-25"
-updated: "2026-11-27"
+updated: "2026-11-28"
 slug: "dynamic-reasoning-robot-use"
-summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链思考带来的延迟开销迅速成为瓶颈。本文聚焦一个核心问题：LLM、VLM 与桌面 CUA 领域的高效混合推理方法能否迁移到 RUA？围绕五条代表性路线，逐篇拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 的问题建模与核心机制。"
+summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链思考带来的延迟开销迅速成为瓶颈。本文聚焦一个核心问题：LLM、VLM 与桌面 CUA 领域的高效混合推理方法能否迁移到 RUA？围绕五条代表性路线，逐篇拆解 RACE、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 的问题建模与核心机制。"
 ---
 
 # Towards Efficient Closed-Loop Agents via Hybrid Reasoning
@@ -13,7 +13,7 @@ summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链
 
 把具备长链推理能力的 LLM 和 VLM 接进机器人闭环（Robot-Use Agent, RUA），最直接的矛盾其实不在“能不能想明白”，而在“来不来得及想”。单轮问答里多吐几百个 thinking token 顶多慢上几秒，可放到连续交互的闭环里，每一步都要读新观测、调技能、等执行，物理环境不会停下来等模型把冗长的 CoT 慢慢写完；反过来，为了压延迟干脆关掉思考，遇到长视界规划、环境扰动或意外失败时又很容易走偏。这两年 LLM、VLM 和桌面 CUA 社区已经探出了不少让模型“该快就快、该慢再慢”的混合推理做法，这篇笔记想探讨的问题很直接：这些面向语言、多模态与桌面任务的 reasoning 加速方法，背后到底抓住了什么机制，又有多大机会迁移到 RUA 里？
 
-沿着这条迁移线索，下文挑出五条代表性路线，依次拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 六篇工作。其中既有在多轮交互里通过在线 RL 按轮跳过冗余思考或细分认知深度的方案，也有在多模态底座上靠 Bi-Mode Annealing 与均衡 rollout 训出 auto-thinking 的做法；既有不动底座权重、靠外置轻量 monitor 级联大小模型的事件驱动 routing，也有在 offline 阶段通过 Model Merging 或双参考分布对齐把快慢双模收进单模型的尝试。先把它们各自的问题建模与方法细节理清，才能进一步判断哪些机制可以直接搬进机器人闭环，哪些还需要针对物理执行重新改造。
+沿着这条迁移线索，下文挑出五条代表性路线，依次拆解 RACE、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 五篇代表工作。其中既有在多轮交互里通过在线 RL 按轮跳过冗余思考的方案，也有在多模态底座上靠 Bi-Mode Annealing 与均衡 rollout 训出 auto-thinking 的做法；既有不动底座权重、靠外置轻量 monitor 级联大小模型的事件驱动 routing，也有在 offline 阶段通过 Model Merging 或双参考分布对齐把快慢双模收进单模型的尝试。先把它们各自的问题建模与方法细节理清，才能进一步判断哪些机制可以直接搬进机器人闭环，哪些还需要针对物理执行重新改造。
 
 ## Multi-Turn Step-Level RL Reasoning Control
 
@@ -56,55 +56,6 @@ $$
 $\rho_{i,k}$ 是 importance ratio，$\mathcal{P}_i$ 是第 $i$ 条轨迹的全部生成 token，$\lambda$ 控制闭合监督的强度。这样一来，“把锚点思考写好”和“跳过惯性思考”被拆成两件事分别优化。
 
 ![RACE 两阶段训练：SFT 冷启动学会按需跳过，覆盖感知的 Masked GRPO 与闭合 loss 在在线 RL 中巩固稀疏规划](assets/efficient_agents_2026/race-training.png)
-
-### CogRouter — Think Fast and Slow via Step-Level Cognitive Depth Adaptation
-
-*ICML 2026 · [arXiv:2602.12662](https://arxiv.org/abs/2602.12662) · [GitHub](https://github.com/rhyang2021/CogRouter)*
-
-#### Abstract
-
-> 长视界具身交互任务中，不同步的认知负荷差异悬殊：开局探索与遇错重规划需要深度推演，而开门进房等常规步骤只需本能直答。若只做“想或不想”的二元切换，难以覆盖态势检查与局部反思等中间需求；若直接用 trajectory-level RL 优化多档思考，policy 又会迅速坍缩为全程深思考的认知僵化。CogRouter 借鉴 ACT-R 认知架构设计四级递进认知深度，先以均匀分布的 CoSFT 打破先验偏置，再通过 confidence-aware advantage reweighting 的 CoPO 依据不同深度对动作预测置信度的支撑强弱分配步级 advantage，使单个 LLM agent 在每一步内生选择恰如其分的思考深度。
-
-#### Methodology
-
-在多轮 POMDP 具身交互中，agent 在每一步 $t$ 面对历史上下文 $\tau_t$ 依次生成三段结构化输出 $y_t = [l_t,\, th_t,\, a_t]$，分别由 `<level>`、`<think>` 与 `<action>` tag 封装。参考认知科学中的 ACT-R 理论，CogRouter 将思考深度细分为四级集合 $\mathcal{L} = \{L_1, L_2, L_3, L_4\}$：$L_1$ 为本能直答，不展开显式思考直接输出动作；$L_2$ 为态势感知，仅评估当前状态与可执行动作；$L_3$ 为经验整合，在态势评估外明确目标并回顾历史得失；$L_4$ 为战略规划，对多个候选动作做前瞻后果推演后再做抉择。下图概括了四级认知设计以及两阶段训练流程。
-
-![CogRouter 总览：四级认知深度设计、均衡 CoSFT 冷启动以及基于动作置信度重加权的 CoPO 优化流程](assets/efficient_agents_2026/cogrouter-overview.png)
-
-直接进入 RL 或沿用专家模型自主挑选的档位标签，都会让 policy 在起步阶段就锁死在特定档位上。因此第一阶段的 CoSFT 刻意回避专家偏置：先收集成功的交互轨迹，再在每一步均匀随机采样一个认知级别 $l_t \in \mathcal{L}$，提示强模型补全与该级别及真实动作 $a_t^*$ 匹配的思考过程 $th_t$，由此在均衡数据集 $\mathcal{D}_{\mathrm{cog}}$ 上最小化 NLL 目标 $\mathcal{L}_{\mathrm{CoSFT}} = -\mathbb{E}_{\mathcal{D}_{\mathrm{cog}}}\!\bigl[\sum_{t=0}^T \log \pi_\theta{(y_t \mid \tau_t^*)}\bigr]$，让模型先稳定掌握全部四个档位的生成格式且不带先验偏斜。
-
-冷启动之后，普通 GRPO 把整条轨迹的单一终局 advantage $A^{(i)}$ 均匀摊派给所有步骤，无法区分哪一步的深度恰当、哪一步在空耗 token，结果训练很快坍缩向全程 $L_4$。第二阶段的 CoPO 基于一条核心直觉：恰当的认知深度应当使模型在条件化该思考过程后，对最终正确动作的预测置信度最高。每轮在线 rollout 得到轨迹组后，先按任务成败与格式合法性之积 $R_i = R_i^{\mathrm{task}} \times R_i^{\mathrm{format}}$ 计算组相对轨迹 advantage $A^{(i)}$。对于成功轨迹（$R_i > 0$）的每一步 $t$，固定当时的观测与已执行动作 $a_t^{(i)}$，反事实地用全部四个认知级别重新生成思考过程，构成 cognitive group $e_t^{(i)} = \{e_t^{(i,k)}\}_{k=1}^4$，其中 $e_t^{(i,k)} = [l_k,\, th_t^{(i,k)},\, a_t^{(i)}]$。随后以动作 token 的平均 log-probability 度量各档位的动作预测置信度，并在组内标准化后经温度系数 $m$ 做 Softmax 重加权：
-
-$$
-\begin{aligned}
-C_t^{(i,k)} &= \frac{1}{\lvert a_t^{(i)} \rvert}\sum_{n=1}^{\lvert a_t^{(i)} \rvert}\log \pi_\theta\!\left(a_{t,n}^{(i)} \;\middle|\; \tau_t^{(i)},\, l_k,\, th_t^{(i,k)},\, a_{t,<n}^{(i)}\right), \\[6pt]
-C_{\mathrm{norm},t}^{(i,k)} &= \frac{C_t^{(i,k)} - \mu_t^{(i)}}{\sigma_t^{(i)}}, \\[6pt]
-g\!\bigl(C_t^{(i,k)}\bigr) &= \frac{\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,k)}\bigr)}{\sum_{j=1}^{4}\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,j)}\bigr)}
-\end{aligned}
-$$
-
-其中 $\mu_t^{(i)}$ 与 $\sigma_t^{(i)}$ 为该步组内置信度的均值与标准差。由于四个档位的权重和恒为 $1$，它只重新分配该步 advantage 而不改变总量级。更重要的是，该重加权仅施加于成功轨迹，失败轨迹保持原轨迹 advantage 不做扩展，避免模型为逃避高置信犯错的重罚而退化回低置信本能直答：
-
-$$
-A_t^{(i,k)} = \begin{cases}
-g\!\bigl(C_t^{(i,k)}\bigr)\cdot A^{(i)}, & R_i > 0, \\
-A^{(i)}, & R_i \le 0
-\end{cases}
-$$
-
-最终 CoPO 目标在成功轨迹集合 $\mathcal{I}^+$ 上对扩展 cognitive group 用步级 advantage $A_t^{(i,k)}$ 优化，在失败轨迹集合 $\mathcal{I}^-$ 上对原始输出用 $A^{(i)}$ 优化，并辅以 clipped importance ratio $\bar{r} = \operatorname{clip}{(r, 1 - \epsilon, 1 + \epsilon)}$ 与参考策略 KL 正则：
-
-$$
-\begin{aligned}
-\mathcal{J}_{\mathrm{CoPO}}(\theta) &= \mathbb{E}\!\Biggl[\frac{1}{G}\sum_{i \in \mathcal{I}^+}\frac{1}{\lvert e^{(i)} \rvert}\sum_{t=0}^{T}\sum_{k=1}^{4}\sum_{n=1}^{\lvert e_t^{(i,k)} \rvert} \\[2pt]
-&\qquad\quad \min\!\Bigl(r_{t,n}^{(i,k)} A_t^{(i,k)},\; \bar{r}_{t,n}^{(i,k)} A_t^{(i,k)}\Bigr) \\[6pt]
-&\quad + \frac{1}{G}\sum_{i \in \mathcal{I}^-}\frac{1}{\lvert y^{(i)} \rvert}\sum_{t=0}^{T}\sum_{n=1}^{\lvert y_t^{(i)} \rvert} \\[2pt]
-&\qquad\quad \min\!\Bigl(r_{t,n}^{(i)} A^{(i)},\; \bar{r}_{t,n}^{(i)} A^{(i)}\Bigr)\Biggr] \\[6pt]
-&\quad - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta \,\Vert\, \pi_{\mathrm{ref}}\bigr]
-\end{aligned}
-$$
-
-测试期仅部署单个策略模型，无需任何外挂 router 或反事实扩展；模型在每一步开头直接自回归吐出 `<level>` token，在常规执行中自然切回本能直答，在开局探索或遇错受阻时自动抬升认知深度。
 
 ## Bi-Mode Annealing and Balanced-Rollout RL — Auto-Thinking MLLMs
 
@@ -268,13 +219,11 @@ $$
 
 ## Synthesis — Composing the Five Hybrid-Reasoning Paradigms
 
-上述六项工作从五个正交层次切入闭环 agent 的快慢混合推理，在介入时机、训练成本与多模态扩展性上形成清晰互补。在多轮在线 RL 层面，RACE 通过跨轮动作 log-likelihood 覆盖实现二元思考剪枝，CogRouter 则借由四级认知深度与置信度重加权 CoPO 实现更细粒度的步级思考分配；在通用多模态双模训练层面，R-4B 通过 Bi-Mode Annealing 统一双模底座并以强制等量 rollout 的 BPO 仅凭数学规则 reward 激发跨领域 auto-thinking；在外置 routing 层面，STEPWISE 面向桌面长视界任务以轻量事件 monitor 级联大小模型，无需微调底座权重即可按事件唤醒强模型；在单模型 offline 后训练层面，Ada-R1 经由长短参数线性 weight merging 与 bi-level DPO、DR-BOLT 经由双参考 Boltzmann 投影分别从权重空间与分布空间赋予单模型内生的快慢切换能力。五类机制分别作用于步级策略学习、退火与双模采样、外置级联调度、参数融合与分布对齐，共同构成了面向闭环 agent 的高效混合推理技术栈。
+上述五项工作从五个正交层次切入闭环 agent 的快慢混合推理，在介入时机、训练成本与多模态扩展性上形成清晰互补。在多轮在线 RL 层面，RACE 通过跨轮动作 log-likelihood 覆盖估计与 Masked GRPO 实现按轮按需的思考剪枝；在通用多模态双模训练层面，R-4B 通过 Bi-Mode Annealing 统一双模底座并以强制等量 rollout 的 BPO 仅凭数学规则 reward 激发跨领域 auto-thinking；在外置 routing 层面，STEPWISE 面向桌面长视界任务以轻量事件 monitor 级联大小模型，无需微调底座权重即可按事件唤醒强模型；在单模型 offline 后训练层面，Ada-R1 经由长短参数线性 weight merging 与 bi-level DPO、DR-BOLT 经由双参考 Boltzmann 投影分别从权重空间与分布空间赋予单模型内生的快慢切换能力。五类机制分别作用于步级策略学习、退火与双模采样、外置级联调度、参数融合与分布对齐，共同构成了面向闭环 agent 的高效混合推理技术栈。
 
 ## References
 
 *When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation*. 2026. [arXiv:2610.12061](https://arxiv.org/abs/2610.12061)
-
-*Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents*. ICML 2026. [arXiv:2602.12662](https://arxiv.org/abs/2602.12662)
 
 *R-4B: Incentivizing General-Purpose Auto-Thinking Capability in MLLMs via Bi-Mode Annealing and Reinforce Learning*. 2025. [arXiv:2508.21113](https://arxiv.org/abs/2508.21113)
 
