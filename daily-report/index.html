@@ -44,25 +44,25 @@ li+li { margin-top:.5rem; }
 @media print { :root { --paper:#fff; } article { break-inside:avoid; } }
 </style></head>
 <body><main><div class="masthead"><a class="brand" href="/daily-report/" lang="en">Daily Report</a>
-<nav aria-label="日报导航"><a href="2026-11-26/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
+<nav aria-label="日报导航"><a href="2026-11-27/">本期固定链接</a><a href="archive/">日报归档</a></nav></div>
 <header>
-<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-26">2026-11-26</time> · 北京时间 · AI / ROBOTICS</p></header>
-<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong><a href="https://joesun-421.github.io/blogs/dynamic-reasoning-robot-use/">扩写并发布 Agent 效率推理综述</a></strong>。将综述扩展为八篇论文、四类机制，按原始摘要重写问题介绍，展开训练流程，并重新整理 27 张原图。更新后的文章已上线，机器人迁移集中在结尾讨论，公式与桌面、手机排版已检查。</li><li><strong><a href="https://github.com/JoeSun-421/personal-skills/tree/main/skills/research-review-template">创建可复用的研究综述 Skill</a></strong>。提炼并安装 research-review-template，明确机制分组、原始训练配方、图示与证据核查要求，同步至个人 Skills 仓库，供后续综述复用。</li><li><strong>Agent 运行时长</strong>。截至北京时间 20:03，本机 Codex 已结束轮次累计运行 1 小时 9 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
+<h1>intern daily report</h1><p class="meta"><time datetime="2026-11-27">2026-11-27</time> · 北京时间 · AI / ROBOTICS</p></header>
+<section aria-labelledby="work"><h2 id="work">已完成的工作</h2><ul><li><strong>Agent 运行时长</strong>。截至北京时间 20:02，本机 Codex 已结束轮次累计运行 0 小时 0 分钟，并行会话分别累计，包含轮次内工具执行时间。另有 1 轮缺少完整起止记录，未计入。</li></ul></section>
 <section aria-labelledby="reading"><h2 id="reading">Research Picks</h2>
-<div class="timeline reading"><article class="entry"><p class="topic">多模态评测 / 指令遵循可靠性</p>
-<div class="entry-head"><h3>Humanity’s First Exam: Measuring the Reliability Floor of LLMs</h3>
-<time class="meta" datetime="2026-11-24">2026-11-24</time></div><p class="meta">Google DeepMind / Google Cloud / Google Research · 官方技术报告 · 文本与图像评测</p>
-<p><strong>方法与结果</strong>　HFE 用 544 道基础题组成 136 个四题变体组，区分偶尔答对与持续答对。报告表 4 中，GPT-6.2 Astra 在 xhigh 设置的 pass@1 为 97.8%；要求四种变体各四次回答均正确的 family pass⁴ 估计为 92.4%（95% 区间 ±4.3 个百分点）。对长任务评测的启发是：单步高准确率仍可能掩盖重复执行与轻微条件变化下的失误。</p>
-<p><strong>证据范围</strong>　每题实际采样六次，用来估计相应概率；并非直接观测所有部署流程的成功率。任务为零样本、无外部工具的单轮回答，题目有意收集基础能力盲点，不能把分数当成日常总体错误率，更不能直接外推到机器人闭环长任务。数值来自报告快照，不是实时榜单。</p>
-<p><a href="https://storage.googleapis.com/deepmind-media/papers/hfe_tech_paper.pdf">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://blog.google/innovation-and-ai/models-and-research/google-deepmind/humanitys-first-exam/">实验室官方来源</a></p></article><article class="entry"><p class="topic">自适应推理 / 低成本策略优化 · 回顾</p>
-<div class="entry-head"><h3>Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking</h3>
-<time class="meta" datetime="2026-10-13">2026-10-13</time></div><p class="meta">LG AI Research / UNIST / 伊利诺伊大学芝加哥分校 · ACL 2026 主会长文 · 语言推理评测</p>
-<p><strong>方法与结果</strong>　RPO 先让模型具备短、长两种回答模式，再把 RL 策略损失集中在起始分支 token，用分组回报学习何时进入长推理。论文在 8B 参考模型的匹配核算中，训练计算量约为 AdaptThink 的 0.02 倍；Qwen3-8B 的长推理比例从 57.3% 降至 44.8%，平均 Pass@1 从 63.8% 变为 62.0%，体现了可量化的成本与准确率折中。</p>
-<p><strong>证据范围</strong>　ACL Anthology 正式长文集确认主会身份；所列日期为 arXiv 首次上传日。约 2% 指特定训练核算，不是通用推理加速比；准确率也并非总能保持。它在回答开始时选择模式，尚未证明能在多轮工具或机器人执行中依据实际反馈动态分配计算。</p>
-<p><a href="https://arxiv.org/abs/2610.17767">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://aclanthology.org/2026.acl-long.816/">会议录用依据</a></p></article><article class="entry"><p class="topic">奖励设计 / 高效推理 · 回顾</p>
-<div class="entry-head"><h3>Self-Aligned Reward: Towards Effective and Efficient Reasoners</h3>
-<time class="meta" datetime="2026-04-16">2026-04-16</time></div><p class="meta">伊利诺伊大学厄巴纳—香槟分校 / Amazon Web Services · ICLR 2026 主会论文 · 数学与逻辑推理</p>
-<p><strong>方法与结果</strong>　SAR 比较答案在有题目条件和无题目条件下的相对困惑度差，奖励利用题目信息的回答，并与可验证正确性奖励结合，而非只按长度惩罚。作者在四个模型、七个基准中结合 PPO 与 GRPO 评测，摘要汇总为回答长度减少约 30%、准确率改善约 4%；具体配置并非都有相同收益。</p>
-<p><strong>证据范围</strong>　主会身份由 ICLR 正式论文集确认；日期对应 arXiv v2，首版发布于 2025 年。该信号仍由模型自身概率构成，不能替代外部正确性验证。原实验是数学与逻辑任务，减少回答 token 不等于减少含工具、感知和执行开销的总时长，也尚未验证 VLA 动作质量。</p>
-<p><a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html">会议录用依据</a></p></article></div></section>
+<div class="timeline reading"><article class="entry"><p class="topic">响应式 VLA / 执行反馈 · 回顾</p>
+<div class="entry-head"><h3>Catch Me If You Can: Real-Time Feedback Denoising for Responsive VLAs</h3>
+<time class="meta" datetime="2026-09-17">2026-09-17</time></div><p class="meta">得克萨斯大学奥斯汀分校 / 中佛罗里达大学 · CoRL 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　VLA-Feedback 将慢速扩散规划器的最后一步去噪留给轻量反馈模块，在动作块执行期间用最新观察修正当前动作。论文报告动态仿真平均成功率由 GR00T 的 27.5% 提升至 85.0%，三个 Panda 实机任务的平均成功率由 51% 提升至 73%。它提供了无需每步重跑完整 VLA、仍可利用执行期视觉反馈的具体接口。</p>
+<p><strong>证据范围</strong>　CoRL 官方录用名单确认主会身份，所列日期为预印本首发日。方法依赖慢规划器先给出合理动作，单步局部去噪不足以挽救严重错误的计划。实机反馈推理为 1.95 ms，但完整传感与控制链路约 71 ms，不能把模型推理耗时当成端到端响应延迟；遮挡、观察噪声和接触附近的突变仍是限制。</p>
+<p><a href="https://arxiv.org/html/2609.21022v1">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://www.corl.org/program/accepted-papers">会议录用依据</a></p></article><article class="entry"><p class="topic">机器人学习 / 数据选择 · 回顾</p>
+<div class="entry-head"><h3>DataMIL: Selecting Data for Robot Imitation Learning with Datamodels</h3>
+<time class="meta" datetime="2025-05-14">2025-05-14</time></div><p class="meta">得克萨斯大学奥斯汀分校 / MIT / 斯坦福大学 · ICLR 2026 主会论文 · 仿真与实机</p>
+<p><strong>方法与结果</strong>　DataMIL 估计先验训练数据对目标策略表现的影响，用目标示范上的验证损失替代昂贵 rollout，并选择高贡献数据与目标示范共同训练。正式版附录表 1 的实机平均成功率为 61.0%，对比 All-Data 的 30.9% 和 STRAP 的 39.8%；研究覆盖 60 多个仿真与实机任务，也展示了跨机器人形态选取 OXE 数据。</p>
+<p><strong>证据范围</strong>　ICLR 正式论文集确认主会身份，日期为 2025 年预印本首发日，结果按 2026 会议版核对。估计 datamodel 的成本仍是直接训练策略的数倍，选取比例与聚类等超参数也影响结果；目标任务规模有限，不能把数据筛选收益直接视为通用机器人自我改进，验证损失也只是成功率代理。</p>
+<p><a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/033d9e8dbbbc0ad90e59222cf1db0fc2-Abstract-Conference.html">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://proceedings.iclr.cc/paper_files/paper/2026/hash/033d9e8dbbbc0ad90e59222cf1db0fc2-Abstract-Conference.html">会议录用依据</a></p></article><article class="entry"><p class="topic">AI agents / 可验证研究流程</p>
+<div class="entry-head"><h3>A thousand fewer paths to root</h3>
+<time class="meta" datetime="2026-11-04">2026-11-04</time></div><p class="meta">OpenAI · 官方技术报告 · 隔离环境中的软件验证</p>
+<p><strong>方法与结果</strong>　报告将代码审查、动态复现、影响验证和候选补丁生成串成 agent 流程，再由人类研究员审查。一次运行从 2,308 个候选发现中动态复现 1,724 项漏洞，按对应补丁去重后得到 948 项本地提权漏洞证据，API 总成本约 121 万美元。值得借鉴的是逐阶段保存可运行证据，把发现数量与验证后的有效成果分开统计。</p>
+<p><strong>证据范围</strong>　这是特定 Linux 配置和未公开 cyber 模型上的研究结果，补丁仍需维护者审查；其中一些问题在扫描结束前已被社区修复或讨论，948 不能等同于独立新披露或已合并修复数量。报告成本为 API 费用，不能当成完整人力与计算成本，也未证明系统能自主改进自身的学习算法。</p>
+<p><a href="https://openai.com/index/a-thousand-fewer-paths-to-root/">阅读原文</a> <span aria-hidden="true">↗</span> · <a href="https://openai.com/index/a-thousand-fewer-paths-to-root/">实验室官方来源</a></p></article></div></section>
 </main></body></html>
