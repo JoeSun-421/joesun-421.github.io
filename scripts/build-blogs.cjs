@@ -83,9 +83,8 @@ const ARTICLE_SCRIPT = `(function(){
       if (backBtn) {
         var scrollingUp = y < lastY - 4;
         var nearBottom = (window.innerHeight + y) >= doc.scrollHeight - 180;
-        var show = y > 720 && (scrollingUp || nearBottom);
-        if (y <= 720) backBtn.classList.remove("is-visible");
-        else if (scrollingUp || nearBottom) backBtn.classList.add("is-visible");
+        if (y <= 720 || nearBottom) backBtn.classList.remove("is-visible");
+        else if (scrollingUp) backBtn.classList.add("is-visible");
         else if (y > lastY + 12) backBtn.classList.remove("is-visible");
       }
       lastY = y;
@@ -94,21 +93,68 @@ const ARTICLE_SCRIPT = `(function(){
     });
   }
 
+  var mathBlocks = Array.prototype.slice.call(document.querySelectorAll(".math-block"));
+  function updateMathScrollCues() {
+    mathBlocks.forEach(function(block) {
+      var sc = block.querySelector(".math-scroll");
+      if (!sc) return;
+      var overflow = sc.scrollWidth > sc.clientWidth + 2;
+      var atStart = sc.scrollLeft <= 2;
+      var atEnd = sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 2;
+      block.classList.toggle("is-scrollable", overflow);
+      block.classList.toggle("is-scrolled-start", overflow && atStart);
+      block.classList.toggle("is-scrolled-end", overflow && atEnd);
+    });
+  }
+  mathBlocks.forEach(function(block) {
+    var sc = block.querySelector(".math-scroll");
+    if (sc) sc.addEventListener("scroll", updateMathScrollCues, { passive: true });
+  });
+
+  var tocMobile = document.querySelector(".toc-mobile");
+  if (tocMobile) {
+    tocMobile.querySelectorAll("a[href^='#']").forEach(function(link) {
+      link.addEventListener("click", function() {
+        tocMobile.removeAttribute("open");
+      });
+    });
+  }
+
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
+  window.addEventListener("resize", function() {
+    onScroll();
+    updateMathScrollCues();
+  }, { passive: true });
   window.addEventListener("beforeprint", function() {
     document.querySelectorAll('img[loading="lazy"]').forEach(function(img) {
       img.setAttribute("loading", "eager");
     });
   });
   onScroll();
+  updateMathScrollCues();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateMathScrollCues);
+  }
 
   var dialog = document.getElementById("figure-lightbox");
   if (dialog && typeof dialog.showModal === "function") {
     var lbStage = dialog.querySelector(".lightbox-stage");
     var lbNum = dialog.querySelector(".lightbox-num");
     var lbCap = dialog.querySelector(".lightbox-caption");
+    var lbZoom = dialog.querySelector(".lightbox-zoom");
     var lbClose = dialog.querySelector(".lightbox-close");
+
+    function setZoom(zoomed) {
+      dialog.classList.toggle("is-zoomed", zoomed);
+      if (lbZoom) {
+        lbZoom.setAttribute("aria-pressed", zoomed ? "true" : "false");
+        lbZoom.textContent = zoomed ? "Fit" : "Zoom 2×";
+      }
+      if (lbStage) {
+        lbStage.scrollLeft = 0;
+        lbStage.scrollTop = 0;
+      }
+    }
 
     function openFigure(frame) {
       var img = frame.querySelector("img");
@@ -117,6 +163,9 @@ const ARTICLE_SCRIPT = `(function(){
       var lbImg = lbStage.querySelector("img");
       if (!lbImg) {
         lbImg = document.createElement("img");
+        lbImg.addEventListener("click", function() {
+          setZoom(!dialog.classList.contains("is-zoomed"));
+        });
         lbStage.appendChild(lbImg);
       }
       lbImg.src = img.currentSrc || img.src;
@@ -125,6 +174,7 @@ const ARTICLE_SCRIPT = `(function(){
       var capEl = fig && fig.querySelector(".fig-caption");
       lbNum.textContent = numEl ? numEl.textContent : "";
       lbCap.textContent = capEl ? capEl.textContent : (img.alt || "");
+      setZoom(false);
       dialog.showModal();
     }
 
@@ -138,11 +188,17 @@ const ARTICLE_SCRIPT = `(function(){
       });
     });
 
+    if (lbZoom) {
+      lbZoom.addEventListener("click", function() {
+        setZoom(!dialog.classList.contains("is-zoomed"));
+      });
+    }
     lbClose.addEventListener("click", function() { dialog.close(); });
     dialog.addEventListener("click", function(e) {
       if (e.target === dialog) dialog.close();
     });
     dialog.addEventListener("close", function() {
+      setZoom(false);
       if (lbStage) lbStage.textContent = "";
     });
   }
@@ -182,15 +238,22 @@ function frame(title, description, canonical, body, opts) {
     body,
     '<footer class="site-footer">' +
       '<span class="footer-copy">© 2026 Zhaoyuan Sun</span>' +
-      '<div class="footer-links"><a href="' + blogsIndex + '">All Blogs</a><a href="' + rootPrefix + 'index.html">Home</a><a href="#top">Back to top ↑</a></div>' +
+      '<div class="footer-links">' +
+        (isIndex
+          ? '<a href="' + rootPrefix + 'index.html">Home</a><a href="' + rootPrefix + 'ideas.html">Ideas</a><a href="#top">Back to top ↑</a>'
+          : '<a href="' + blogsIndex + '">All Blogs</a><a href="' + rootPrefix + 'index.html">Home</a><a href="#top">Back to top ↑</a>') +
+      '</div>' +
     '</footer>',
     "</div>",
     isArticle ? [
       '<a class="floating-top" href="#top" aria-label="Back to top">↑</a>',
       '<dialog id="figure-lightbox" class="lightbox" aria-label="Figure viewer">',
       '<div class="lightbox-inner">',
-      '<div class="lightbox-bar"><div class="lightbox-meta"><span class="lightbox-num"></span><span class="lightbox-caption"></span></div>',
-      '<button type="button" class="lightbox-close" aria-label="Close figure viewer">Close ×</button></div>',
+      '<div class="lightbox-bar"><div class="lightbox-top"><span class="lightbox-num"></span>' +
+        '<div class="lightbox-actions">' +
+        '<button type="button" class="lightbox-zoom" aria-pressed="false" aria-label="Toggle figure zoom">Zoom 2×</button>' +
+        '<button type="button" class="lightbox-close" aria-label="Close figure viewer">Close ×</button>' +
+        '</div></div><div class="lightbox-caption"></div></div>',
       '<div class="lightbox-stage"></div>',
       '</div></dialog>',
       '<script>' + ARTICLE_SCRIPT + '</script>'
@@ -242,7 +305,7 @@ function compileMarkdown(source, postDir) {
       displayIdx += 1;
       const blockHtml =
         '<div class="math-block" data-eq="' + displayIdx + '">' +
-        '<div class="math-scroll">' + f.html + '</div>' +
+        '<div class="math-viewport"><div class="math-scroll">' + f.html + '</div></div>' +
         '<span class="math-num" aria-hidden="true">(' + displayIdx + ')</span></div>';
       if (html.includes("<p>" + key + "</p>")) {
         html = html.replace("<p>" + key + "</p>", blockHtml);
@@ -294,13 +357,15 @@ function compileMarkdown(source, postDir) {
     if (level === "2") {
       h2Count += 1;
       const num = String(h2Count).padStart(2, "0");
-      outline.push({ id, label: plain, num, children: [] });
+      const h2DashIdx = plain.indexOf(" — ");
+      const shortLabel = h2DashIdx > 0 ? plain.slice(0, h2DashIdx).trim() : plain;
+      outline.push({ id, label: plain, shortLabel, num, children: [] });
       return (
         '<h2 id="' + id + '">' +
         '<span class="sec-num" aria-hidden="true">' + num + "</span>" +
-        '<span class="heading-text">' + label + "</span>" +
+        '<span class="heading-text">' + label +
         '<a class="heading-anchor" href="#' + id + '" aria-label="Link to section: ' + escape(plain) + '">#</a>' +
-        "</h2>"
+        "</span></h2>"
       );
     }
 
@@ -319,11 +384,14 @@ function compileMarkdown(source, postDir) {
     }
     return (
       '<h3 id="' + id + '">' +
-      '<span class="heading-text">' + formatted + "</span>" +
+      '<span class="heading-text">' + formatted +
       '<a class="heading-anchor" href="#' + id + '" aria-label="Link to subsection: ' + escape(plain) + '">#</a>' +
-      "</h3>"
+      "</span></h3>"
     );
   });
+
+  // Style paper metadata lines immediately following H3 paper headings
+  html = html.replace(/(<h3\b[^>]*>[\s\S]*?<\/h3>\s*)<p><em>((?:(?!<\/em><\/p>)[\s\S])*)<\/em><\/p>/g, '$1<p class="paper-meta">$2</p>');
 
   // Wrap References block cleanly for dedicated academic citation typography
   const refMarker = '<h2 id="references">';
@@ -355,9 +423,9 @@ function renderTocList(outline) {
         ).join("") + "</ul>"
       : "";
     return (
-      '<li><a class="toc-sec-link" href="#' + sec.id + '">' +
+      '<li><a class="toc-sec-link" href="#' + sec.id + '" title="' + escape(sec.label) + '">' +
       '<span class="toc-num">' + sec.num + '</span>' +
-      '<span class="toc-label">' + escape(sec.label) + "</span></a>" + sub + "</li>"
+      '<span class="toc-label">' + escape(sec.shortLabel || sec.label) + "</span></a>" + sub + "</li>"
     );
   }).join("") + "</ol>";
 }
@@ -388,7 +456,7 @@ for (const post of posts) {
     '<main class="post-shell">',
     '<header class="post-header">',
     '<div class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span>Research notes · Adaptive reasoning</div>',
-    "<h1>" + escape(post.title).replace(/Efficient Reasoning$/, '<span class="title-outline">Efficient Reasoning</span>') + "</h1>",
+    "<h1>" + escape(post.title) + "</h1>",
     post.summary ? '<p class="post-lead">' + escape(post.summary) + "</p>" : "",
     '<div class="post-meta">' + metaGroups + "</div>",
     "</header>",
@@ -437,10 +505,13 @@ for (const post of posts) {
 
 const entries = posts.map(post => {
   const st = postStats.get(post.slug);
-  const subMeta = st
-    ? '<span class="post-item-stats">' + st.readingMinutes + " min read" +
-      (st.figureCount ? " · " + st.figureCount + " figures" : "") + "</span>"
-    : "";
+  const idxRows = [];
+  if (st) idxRows.push('<span class="post-item-stats">' + st.readingMinutes + " min read</span>");
+  const countParts = [];
+  if (st && st.figureCount) countParts.push(st.figureCount + " figures");
+  if (st && st.displayMath) countParts.push(st.displayMath + " equations");
+  if (countParts.length) idxRows.push('<span class="post-item-stats">' + countParts.join(" · ") + "</span>");
+  const subMeta = idxRows.join("");
   return [
     '<li class="post-item">',
     '<a class="post-card" href="' + post.slug + '/index.html">',

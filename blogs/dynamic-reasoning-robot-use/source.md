@@ -11,7 +11,7 @@ summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链
 
 ## Introduction
 
-把具备长链推理能力的 LLM 和 VLM 接进机器人闭环（Robot-Use Agent，RUA），最直接的矛盾其实不在“能不能想明白”，而在“来不来得及想”。单轮问答里多吐几百个 thinking token 顶多慢上几秒，可放到连续交互的闭环里，每一步都要读新观测、调技能、等执行，物理环境不会停下来等模型把冗长的 CoT 慢慢写完；反过来，为了压延迟干脆关掉思考，遇到长视界规划、环境扰动或意外失败时又很容易走偏。这两年 LLM、VLM 和桌面 CUA 社区已经探出了不少让模型“该快就快、该慢再慢”的混合推理做法，这篇笔记想探讨的问题很直接：这些面向语言、多模态与桌面任务的 reasoning 加速方法，背后到底抓住了什么机制，又有多大机会迁移到 RUA 里？
+把具备长链推理能力的 LLM 和 VLM 接进机器人闭环（Robot-Use Agent, RUA），最直接的矛盾其实不在“能不能想明白”，而在“来不来得及想”。单轮问答里多吐几百个 thinking token 顶多慢上几秒，可放到连续交互的闭环里，每一步都要读新观测、调技能、等执行，物理环境不会停下来等模型把冗长的 CoT 慢慢写完；反过来，为了压延迟干脆关掉思考，遇到长视界规划、环境扰动或意外失败时又很容易走偏。这两年 LLM、VLM 和桌面 CUA 社区已经探出了不少让模型“该快就快、该慢再慢”的混合推理做法，这篇笔记想探讨的问题很直接：这些面向语言、多模态与桌面任务的 reasoning 加速方法，背后到底抓住了什么机制，又有多大机会迁移到 RUA 里？
 
 沿着这条迁移线索，下文挑出五条代表性路线，依次拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 六篇工作。其中既有在多轮交互里通过在线 RL 按轮跳过冗余思考或细分认知深度的方案，也有在多模态底座上靠 Bi-Mode Annealing 与均衡 rollout 训出 auto-thinking 的做法；既有不动底座权重、靠外置轻量 monitor 级联大小模型的事件驱动 routing，也有在 offline 阶段通过 Model Merging 或双参考分布对齐把快慢双模收进单模型的尝试。先把它们各自的问题建模与方法细节理清，才能进一步判断哪些机制可以直接搬进机器人闭环，哪些还需要针对物理执行重新改造。
 
@@ -27,7 +27,7 @@ summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链
 
 #### Methodology
 
-多轮轨迹写作 $\tau = (u, r_1, a_1, o_1, \dots, r_T, a_T)$，$r_t$ 是第 $t$ 轮的思考。要检验“删掉某轮思考后动作还对不对”，最直接的办法是反复和环境交互 rollout 重采样，代价太高。RACE 发现了一个好用的代理：删掉思考后，参考动作 $a_j^*$ 的 teacher-forcing 平均 log-likelihood 跌得越少，重采样时动作越能复现。于是“找出最少的必要思考”变成了一串前向 log-likelihood 检验。这个算法叫 `LoGiC`。它保留第一轮全局规划，从第二轮起依次尝试把 $r_t$ 换成空闭合符 $e$（直接输出 `</think>`），然后重新计算当前和之后所有轮次参考动作的 log-likelihood，看最大跌幅是否在容差 $\epsilon$ 之内：
+多轮轨迹写作 $\tau = (u, r_1, a_1, o_1, \dots, r_T, a_T)$，$r_t$ 是第 $t$ 轮的思考。要检验“删掉某轮思考后动作还对不对”，最直接的办法是反复和环境交互 rollout 重采样，代价太高。RACE 发现了一个好用的代理：删掉思考后，参考动作 $a_j^*$ 的 teacher-forcing 平均 log-likelihood 跌得越少，重采样时动作越能复现。于是“找出最少的必要思考”变成了一串前向 log-likelihood 检验。这个算法叫 LoGiC。它保留第一轮全局规划，从第二轮起依次尝试把 $r_t$ 换成空闭合符 $e$（直接输出 `</think>`），然后重新计算当前和之后所有轮次参考动作的 log-likelihood，看最大跌幅是否在容差 $\epsilon$ 之内：
 
 $$
 \begin{aligned}
@@ -47,7 +47,7 @@ $x^{(t)}$ 是已经压缩过的 prefix，$\ell^{(t-1)}$ 是上一步留下的基
 $$
 \begin{aligned}
 \mathcal{L}_{\mathrm{GRPO}}(\theta) &= -\frac{1}{\sum_{i \in \mathcal{B}} \lvert \mathcal{P}_i \rvert} \sum_{i \in \mathcal{B}} \sum_{k \in \mathcal{K}_i} \\[4pt]
-&\quad \min\!\Bigl(\rho_{i,k}\hat{A}_i,\; \operatorname{clip}\bigl(\rho_{i,k},\, 1-\epsilon_{\mathrm{clip}},\, 1+\epsilon_{\mathrm{clip}}\bigr)\hat{A}_i\Bigr), \\[6pt]
+&\;\; \min\!\Bigl(\rho_{i,k}\hat{A}_i,\, \operatorname{clip}\bigl(\rho_{i,k}, 1-\epsilon_{\mathrm{clip}}, 1+\epsilon_{\mathrm{clip}}\bigr)\hat{A}_i\Bigr), \\[6pt]
 \mathcal{L}_{\mathrm{close}}(\theta) &= -\frac{1}{\sum_{i \in \mathcal{B}} T_i} \sum_{i \in \mathcal{I}_{\mathrm{succ}}} \sum_{t \in S_i} \log \pi_\theta\!\bigl(e \mid x_i^{(t)}\bigr), \\[6pt]
 \mathcal{L}_{\mathrm{actor}}(\theta) &= \mathcal{L}_{\mathrm{GRPO}}(\theta) + \lambda\,\mathcal{L}_{\mathrm{close}}(\theta)
 \end{aligned}
@@ -71,15 +71,15 @@ $\rho_{i,k}$ 是 importance ratio，$\mathcal{P}_i$ 是第 $i$ 条轨迹的全�
 
 ![CogRouter 总览：四级认知深度设计、均衡 CoSFT 冷启动以及基于动作置信度重加权的 CoPO 优化流程](assets/efficient_agents_2026/cogrouter-overview.png)
 
-直接进入 RL 或沿用专家模型自主挑选的档位标签，都会让 policy 在起步阶段就锁死在特定档位上。因此第一阶段的 `CoSFT` 刻意回避专家偏置：先收集成功的交互轨迹，再在每一步均匀随机采样一个认知级别 $l_t \in \mathcal{L}$，提示强模型补全与该级别及真实动作 $a_t^*$ 匹配的思考过程 $th_t$，由此在均衡数据集 $\mathcal{D}_{\mathrm{cog}}$ 上最小化 NLL 目标 $\mathcal{L}_{\mathrm{CoSFT}} = -\mathbb{E}_{\mathcal{D}_{\mathrm{cog}}}\!\bigl[\sum_{t=0}^T \log \pi_\theta(y_t \mid \tau_t^*)\bigr]$，让模型先稳定掌握全部四个档位的生成格式且不带先验偏斜。
+直接进入 RL 或沿用专家模型自主挑选的档位标签，都会让 policy 在起步阶段就锁死在特定档位上。因此第一阶段的 CoSFT 刻意回避专家偏置：先收集成功的交互轨迹，再在每一步均匀随机采样一个认知级别 $l_t \in \mathcal{L}$，提示强模型补全与该级别及真实动作 $a_t^*$ 匹配的思考过程 $th_t$，由此在均衡数据集 $\mathcal{D}_{\mathrm{cog}}$ 上最小化 NLL 目标 $\mathcal{L}_{\mathrm{CoSFT}} = -\mathbb{E}_{\mathcal{D}_{\mathrm{cog}}}\!\bigl[\sum_{t=0}^T \log \pi_\theta{(y_t \mid \tau_t^*)}\bigr]$，让模型先稳定掌握全部四个档位的生成格式且不带先验偏斜。
 
-冷启动之后，普通 GRPO 把整条轨迹的单一终局 advantage $A^{(i)}$ 均匀摊派给所有步骤，无法区分哪一步的深度恰当、哪一步在空耗 token，结果训练很快坍缩向全程 $L_4$。第二阶段的 `CoPO` 基于一条核心直觉：恰当的认知深度应当使模型在条件化该思考过程后，对最终正确动作的预测置信度最高。每轮在线 rollout 得到轨迹组后，先按任务成败与格式合法性之积 $R_i = R_i^{\mathrm{task}} \times R_i^{\mathrm{format}}$ 计算组相对轨迹 advantage $A^{(i)}$。对于成功轨迹（$R_i > 0$）的每一步 $t$，固定当时的观测与已执行动作 $a_t^{(i)}$，反事实地用全部四个认知级别重新生成思考过程，构成 cognitive group $e_t^{(i)} = \{e_t^{(i,k)}\}_{k=1}^4$，其中 $e_t^{(i,k)} = [l_k,\, th_t^{(i,k)},\, a_t^{(i)}]$。随后以动作 token 的平均 log-probability 度量各档位的动作预测置信度，并在组内标准化后经温度系数 $m$ 做 Softmax 重加权：
+冷启动之后，普通 GRPO 把整条轨迹的单一终局 advantage $A^{(i)}$ 均匀摊派给所有步骤，无法区分哪一步的深度恰当、哪一步在空耗 token，结果训练很快坍缩向全程 $L_4$。第二阶段的 CoPO 基于一条核心直觉：恰当的认知深度应当使模型在条件化该思考过程后，对最终正确动作的预测置信度最高。每轮在线 rollout 得到轨迹组后，先按任务成败与格式合法性之积 $R_i = R_i^{\mathrm{task}} \times R_i^{\mathrm{format}}$ 计算组相对轨迹 advantage $A^{(i)}$。对于成功轨迹（$R_i > 0$）的每一步 $t$，固定当时的观测与已执行动作 $a_t^{(i)}$，反事实地用全部四个认知级别重新生成思考过程，构成 cognitive group $e_t^{(i)} = \{e_t^{(i,k)}\}_{k=1}^4$，其中 $e_t^{(i,k)} = [l_k,\, th_t^{(i,k)},\, a_t^{(i)}]$。随后以动作 token 的平均 log-probability 度量各档位的动作预测置信度，并在组内标准化后经温度系数 $m$ 做 Softmax 重加权：
 
 $$
 \begin{aligned}
 C_t^{(i,k)} &= \frac{1}{\lvert a_t^{(i)} \rvert}\sum_{n=1}^{\lvert a_t^{(i)} \rvert}\log \pi_\theta\!\left(a_{t,n}^{(i)} \;\middle|\; \tau_t^{(i)},\, l_k,\, th_t^{(i,k)},\, a_{t,<n}^{(i)}\right), \\[6pt]
-C_{\mathrm{norm},t}^{(i,k)} &= \frac{C_t^{(i,k)} - \mu_t^{(i)}}{\sigma_t^{(i)}}, \qquad
-g\!\bigl(C_t^{(i,k)}\bigr) = \frac{\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,k)}\bigr)}{\sum_{j=1}^{4}\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,j)}\bigr)}
+C_{\mathrm{norm},t}^{(i,k)} &= \frac{C_t^{(i,k)} - \mu_t^{(i)}}{\sigma_t^{(i)}}, \\[6pt]
+g\!\bigl(C_t^{(i,k)}\bigr) &= \frac{\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,k)}\bigr)}{\sum_{j=1}^{4}\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,j)}\bigr)}
 \end{aligned}
 $$
 
@@ -92,12 +92,15 @@ A^{(i)}, & R_i \le 0
 \end{cases}
 $$
 
-最终 `CoPO` 目标在成功轨迹集合 $\mathcal{I}^+$ 上对扩展 cognitive group 用步级 advantage $A_t^{(i,k)}$ 优化，在失败轨迹集合 $\mathcal{I}^-$ 上对原始输出用 $A^{(i)}$ 优化，并辅以 clipped importance ratio $\bar{r} = \operatorname{clip}(r, 1 - \epsilon, 1 + \epsilon)$ 与参考策略 KL 正则：
+最终 CoPO 目标在成功轨迹集合 $\mathcal{I}^+$ 上对扩展 cognitive group 用步级 advantage $A_t^{(i,k)}$ 优化，在失败轨迹集合 $\mathcal{I}^-$ 上对原始输出用 $A^{(i)}$ 优化，并辅以 clipped importance ratio $\bar{r} = \operatorname{clip}{(r, 1 - \epsilon, 1 + \epsilon)}$ 与参考策略 KL 正则：
 
 $$
 \begin{aligned}
-\mathcal{J}_{\mathrm{CoPO}}(\theta) &= \mathbb{E}\!\Biggl[\frac{1}{G}\sum_{i \in \mathcal{I}^+}\frac{1}{\lvert e^{(i)} \rvert}\sum_{t=0}^{T}\sum_{k=1}^{4}\sum_{n=1}^{\lvert e_t^{(i,k)} \rvert}\min\!\Bigl(r_{t,n}^{(i,k)} A_t^{(i,k)},\; \bar{r}_{t,n}^{(i,k)} A_t^{(i,k)}\Bigr) \\[6pt]
-&\quad + \frac{1}{G}\sum_{i \in \mathcal{I}^-}\frac{1}{\lvert y^{(i)} \rvert}\sum_{t=0}^{T}\sum_{n=1}^{\lvert y_t^{(i)} \rvert}\min\!\Bigl(r_{t,n}^{(i)} A^{(i)},\; \bar{r}_{t,n}^{(i)} A^{(i)}\Bigr)\Biggr] - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta \,\Vert\, \pi_{\mathrm{ref}}\bigr]
+\mathcal{J}_{\mathrm{CoPO}}(\theta) &= \mathbb{E}\!\Biggl[\frac{1}{G}\sum_{i \in \mathcal{I}^+}\frac{1}{\lvert e^{(i)} \rvert}\sum_{t=0}^{T}\sum_{k=1}^{4}\sum_{n=1}^{\lvert e_t^{(i,k)} \rvert} \\[2pt]
+&\qquad\quad \min\!\Bigl(r_{t,n}^{(i,k)} A_t^{(i,k)},\; \bar{r}_{t,n}^{(i,k)} A_t^{(i,k)}\Bigr) \\[6pt]
+&\quad + \frac{1}{G}\sum_{i \in \mathcal{I}^-}\frac{1}{\lvert y^{(i)} \rvert}\sum_{t=0}^{T}\sum_{n=1}^{\lvert y_t^{(i)} \rvert} \\[2pt]
+&\qquad\quad \min\!\Bigl(r_{t,n}^{(i)} A^{(i)},\; \bar{r}_{t,n}^{(i)} A^{(i)}\Bigr)\Biggr] \\[6pt]
+&\quad - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta \,\Vert\, \pi_{\mathrm{ref}}\bigr]
 \end{aligned}
 $$
 
@@ -123,19 +126,19 @@ $$
 
 退火完成后得到的基座虽然分别具备双模能力，但直接开启 auto-thinking 推理时会出现明显的 thinking atrophy（思考萎缩）——由于退火数据里直答样本占比更高，模型面对复杂题也倾向偷懒输出空思考块。而直接沿用 vanilla GRPO 做在线 RL 又容易陷入单模偏置：一旦某一种模式在组内暂时占优，另一种模式的 rollout 数量就会迅速萎缩直至坍缩。
 
-为在不引入复杂 reward engineering 的前提下根治 mode collapse，第二阶段提出 Bi-Mode Policy Optimization（`BPO`）。`BPO` 在 GRPO 框架内改写采样方式：对每个输入 query $q$，在前缀显式拼接模式专属 special token（`<thinking token>` 与 `<non-thinking token>`），强制策略确定性地生成两组等量回复——$g$ 条 thinking rollout $\{o_1, \dots, o_g\}$ 与 $g$ 条 non-thinking rollout $\{\tilde{o}_1, \dots, \tilde{o}_g\}$，并把全部 $2g$ 条轨迹合并进同一个 mixed group 里，统一依据简洁的数学规则正确性 reward 计算 token-level importance ratio $R_k$ 与组相对 advantage $A_k$：
+为在不引入复杂 reward engineering 的前提下根治 mode collapse，第二阶段提出 Bi-Mode Policy Optimization（BPO）。BPO 在 GRPO 框架内改写采样方式：对每个输入 query $q$，在前缀显式拼接模式专属 special token（`<thinking token>` 与 `<non-thinking token>`），强制策略确定性地生成两组等量回复——$g$ 条 thinking rollout $\{o_1, \dots, o_g\}$ 与 $g$ 条 non-thinking rollout $\{\tilde{o}_1, \dots, \tilde{o}_g\}$，并把全部 $2g$ 条轨迹合并进同一个 mixed group 里，统一依据简洁的数学规则正确性 reward 计算 token-level importance ratio $R_k$ 与组相对 advantage $A_k$：
 
 $$
 \begin{aligned}
 o_k' &= \begin{cases} o_k, & 0 < k \le g, \\
 \tilde{o}_{k-g}, & g < k \le 2g, \end{cases} \\[6pt]
-\mathcal{J}_{\mathrm{BPO}}(\theta) &= \mathbb{E}_{q \sim P(Q)}\!\Biggl[\frac{1}{2g}\sum_{k=1}^{2g} \\[4pt]
-&\quad \min\!\Bigl(R_k(o_k')\,A_k(o_k'),\; \operatorname{clip}\bigl(R_k(o_k'),\, 1 - \epsilon,\, 1 + \epsilon\bigr)\,A_k(o_k')\Bigr)\Biggr] \\[4pt]
+\mathcal{J}_{\mathrm{BPO}}(\theta) &= \mathbb{E}_{q \sim P(Q)}\!\Biggl[\frac{1}{2g}\sum_{k=1}^{2g} \min\!\Bigl(R_k(o_k')\,A_k(o_k'), \\[2pt]
+&\qquad\quad \operatorname{clip}\bigl(R_k(o_k'),\, 1 - \epsilon,\, 1 + \epsilon\bigr)\,A_k(o_k')\Bigr)\Biggr] \\[6pt]
 &\quad - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta(\cdot \mid q) \,\Vert\, \pi_{\mathrm{ref}}(\cdot \mid q)\bigr]
 \end{aligned}
 $$
 
-其中 $\epsilon$ 与 $\beta$ 分别控制 clip 区间与参考策略 KL 正则强度。通过在同题同组里强制对照两种路径的成败效用，模型清晰分辨出哪些题必须展开思考才能得分、哪些题直答即可拿满回报，且仅凭数学领域的规则 reward 便能将这种难度判别泛化至非数学通用多模态任务。下图描绘了 `BPO` 的双模采样与混合组优化架构。
+其中 $\epsilon$ 与 $\beta$ 分别控制 clip 区间与参考策略 KL 正则强度。通过在同题同组里强制对照两种路径的成败效用，模型清晰分辨出哪些题必须展开思考才能得分、哪些题直答即可拿满回报，且仅凭数学领域的规则 reward 便能将这种难度判别泛化至非数学通用多模态任务。下图描绘了 BPO 的双模采样与混合组优化架构。
 
 ![R-4B 的 BPO 框架：通过 special token 对同一输入强制采样等量 thinking 与 non-thinking rollout，在统一混合组内经规则 reward 计算 mixed advantage 并以 KL 正则更新](assets/efficient_agents_2026/r4b-bpo.png)
 
@@ -205,7 +208,7 @@ $$
 
 $$
 \begin{aligned}
-\hat{\mathbb{E}}\bigl[C^m(x)\bigr] &= \frac{1}{K}\sum_{i=1}^{K}\mathbb{I}\bigl[\mathrm{Correct}(y_i^m)\bigr], \qquad m \in \{L, S\}, \\[4pt]
+\hat{\mathbb{E}}\bigl[C^m(x)\bigr] &= \frac{1}{K}\sum_{i=1}^{K}\mathbb{I}\bigl[\mathrm{Correct}(y_i^m)\bigr], \quad (m \in \{L, S\}), \\[4pt]
 g^*(x) &= \begin{cases} g_L, & \hat{\mathbb{E}}[C^L(x)] - \hat{\mathbb{E}}[C^S(x)] > \epsilon, \\
 g_S, & \text{otherwise} \end{cases}
 \end{aligned}
@@ -215,9 +218,11 @@ $$
 
 $$
 \begin{aligned}
-y_w &= \operatorname*{arg\,min}_{y \in \{y_i\}_{g=g^*}^{\mathrm{correct}}} \, \lvert y \rvert, \qquad y_l \in \operatorname*{arg\,max}_{y \in \{y_i\}_{g=g^*}}{}^{\!(M_2)} \, \lvert y \rvert, \\[6pt]
+y_w &= \operatorname*{arg\,min}_{y \in \{y_i\}_{g=g^*}^{\mathrm{correct}}} \, \lvert y \rvert, \\[6pt]
+y_l &\in \operatorname*{arg\,max}_{y \in \{y_i\}_{g=g^*}}{}^{\!(M_2)} \, \lvert y \rvert, \\[6pt]
 \mathcal{J}_{\mathrm{Ada\text{-}R1}}(\theta_H) &= \mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}_{\mathrm{group}} \cup \mathcal{D}_{\mathrm{instance}}} \\[4pt]
-&\quad \Biggl[\log \sigma\!\Biggl(\beta\log\frac{\pi_{\theta_H}(y_w \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_w \mid x)} - \beta\log\frac{\pi_{\theta_H}(y_l \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_l \mid x)}\Biggr)\Biggr]
+&\quad \Biggl[\log \sigma\!\Biggl(\beta\log\frac{\pi_{\theta_H}(y_w \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_w \mid x)} \\[4pt]
+&\qquad\quad - \beta\log\frac{\pi_{\theta_H}(y_l \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_l \mid x)}\Biggr)\Biggr]
 \end{aligned}
 $$
 
@@ -239,22 +244,23 @@ group-level 偏好负责“跨风格选档位”，instance-level 偏好负责�
 
 ![快慢 behavior policy 的 cross log-likelihood 热力图：慢策略对快答的首个 token 格式壁垒，以及快策略对长推理链的长度累积衰减](assets/efficient_agents_2026/drbolt-separation.png)
 
-DR-BOLT 的解法是用先验权重 $\alpha(x) \in (0, 1)$ 构造目标混合参考分布 $\rho(y \mid x) = \alpha(x)\pi_{\mathrm{f}}(y \mid x) + (1 - \alpha(x))\pi_{\mathrm{s}}(y \mid x)$，配合兼顾正确性 $r_{\mathrm{acc}}$、格式合法性 $r_{\mathrm{fmt}}$ 与归一化长度 $\ell(y)$ 的标量 reward $r(x, y) = r_{\mathrm{acc}}(x, y) + \gamma r_{\mathrm{fmt}}(y) - \lambda \ell(y)$。在温度 $\beta > 0$ 的 KL 正则目标下，最优策略是 $\rho$ 上的 Boltzmann 重加权闭式解 $\pi_{\mathrm{DR}}^\star(y \mid x) \propto \rho(y \mid x)\exp(r(x, y)/\beta)$。把总 partition function 按两种模式拆为 $Z_{\mathrm{f}}(x)$ 与 $Z_{\mathrm{s}}(x)$ 并对快模态求边缘概率，便自然导出免外挂 router 的配分竞争切换律：
+DR-BOLT 的解法是用先验权重 $\alpha(x) \in (0, 1)$ 构造目标混合参考分布 $\rho{(y \mid x)} = \alpha(x)\pi_{\mathrm{f}}{(y \mid x)} + {(1 - \alpha(x))}\pi_{\mathrm{s}}{(y \mid x)}$，配合兼顾正确性 $r_{\mathrm{acc}}$、格式合法性 $r_{\mathrm{fmt}}$ 与归一化长度 $\ell(y)$ 的标量 reward $r{(x, y)} = r_{\mathrm{acc}}{(x, y)} + \gamma r_{\mathrm{fmt}}(y) - \lambda \ell(y)$。在温度 $\beta > 0$ 的 KL 正则目标下，最优策略是 $\rho$ 上的 Boltzmann 重加权闭式解 $\pi_{\mathrm{DR}}^\star{(y \mid x)} \propto \rho{(y \mid x)}\exp{(r(x, y)/\beta)}$。把总 partition function 按两种模式拆为 $Z_{\mathrm{f}}(x)$ 与 $Z_{\mathrm{s}}(x)$ 并对快模态求边缘概率，便自然导出免外挂 router 的配分竞争切换律：
 
 $$
 \begin{aligned}
-Z_m(x) &= \mathbb{E}_{y \sim \pi_m(\cdot \mid x)}\!\Bigl[\exp\!\bigl(r(x, y)/\beta\bigr)\Bigr], \qquad m \in \{\mathrm{f}, \mathrm{s}\}, \\[6pt]
+Z_m(x) &= \mathbb{E}_{y \sim \pi_m(\cdot \mid x)}\!\Bigl[\exp\!\bigl(r(x, y)/\beta\bigr)\Bigr],\; m \in \{\mathrm{f}, \mathrm{s}\}, \\[6pt]
 P^\star(z = \mathrm{f} \mid x) &= \frac{\alpha(x)\,Z_{\mathrm{f}}(x)}{\alpha(x)\,Z_{\mathrm{f}}(x) + \bigl(1 - \alpha(x)\bigr)\,Z_{\mathrm{s}}(x)}
 \end{aligned}
 $$
 
-当题目简单、快慢两路都能答对时，快答更小的长度惩罚令 $Z_{\mathrm{f}}(x)$ 胜出；当视觉关系复杂、快答容易出错时，正确率回报差距令 $Z_{\mathrm{s}}(x)$ 占优。实际 offline 训练时，候选池按经验采样比例 $q(x)$ 采自行为混合分布 $\mu(y \mid x) = q(x)\pi_{\mathrm{f}}(y \mid x) + (1 - q(x))\pi_{\mathrm{s}}(y \mid x)$。对 forward KL 做测度变换会引入行为-参考密度比 $\kappa(x, y) = \rho(y \mid x)/\mu(y \mid x)$；得益于快慢格式在支撑集上几乎分离（跨模式交叉似然比极小），$\kappa(x, y)$ 无需再跑双模型前向打分，直接简化为仅取决于样本来源的模态常数近似 $\widehat{\kappa}(x, y)$。结合 Monte Carlo 混合配分估计 $\widehat{Z}_\rho(x)$，模型只需在离线池 $\mathcal{D}_{\mathrm{DR}}$ 上最小化 weighted NLL：
+当题目简单、快慢两路都能答对时，快答更小的长度惩罚令 $Z_{\mathrm{f}}(x)$ 胜出；当视觉关系复杂、快答容易出错时，正确率回报差距令 $Z_{\mathrm{s}}(x)$ 占优。实际 offline 训练时，候选池按经验采样比例 $q(x)$ 采自行为混合分布 $\mu{(y \mid x)} = q(x)\pi_{\mathrm{f}}{(y \mid x)} + {(1 - q(x))}\pi_{\mathrm{s}}{(y \mid x)}$。对 forward KL 做测度变换会引入行为–参考密度比 $\kappa{(x, y)} = \rho{(y \mid x)}/\mu{(y \mid x)}$；得益于快慢格式在支撑集上几乎分离（跨模式交叉似然比极小），$\kappa{(x, y)}$ 无需再跑双模型前向打分，直接简化为仅取决于样本来源的模态常数近似 $\widehat{\kappa}{(x, y)}$。结合 Monte Carlo 混合配分估计 $\widehat{Z}_\rho(x)$，模型只需在离线池 $\mathcal{D}_{\mathrm{DR}}$ 上最小化 weighted NLL：
 
 $$
 \begin{aligned}
-\widehat{\kappa}(x, y) &= \begin{cases} \dfrac{\alpha(x)}{q(x)}, & y \text{ sampled from } \pi_{\mathrm{f}}, \\[8pt]
-\dfrac{1 - \alpha(x)}{1 - q(x)}, & y \text{ sampled from } \pi_{\mathrm{s}}, \end{cases} \\[6pt]
-\mathcal{L}_{\mathrm{DR\text{-}BOLT}}(\theta) &= -\mathbb{E}_{(x, y) \sim \mathcal{D}_{\mathrm{DR}}}\!\left[\frac{\widehat{\kappa}(x, y)\exp\!\bigl(r(x, y)/\beta\bigr)}{\widehat{Z}_\rho(x)}\log\pi_\theta(y \mid x)\right]
+\widehat{\kappa}(x, y) &= \begin{cases} \dfrac{\alpha(x)}{q(x)}, & y \sim \pi_{\mathrm{f}}, \\[12pt]
+\dfrac{1 - \alpha(x)}{1 - q(x)}, & y \sim \pi_{\mathrm{s}}, \end{cases} \\[8pt]
+\mathcal{L}_{\mathrm{DR\text{-}BOLT}}(\theta) &= -\mathbb{E}_{(x, y) \sim \mathcal{D}_{\mathrm{DR}}}\!\Biggl[\frac{\widehat{\kappa}(x, y)\exp\!\bigl(r(x, y)/\beta\bigr)}{\widehat{Z}_\rho(x)} \\[4pt]
+&\qquad\qquad\quad \cdot \log\pi_\theta(y \mid x)\Biggr]
 \end{aligned}
 $$
 
