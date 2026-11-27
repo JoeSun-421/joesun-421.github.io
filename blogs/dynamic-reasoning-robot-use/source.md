@@ -1,566 +1,279 @@
 ---
-title: "Towards Efficient Robot-Use Agents via Efficient Reasoning"
-date: 2026-11-25
-description: "八篇近期工作，按上下文管理、预算分配、推理削减与模型协作四类讲解原文流程、强化学习配方和实验。"
-tags: [dynamic-reasoning, efficient-agents, computer-use, robot-use, reinforcement-learning]
-slug: dynamic-reasoning-robot-use
+title: "Towards Efficient Closed-Loop Agents via Hybrid Reasoning"
+date: "2026-11-27"
+published: "2026-11-25"
+updated: "2026-11-27"
+slug: "dynamic-reasoning-robot-use"
+summary: "当推理型 LLM 与 VLM 走进具身机器人闭环（RUA），长链思考带来的延迟开销迅速成为瓶颈。本文聚焦一个核心问题：LLM、VLM 与桌面 CUA 领域的高效混合推理方法能否迁移到 RUA？围绕五条代表性路线，逐篇拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 的问题建模与核心机制。"
 ---
 
-# Towards Efficient Robot-Use Agents via Efficient Reasoning
+# Towards Efficient Closed-Loop Agents via Hybrid Reasoning
 
-## Why Robot-Use Agents Need Efficient Reasoning
+## Introduction
 
-我们关注由 LLM/VLM 直接生成动作的 robot-use agent：模型读取图像与机器人状态，输出末端位姿等动作指令，控制器执行后返回新观察。一次动作会改变环境，新的反馈又会改变下一步决策所需的信息。长任务因此需要持续分配推理计算，而每一步的推理需求并不相同。
+把具备长链推理能力的 LLM 和 VLM 接进机器人闭环（Robot-Use Agent，RUA），最直接的矛盾其实不在“能不能想明白”，而在“来不来得及想”。单轮问答里多吐几百个 thinking token 顶多慢上几秒，可放到连续交互的闭环里，每一步都要读新观测、调技能、等执行，物理环境不会停下来等模型把冗长的 CoT 慢慢写完；反过来，为了压延迟干脆关掉思考，遇到长视界规划、环境扰动或意外失败时又很容易走偏。这两年 LLM、VLM 和桌面 CUA 社区已经探出了不少让模型“该快就快、该慢再慢”的混合推理做法，这篇笔记想探讨的问题很直接：这些面向语言、多模态与桌面任务的 reasoning 加速方法，背后到底抓住了什么机制，又有多大机会迁移到 RUA 里？
 
-在这篇文章中，我们从多轮 agent，尤其是 computer-use 的研究中整理可以借鉴的机制。两者都通过“观察 → 决策 → 执行 → 新观察”推进任务；computer-use 已围绕上下文管理、计算分配和模型协作形成具体方案。我们先讲清这些方案在原任务中的运行方式、训练信号与实验证据，最后讨论迁移到机器人时需要重新验证的条件。
+沿着这条迁移线索，下文挑出五条代表性路线，依次拆解 RACE、CogRouter、R-4B、STEPWISE、Ada-R1 与 DR-BOLT 六篇工作。其中既有在多轮交互里通过在线 RL 按轮跳过冗余思考或细分认知深度的方案，也有在多模态底座上靠 Bi-Mode Annealing 与均衡 rollout 训出 auto-thinking 的做法；既有不动底座权重、靠外置轻量 monitor 级联大小模型的事件驱动 routing，也有在 offline 阶段通过 Model Merging 或双参考分布对齐把快慢双模收进单模型的尝试。先把它们各自的问题建模与方法细节理清，才能进一步判断哪些机制可以直接搬进机器人闭环，哪些还需要针对物理执行重新改造。
 
-我们的关注点是完整任务的效率：推理节省的时间，需要与摘要、调度、核验及执行等开销一起计算，并与任务成功率共同评价。减少 token、降低计算量和缩短总耗时分别对应不同证据。
+## Multi-Turn Step-Level RL Reasoning Control
 
-## Four Routes to Efficient Reasoning
+### RACE — Adaptive Reasoning via Cross-Turn Estimation
 
-上下文长度、推理预算、重复思考和模型分工对应四类资源开销：
-
-1. **Context Management：** CompactionRL、ContextBudget。压缩交互历史，在有限上下文窗口中继续执行长任务。
-2. **Adaptive Compute Allocation：** TAB、CogRouter。根据当前交互选择推理预算或认知深度。
-3. **Reasoning Reduction and Reuse：** PUMA、RACE。截去冗余生成，保留对当前及后续动作有用的思考。
-4. **Model Collaboration and Execution：** STEPWISE、SpecAgent。按事件升级模型，或让强模型批量核验小模型草稿。
-
-我们按主要干预位置组织这四类方法。上下文管理改变模型每轮读取的信息；计算分配决定当前投入多少思考；推理削减与复用减少重复生成；模型协作调整生成和核验的分工。这些机制可以组合，但各自报告的窗口容量、token 数、模型调用和真实耗时仍需分别理解。文末综述提供了工具 agent 的上下文、调用、推理与执行视角。
-
-下文各节的 Abstract 为原论文摘要的中文转述，其中“我们”沿用论文作者的口吻；方法解读和最后的迁移讨论另行展开。
-
-## Context Management
-
-这一类改变交互历史的保存方式。CompactionRL 将摘要与执行联合训练，ContextBudget 将剩余容量和新观察长度纳入压缩决策。
-
-### CompactionRL — Jointly Learn Execution and Compaction
+*2026 · [arXiv:2610.12061](https://arxiv.org/abs/2610.12061) · [GitHub](https://github.com/HututuAI/RACE)*
 
 #### Abstract
 
-> 长任务 agent 的交互轨迹可能在任务完成前超过上下文上限。将已有交互压缩为摘要，再从压缩上下文继续执行，是延长任务轨迹的自然途径；但如何把这一过程纳入强化学习，仍缺少充分研究。
->
-> 在这篇文章中，我们提出 CompactionRL，将任务执行与摘要生成联合优化。训练结合 token 级损失归一化和跨段广义优势估计，使策略能够从包含多次上下文压缩的长轨迹中学习。在两个规模的开放底座上，实验均显示 agent 编程任务的表现优于仅在推理时压缩的底座，说明压缩行为本身也可以通过训练得到改善。
+> 多轮 agent 通常在每一轮动作前都重写一遍思考，可很多时候前几轮的规划已经把后面几步安排好了；直接在 RL 里惩罚总长度，又会把关键节点上必要的思考一起压扁。RACE 用一个廉价信号判断哪一轮可以不想：删掉这一轮的思考之后，后续参考动作的 log-likelihood 掉得多不多。据此标出可跳过的轮次，再用 Masked GRPO 和显式闭合监督让模型学会按需跳过。
 
-#### Method and RL Recipe
+#### Methodology
 
-CompactionRL 联合优化任务执行与摘要生成，两者共享最终任务回报。
-
-![CompactionRL context compaction and benchmark results](assets/efficient_agents_2026/compactionrl-overview.png)
-
-上下文剩余容量低于阈值时，同一个策略生成摘要，再从“摘要＋最近交互”继续执行。每个动作与工具反馈作为完整单元保留，默认逐字保留最近两轮。
-
-![CompactionRL trainable segments and cross-segment credit](assets/efficient_agents_2026/compactionrl-training.png)
-
-训练按 §3.1–3.2 的顺序进行：
-
-1. 每个问题采样一条完整 rollout，执行过程中允许触发多次 compaction。
-2. 将 rollout 切成执行段与摘要段，保存各段生成 token、old log-probability 和 loss mask。
-3. 用最终任务正确性给整条 rollout 计分，执行段和摘要段共享该回报。
-4. critic 在各段上下文上预测价值，计算本段的局部 GAE，再按后续段的 token 数做位置修正。
-5. 汇总执行与摘要的有效生成 token，计算 PPO actor loss 和 critic loss。观察、重复的上下文前缀不参与策略损失。
-
-设 $s$ 为分段编号，$k$ 为段内 token 位置，$n_s$ 为本段参与优化的 token 数。后续段的 token 总数为 $N_{>s}$：
+多轮轨迹写作 $\tau = (u, r_1, a_1, o_1, \dots, r_T, a_T)$，$r_t$ 是第 $t$ 轮的思考。要检验“删掉某轮思考后动作还对不对”，最直接的办法是反复和环境交互 rollout 重采样，代价太高。RACE 发现了一个好用的代理：删掉思考后，参考动作 $a_j^*$ 的 teacher-forcing 平均 log-likelihood 跌得越少，重采样时动作越能复现。于是“找出最少的必要思考”变成了一串前向 log-likelihood 检验。这个算法叫 `LoGiC`。它保留第一轮全局规划，从第二轮起依次尝试把 $r_t$ 换成空闭合符 $e$（直接输出 `</think>`），然后重新计算当前和之后所有轮次参考动作的 log-likelihood，看最大跌幅是否在容差 $\epsilon$ 之内：
 
 $$
 \begin{aligned}
-N_{>s}&=\sum_{j>s}n_j,\\
-\widehat A_{s,k}
-&=(\gamma\lambda)^{N_{>s}}A^{\mathrm{loc}}_{s,k}.
+\widetilde{\ell}_j^{(t)} &= \begin{cases} \ell_j^{(t-1)}, & j < t, \\
+\ell\!\bigl(a_t^* \mid x^{(t)},\, e\bigr), & j = t, \\
+\ell\!\bigl(a_j^* \mid x^{(t)},\, e,\, a_t^*,\, o_t,\, \tau_{t+1:j-1}^*,\, r_j\bigr), & j > t, \end{cases} \\[6pt]
+\Delta_{\max}^{(t)} &= \max_{j \ge t}\bigl(\ell_j^{(t-1)} - \widetilde{\ell}_j^{(t)}\bigr) \le \epsilon
 \end{aligned}
 $$
 
-$A^{\mathrm{loc}}_{s,k}$ 是用本段价值估计和 TD residual 得到的局部 GAE；$\gamma$ 为折扣，$\lambda$ 为 GAE 参数。位置修正让较早段的终局回报按实际距离衰减。它是便于各段并行处理的近似，不递归重建后续各段的全部 TD residual。
+$x^{(t)}$ 是已经压缩过的 prefix，$\ell^{(t-1)}$ 是上一步留下的基准 log-likelihood。条件满足，说明已保留的思考和观测足以支撑后续动作，这一轮思考就删掉，基准更新为 $\widetilde{\ell}^{(t)}$；否则保留它，作为新的推理锚点。每次判断都建立在前面已生效的删减之上，避免了各轮独立裁剪时的误差累积。下图画出了这个逐轮检验的过程。
 
-PPO 更新对所有有效 token 统一归一化：
+![LoGiC 逐轮检验：删去当前思考块后，当前与未来所有参考动作的 log-likelihood 跌幅是否仍在容差之内](assets/efficient_agents_2026/race-logic.png)
+
+训练分两步：先用 LoGiC 压缩后的稀疏轨迹做 SFT 冷启动，再做在线 RL。RACE 对成功的在线轨迹运行 LoGiC（失败轨迹按标准 GRPO 处理），标出可跳过轮集合 $S_i$，把其中的冗余思考 token 从 policy gradient 里 mask 剔除，防止 GRPO 继续强化多余思考，只对有效 token 集 $\mathcal{K}_i$ 求和，分母仍用总生成长度来稳定梯度量级；而单靠 mask 并不能教会模型主动停下来，因此在成功轨迹的可跳过轮上再加一项闭合 loss：
 
 $$
 \begin{aligned}
-\rho_{s,k}
-&=\frac{\pi_\theta(y_{s,k}\mid x_{s,k})}
-{\pi_{\mathrm{old}}(y_{s,k}\mid x_{s,k})},\\
-\overline\rho_{s,k}
-&=\operatorname{clip}(\rho_{s,k},1-\epsilon,1+\epsilon),\\
-\ell_{s,k}
-&=\min(\rho_{s,k}\widehat A_{s,k},
-\overline\rho_{s,k}\widehat A_{s,k}),\\
-\mathcal L_\pi
-&=-\frac1{|\mathcal M|}\sum_{(s,k)\in\mathcal M}\ell_{s,k}.
+\mathcal{L}_{\mathrm{GRPO}}(\theta) &= -\frac{1}{\sum_{i \in \mathcal{B}} \lvert \mathcal{P}_i \rvert} \sum_{i \in \mathcal{B}} \sum_{k \in \mathcal{K}_i} \\[4pt]
+&\quad \min\!\Bigl(\rho_{i,k}\hat{A}_i,\; \operatorname{clip}\bigl(\rho_{i,k},\, 1-\epsilon_{\mathrm{clip}},\, 1+\epsilon_{\mathrm{clip}}\bigr)\hat{A}_i\Bigr), \\[6pt]
+\mathcal{L}_{\mathrm{close}}(\theta) &= -\frac{1}{\sum_{i \in \mathcal{B}} T_i} \sum_{i \in \mathcal{I}_{\mathrm{succ}}} \sum_{t \in S_i} \log \pi_\theta\!\bigl(e \mid x_i^{(t)}\bigr), \\[6pt]
+\mathcal{L}_{\mathrm{actor}}(\theta) &= \mathcal{L}_{\mathrm{GRPO}}(\theta) + \lambda\,\mathcal{L}_{\mathrm{close}}(\theta)
 \end{aligned}
 $$
 
-$x_{s,k}$ 是该 token 的上下文，$\mathcal M$ 包含执行段和摘要段的有效 assistant token，$\epsilon$ 是裁剪宽度。按 token 归一化，避免分段数量直接决定一条 rollout 的权重。
+$\rho_{i,k}$ 是 importance ratio，$\mathcal{P}_i$ 是第 $i$ 条轨迹的全部生成 token，$\lambda$ 控制闭合监督的强度。这样一来，“把锚点思考写好”和“跳过惯性思考”被拆成两件事分别优化。
 
-Appendix A.2 中，actor 与 critic 从同一底座初始化，critic 增加标量价值头。actor 学习率为 $2\times10^{-6}$，critic 为 $3\times10^{-6}$，每次策略更新配两次 critic 更新。
+![RACE 两阶段训练：SFT 冷启动学会按需跳过，覆盖感知的 Masked GRPO 与闭合 loss 在在线 RL 中巩固稀疏规划](assets/efficient_agents_2026/race-training.png)
 
-#### Results
+### CogRouter — Think Fast and Slow via Step-Level Cognitive Depth Adaptation
 
-v2 在相同峰值上下文下比较训练与推理 compaction。GLM-4.7-Flash 使用 64K 窗口，相对仅在推理时压缩的底座，SWE-bench Verified 的 200 题子集由 50.5% 提高到 56.0%，Terminal-Bench 2.0 由 13.5% 提高到 20.2%。
-
-![CompactionRL summary and execution training dynamics](assets/efficient_agents_2026/compactionrl-dynamics.png)
-
-摘要参与训练后变得更详细，任务成功率随训练提升。去掉摘要损失、token 归一化或跨段修正的消融用于检验各部分作用。这些结果支持固定窗口下的长任务质量提升，尚未给出逐步推理的延迟收益。
-
-### ContextBudget — Manage History Before Loading Observations
+*ICML 2026 · [arXiv:2602.12662](https://arxiv.org/abs/2602.12662) · [GitHub](https://github.com/rhyang2021/CogRouter)*
 
 #### Abstract
 
-> LLM agent 能够执行长程推理，但部署时的显存、延迟和成本限制了可用上下文。随着交互历史不断增长，保留既有信息与遵守窗口限制之间的矛盾日益突出，压缩决策需要考虑当前还剩多少容量，以及新的观察将占用多少空间。
->
-> 在这篇文章中，我们提出预算感知的上下文管理框架 BACM，将历史压缩建模为受上下文预算约束的序贯决策。agent 在载入新观察前评估剩余预算，决定何时压缩、压缩多少历史。进一步提出的 BACM-RL 通过端到端课程强化学习，在逐渐变化的上下文预算下学习压缩策略。组合多目标问答和长程网页浏览实验显示，该方法在不同模型规模、任务复杂度与窗口预算下均具有优势。
+> 长视界具身交互任务中，不同步的认知负荷差异悬殊：开局探索与遇错重规划需要深度推演，而开门进房等常规步骤只需本能直答。若只做“想或不想”的二元切换，难以覆盖态势检查与局部反思等中间需求；若直接用 trajectory-level RL 优化多档思考，policy 又会迅速坍缩为全程深思考的认知僵化。CogRouter 借鉴 ACT-R 认知架构设计四级递进认知深度，先以均匀分布的 CoSFT 打破先验偏置，再通过 confidence-aware advantage reweighting 的 CoPO 依据不同深度对动作预测置信度的支撑强弱分配步级 advantage，使单个 LLM agent 在每一步内生选择恰如其分的思考深度。
 
-#### Method and RL Recipe
+#### Methodology
 
-![ContextBudget deferred observation loading and GRPO](assets/efficient_agents_2026/contextbudget-framework.png)
+在多轮 POMDP 具身交互中，agent 在每一步 $t$ 面对历史上下文 $\tau_t$ 依次生成三段结构化输出 $y_t = [l_t,\, th_t,\, a_t]$，分别由 `<level>`、`<think>` 与 `<action>` tag 封装。参考认知科学中的 ACT-R 理论，CogRouter 将思考深度细分为四级集合 $\mathcal{L} = \{L_1, L_2, L_3, L_4\}$：$L_1$ 为本能直答，不展开显式思考直接输出动作；$L_2$ 为态势感知，仅评估当前状态与可执行动作；$L_3$ 为经验整合，在态势评估外明确目标并回顾历史得失；$L_4$ 为战略规划，对多个候选动作做前瞻后果推演后再做抉择。下图概括了四级认知设计以及两阶段训练流程。
 
-在读取新观察的内容前，agent 先获得当前剩余容量与新观察的 token 长度，再决定如何处理旧历史。设上下文窗口为 $B$，历史缓冲区为 $\mathcal C_t$，待加载观察为 $o_t$：
+![CogRouter 总览：四级认知深度设计、均衡 CoSFT 冷启动以及基于动作置信度重加权的 CoPO 优化流程](assets/efficient_agents_2026/cogrouter-overview.png)
+
+直接进入 RL 或沿用专家模型自主挑选的档位标签，都会让 policy 在起步阶段就锁死在特定档位上。因此第一阶段的 `CoSFT` 刻意回避专家偏置：先收集成功的交互轨迹，再在每一步均匀随机采样一个认知级别 $l_t \in \mathcal{L}$，提示强模型补全与该级别及真实动作 $a_t^*$ 匹配的思考过程 $th_t$，由此在均衡数据集 $\mathcal{D}_{\mathrm{cog}}$ 上最小化 NLL 目标 $\mathcal{L}_{\mathrm{CoSFT}} = -\mathbb{E}_{\mathcal{D}_{\mathrm{cog}}}\!\bigl[\sum_{t=0}^T \log \pi_\theta(y_t \mid \tau_t^*)\bigr]$，让模型先稳定掌握全部四个档位的生成格式且不带先验偏斜。
+
+冷启动之后，普通 GRPO 把整条轨迹的单一终局 advantage $A^{(i)}$ 均匀摊派给所有步骤，无法区分哪一步的深度恰当、哪一步在空耗 token，结果训练很快坍缩向全程 $L_4$。第二阶段的 `CoPO` 基于一条核心直觉：恰当的认知深度应当使模型在条件化该思考过程后，对最终正确动作的预测置信度最高。每轮在线 rollout 得到轨迹组后，先按任务成败与格式合法性之积 $R_i = R_i^{\mathrm{task}} \times R_i^{\mathrm{format}}$ 计算组相对轨迹 advantage $A^{(i)}$。对于成功轨迹（$R_i > 0$）的每一步 $t$，固定当时的观测与已执行动作 $a_t^{(i)}$，反事实地用全部四个认知级别重新生成思考过程，构成 cognitive group $e_t^{(i)} = \{e_t^{(i,k)}\}_{k=1}^4$，其中 $e_t^{(i,k)} = [l_k,\, th_t^{(i,k)},\, a_t^{(i)}]$。随后以动作 token 的平均 log-probability 度量各档位的动作预测置信度，并在组内标准化后经温度系数 $m$ 做 Softmax 重加权：
 
 $$
 \begin{aligned}
-r_t&=B-|\mathcal C_t|,\\
-u_t&\sim\pi_\theta(\cdot\mid s_t,r_t,|o_t|),\\
-\mathcal C_{t+1}&=\mathcal C'_t\oplus o_t,\\
-|\mathcal C'_t|&\le B-|o_t|.
+C_t^{(i,k)} &= \frac{1}{\lvert a_t^{(i)} \rvert}\sum_{n=1}^{\lvert a_t^{(i)} \rvert}\log \pi_\theta\!\left(a_{t,n}^{(i)} \;\middle|\; \tau_t^{(i)},\, l_k,\, th_t^{(i,k)},\, a_{t,<n}^{(i)}\right), \\[6pt]
+C_{\mathrm{norm},t}^{(i,k)} &= \frac{C_t^{(i,k)} - \mu_t^{(i)}}{\sigma_t^{(i)}}, \qquad
+g\!\bigl(C_t^{(i,k)}\bigr) = \frac{\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,k)}\bigr)}{\sum_{j=1}^{4}\exp\!\bigl(m\cdot C_{\mathrm{norm},t}^{(i,j)}\bigr)}
 \end{aligned}
 $$
 
-$s_t$ 是当前推理状态，$r_t$ 是剩余 token 容量；$u_t$ 选择不压缩、聚合部分历史块或聚合全部历史块。$\mathcal C'_t$ 是处理后的历史，$\oplus$ 表示追加观察。选择要聚合的历史块后，模型生成合并摘要替换这些块。决策时可见观察长度，内容要等处理完成后才载入。
+其中 $\mu_t^{(i)}$ 与 $\sigma_t^{(i)}$ 为该步组内置信度的均值与标准差。由于四个档位的权重和恒为 $1$，它只重新分配该步 advantage 而不改变总量级。更重要的是，该重加权仅施加于成功轨迹，失败轨迹保持原轨迹 advantage 不做扩展，避免模型为逃避高置信犯错的重罚而退化回低置信本能直答：
 
-BACM-RL 用多轮 GRPO 联合更新压缩决策与任务生成：
+$$
+A_t^{(i,k)} = \begin{cases}
+g\!\bigl(C_t^{(i,k)}\bigr)\cdot A^{(i)}, & R_i > 0, \\
+A^{(i)}, & R_i \le 0
+\end{cases}
+$$
 
-1. 用二目标组合 QA 构造训练任务，采样同题的多条完整交互轨迹。
-2. 计算最终答案的 F1；若轨迹任一轮超过当前阶段窗口限制，将该轨迹奖励置为 0。
-3. 在同题 rollout 组内标准化奖励，将同一轨迹优势分配给各轮生成 token。
-4. 使用 clipped policy objective 与参考策略 KL 更新模型。
-5. 逐阶段收紧窗口，沿用当前模型继续训练。
-
-在课程阶段 $j$，奖励为：
+最终 `CoPO` 目标在成功轨迹集合 $\mathcal{I}^+$ 上对扩展 cognitive group 用步级 advantage $A_t^{(i,k)}$ 优化，在失败轨迹集合 $\mathcal{I}^-$ 上对原始输出用 $A^{(i)}$ 优化，并辅以 clipped importance ratio $\bar{r} = \operatorname{clip}(r, 1 - \epsilon, 1 + \epsilon)$ 与参考策略 KL 正则：
 
 $$
 \begin{aligned}
-\widetilde R_i^{(j)}
-&=\begin{cases}
-R_i,&\forall t:\ |\mathcal C_{i,t}|\le B^{(j)},\\
-0,&\text{otherwise},
-\end{cases}\\
-\widehat A_i^{(j)}
-&=\frac{\widetilde R_i^{(j)}-\mu_j}{\sigma_j+\varepsilon}.
+\mathcal{J}_{\mathrm{CoPO}}(\theta) &= \mathbb{E}\!\Biggl[\frac{1}{G}\sum_{i \in \mathcal{I}^+}\frac{1}{\lvert e^{(i)} \rvert}\sum_{t=0}^{T}\sum_{k=1}^{4}\sum_{n=1}^{\lvert e_t^{(i,k)} \rvert}\min\!\Bigl(r_{t,n}^{(i,k)} A_t^{(i,k)},\; \bar{r}_{t,n}^{(i,k)} A_t^{(i,k)}\Bigr) \\[6pt]
+&\quad + \frac{1}{G}\sum_{i \in \mathcal{I}^-}\frac{1}{\lvert y^{(i)} \rvert}\sum_{t=0}^{T}\sum_{n=1}^{\lvert y_t^{(i)} \rvert}\min\!\Bigl(r_{t,n}^{(i)} A^{(i)},\; \bar{r}_{t,n}^{(i)} A^{(i)}\Bigr)\Biggr] - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta \,\Vert\, \pi_{\mathrm{ref}}\bigr]
 \end{aligned}
 $$
 
-$R_i$ 是答案 F1，$\mu_j,\sigma_j$ 由当前同题组的预算约束奖励计算，$\varepsilon$ 用于数值稳定。模型同时生成压缩操作与任务响应，两类 token 都参与训练。
+测试期仅部署单个策略模型，无需任何外挂 router 或反事实扩展；模型在每一步开头直接自回归吐出 `<level>` token，在常规执行中自然切回本能直答，在开局探索或遇错受阻时自动抬升认知深度。
 
-Appendix A.5 的课程共有 300 个更新，每阶段 60 个，窗口依次为 8,192、7,168、6,144、5,120、4,096 token；组内采样 5 条 rollout，actor 学习率为 $10^{-6}$。评测扩展到更多目标的组合题与 BrowseComp-Plus。
+## Bi-Mode Annealing and Balanced-Rollout RL — Auto-Thinking MLLMs
 
-#### Results
+### R-4B — Auto-Thinking MLLM via Bi-Mode Annealing and Bi-Mode Policy Optimization
 
-![ContextBudget performance across context windows](assets/efficient_agents_2026/contextbudget-budgets.png)
-
-组合题的累计 F1 为各子目标 F1 之和，取值上限等于目标数。实验在 16K–4K 窗口下比较该指标，并分别去掉预算信息、延迟加载和递减窗口课程。指标同时反映任务完成质量与受限窗口下的信息保留。
-
-![ContextBudget answer quality and compression calls](assets/efficient_agents_2026/contextbudget-compressions.png)
-
-固定 8K 窗口时，二目标任务相对 MEM1 的平均压缩调用从 1.92 降到 1.12，累计 F1 从约 0.84 提高到 0.91。目标数增多后，方法增加压缩调用以维持任务表现；节省资源与保留信息随任务负载共同变化。
-
-## Adaptive Compute Allocation
-
-这一类决定当前轮次使用多少推理。TAB 输出外部预算，CogRouter 在同一策略中选择认知层级并生成动作。
-
-### TAB — Allocate Budgets Across Turns
+*2025 · [arXiv:2508.21113](https://arxiv.org/abs/2508.21113) · [GitHub](https://github.com/yannqi/R-4B)*
 
 #### Abstract
 
-> 长推理模型在简单问题上也会生成过多思考，带来额外 token 与延迟。已有长度正则、动态路由和按难度分配预算的方法主要面向单轮任务，难以直接处理多轮交互的序贯依赖：某一轮花费多少计算，还会影响后续关键步骤能够获得的预算。
->
-> 为此，我们提出 TAB，将多轮推理建模为带有全局 token 约束的序贯计算分配问题。预算策略根据交互历史，为不同轮次分配思考预算，在任务准确率与总计算开销之间权衡。我们先在分层规划与执行的数学推理系统上训练，再将同一策略直接用于工具调用、模拟对话和终端任务。数学实验最多节省 35% token 与 30% 延迟，迁移实验最多节省 20% token 与 15% 延迟，同时保持任务准确率。
+> MLLM 一旦默认展开长链思考，在简单视觉识图或 OCR 查询上会产生大量冗余推理；若依靠手工标注难度或精细调节的 reward shaping 训练自适应切换，又容易在 RL 阶段发生 mode collapse。R-4B 提出两阶段训练范式：先以自动化双启发式数据筛选与 Bi-Mode Annealing 让单模型在同一模板下兼备 thinking 与 non-thinking 两种能力，再通过 Bi-Mode Policy Optimization（BPO）强制每个查询生成对等数量的双模 rollout 并纳入同一 GRPO 混合组对比优化，仅凭简洁的规则 reward 即可激发跨领域通用的 auto-thinking 切换能力。
 
-#### Method and RL Recipe
+#### Methodology
 
-![TAB budget allocator and solver loop](assets/efficient_agents_2026/tab-overview.png)
+要让单个 MLLM 在通用多模态场景下自主决定是否思考，前提是底座本身已经扎实掌握 thinking 与 non-thinking 两种行为模式。R-4B 的第一阶段围绕 Bi-Mode Annealing 展开，先借助强 MLLM 标注器设计了两套免人工难度标注的数据划分启发式：对于答案可验证的客观题（如数学与选择题），采用基于表现的 offline hard mining，对每题多次采样，仅当全部尝试失败时划入 reasoning 数据，能够答对的简单题划入 non-reasoning 数据；对于难以直接核验正误的主观开放题（如看图描述与开放创作），则通过 prompt engineering 判别其内在复杂度。被划为 reasoning 的样本交由强多模态推理模型补全思维链，再经一致性检验、关键词过滤与去重清洗。
 
-TAB 分开使用 Budgeter 和 Solver。每轮 Budgeter 根据历史与当前输入输出难度档位，再映射成 Solver 的 token 预算或 reasoning-effort 设置。Solver 在这个设置下生成回答，新的反馈进入下一轮。
+所有退火数据封装进统一的结构化输出模板，避免双模之间出现格式割裂：需要推理的样本写为 `<think>reasoning steps</think>answer`，适合直答的样本则保留空思考块写为 `<think> </think>answer`。随后把多领域 thinking 与 non-thinking 精料混合在一起执行单阶段 Bi-Mode Annealing，在 learning rate 衰减期同时把深思考与简洁直答揉进同一组权重，防止只训推理或串行两段训练带来的通用视觉能力遗忘。下图展示了这套自动化双模数据构建流程。
 
-每轮的预算选择与回答生成分别为：
+![R-4B 双模数据筛选与封装：针对客观题做 offline hard mining、针对主观题做 prompt engineering，统一构建带思考块与空思考块的 Bi-Mode Annealing 数据](assets/efficient_agents_2026/r4b-curation.png)
 
-$$
-b_t\sim\pi_\phi(\cdot\mid h_t),
-\qquad
-y_t\sim f_\theta(\cdot\mid h_t;b_t).
-$$
+退火完成后得到的基座虽然分别具备双模能力，但直接开启 auto-thinking 推理时会出现明显的 thinking atrophy（思考萎缩）——由于退火数据里直答样本占比更高，模型面对复杂题也倾向偷懒输出空思考块。而直接沿用 vanilla GRPO 做在线 RL 又容易陷入单模偏置：一旦某一种模式在组内暂时占优，另一种模式的 rollout 数量就会迅速萎缩直至坍缩。
 
-$t$ 是交互轮次；$h_t$ 包括当前输入与之前的交互；$\phi$ 是预算策略参数，$\theta$ 是 Solver 参数。RL 更新 Budgeter，Solver 提供预算动作后的反馈。
-
-训练数据来自 MATH 训练集的 Level-5 问题。Planner 先分解问题，Budgeter 逐轮选择档位，固定的 Solver 在对应预算下生成回答。训练只更新 Budgeter。完成训练后，同一预算策略直接用于 BFCL、Tau-Bench 和 Terminal-Bench。
-
-训练用 GRPO：
-
-1. 同一道训练题采样多条完整交互，每条使用不同的预算分配序列。
-2. 到终局检查答案，同时统计实际消耗的 Solver token。
-3. 根据全局预算计算奖励，在同题轨迹组内标准化。
-4. 将轨迹优势用于该轨迹中所有预算决策的 clipped policy 更新。
-
-训练使用实际消耗的 token。记第 $t$ 轮消耗为 $n_t$，轨迹奖励为：
-
-$$
-R_i=S_i-\lambda\max\!\left(0,\sum_t n_{i,t}-B\right).
-$$
-
-$S_i$ 是终局正确性，$B$ 是整项任务的目标预算，$\lambda$ 是超额成本系数。低于 $B$ 时成本项为零，策略可以把预算集中到关键轮次。
-
-$$
-\widehat A_i
-=\frac{R_i-\operatorname{mean}_{j\in\mathcal G(x)}R_j}
-{\operatorname{std}_{j\in\mathcal G(x)}R_j}.
-$$
-
-$\mathcal G(x)$ 是同一道题的完整轨迹组。**同一条轨迹的各轮共享这个优势**；它学习哪些整体分配方案更好，尚未给每一轮提供独立的因果贡献估计。
-
-Qwen3-4B Budgeter 使用 LoRA rank 64、学习率 $10^{-5}$，训练 125 个更新。全局预算 $B\in\{3k,5k,8k,10k\}$ 各自对应一个独立策略。模型输出 0–4 五个档位，映射到 Solver 的 256–4096 token 预算。
-
-数学任务中的预算分布如下；全局预算收紧时，小预算档位的使用比例上升。
-
-![TAB learned allocation under different budgets](assets/efficient_agents_2026/tab-allocation.png)
-
-![TAB transfer accuracy versus total tokens](assets/efficient_agents_2026/tab-transfer.png)
-
-![TAB transfer accuracy versus end-to-end latency](assets/efficient_agents_2026/tab-latency.png)
-
-迁移实验最多节省约 20% token 与 15% 延迟，计时包含 Budgeter 开销。两张图分别给出准确率与总 token、准确率与端到端延迟的关系。
-
-### CogRouter — Choose Cognitive Depth at Each Step
-
-#### Abstract
-
-> 现有多轮 agent 往往采用固定的认知模式：非思考模型每步立即响应，思考模型每步都进行深度推理。长任务中，不同步骤的需求却差异很大，既包含常规执行，也包含反思与战略规划；固定模式难以让计算投入与当前步骤的需求相匹配。
->
-> 在这篇文章中，我们提出 CogRouter，使 agent 逐步调整认知深度。基于 ACT-R 理论，我们设计从直觉响应到战略规划的四个层级，先用 CoSFT 建立稳定的层级行为，再用 CoPO 根据动作置信度重分配优势，进行步骤级信用分配。其核心依据是：合适的认知深度应当提高后续动作的置信度。ALFWorld 与 ScienceWorld 的实验显示，这种训练能够同时改善任务表现与推理效率。
-
-#### Method and RL Recipe
-
-![CogRouter balanced SFT and cognition-aware optimization](assets/efficient_agents_2026/cogrouter-framework.png)
-
-四个层级依次对应直接响应、当前状态分析、结合执行历史的反思、评价候选动作未来影响。每轮按 `<level>`、`<think>`、`<action>` 的结构生成。
-
-CoSFT 使用 GPT-4o 的成功轨迹。在每步均衡随机指定一个层级，再让专家根据历史和固定参考动作补写该层级的思考，对完整结构化输出做交叉熵训练。
-
-CoPO 随后执行：
-
-1. 当前策略与环境交互，采样同题多条完整轨迹。
-2. 计算任务成功与格式奖励，再得到组相对优势。
-3. 对成功轨迹的每一步，固定观察与动作，补生成四种层级的思考。
-4. 对同一个参考动作做 teacher-forced scoring，比较四种思考下的平均动作 token log-probability。
-5. 将分数标准化并转换成 softmax 权重，重新分配该步优势，再用 clipped policy loss 更新层级、思考与动作 token。
-
-轨迹奖励为任务成功与格式检查的乘积：
-
-$$
-R_i=R_i^{\mathrm{task}}R_i^{\mathrm{format}}.
-$$
-
-两个因子均为 0/1；任何一步格式不符合要求，格式项就为 0。$\widehat A_i$ 由同题轨迹组的奖励计算。
-
-在成功轨迹 $i$ 的第 $t$ 步，层级 $c$ 的思考与历史构成 $h_{i,t}^{(c)}$。固定参考动作 $a_{i,t}$ 有 $M_{i,t}$ 个 token，其置信度为：
-
-$$
-C_{i,t}^{(c)}=\frac1{M_{i,t}}
-\sum_{k=1}^{M_{i,t}}
-\log\pi_\theta\!\left(a_{i,t,k}\mid h_{i,t}^{(c)},a_{i,t,<k}\right).
-$$
-
-$c\in\{1,2,3,4\}$ 是层级编号。对同一步四个分数标准化，再计算权重：
+为在不引入复杂 reward engineering 的前提下根治 mode collapse，第二阶段提出 Bi-Mode Policy Optimization（`BPO`）。`BPO` 在 GRPO 框架内改写采样方式：对每个输入 query $q$，在前缀显式拼接模式专属 special token（`<thinking token>` 与 `<non-thinking token>`），强制策略确定性地生成两组等量回复——$g$ 条 thinking rollout $\{o_1, \dots, o_g\}$ 与 $g$ 条 non-thinking rollout $\{\tilde{o}_1, \dots, \tilde{o}_g\}$，并把全部 $2g$ 条轨迹合并进同一个 mixed group 里，统一依据简洁的数学规则正确性 reward 计算 token-level importance ratio $R_k$ 与组相对 advantage $A_k$：
 
 $$
 \begin{aligned}
-\widetilde C_{i,t}^{(c)}
-&=\frac{C_{i,t}^{(c)}-\mu_{i,t}}{\sigma_{i,t}},\\
-w_{i,t}^{(c)}
-&=\frac{\exp(\eta\widetilde C_{i,t}^{(c)})}
-{\sum_{b=1}^{4}\exp(\eta\widetilde C_{i,t}^{(b)})},\\
-\widehat A_{i,t}^{(c)}
-&=w_{i,t}^{(c)}\widehat A_i.
+o_k' &= \begin{cases} o_k, & 0 < k \le g, \\
+\tilde{o}_{k-g}, & g < k \le 2g, \end{cases} \\[6pt]
+\mathcal{J}_{\mathrm{BPO}}(\theta) &= \mathbb{E}_{q \sim P(Q)}\!\Biggl[\frac{1}{2g}\sum_{k=1}^{2g} \\[4pt]
+&\quad \min\!\Bigl(R_k(o_k')\,A_k(o_k'),\; \operatorname{clip}\bigl(R_k(o_k'),\, 1 - \epsilon,\, 1 + \epsilon\bigr)\,A_k(o_k')\Bigr)\Biggr] \\[4pt]
+&\quad - \beta\,D_{\mathrm{KL}}\!\bigl[\pi_\theta(\cdot \mid q) \,\Vert\, \pi_{\mathrm{ref}}(\cdot \mid q)\bigr]
 \end{aligned}
 $$
 
-$\mu_{i,t},\sigma_{i,t}$ 仅由该步四个层级的置信度计算；$\eta$ 控制分布尖锐程度，原文设为 2。失败轨迹不扩展四组思考，继续使用原轨迹优势。CoPO 保留组相对优势，没有 learned critic。
+其中 $\epsilon$ 与 $\beta$ 分别控制 clip 区间与参考策略 KL 正则强度。通过在同题同组里强制对照两种路径的成败效用，模型清晰分辨出哪些题必须展开思考才能得分、哪些题直答即可拿满回报，且仅凭数学领域的规则 reward 便能将这种难度判别泛化至非数学通用多模态任务。下图描绘了 `BPO` 的双模采样与混合组优化架构。
 
-#### Results
+![R-4B 的 BPO 框架：通过 special token 对同一输入强制采样等量 thinking 与 non-thinking rollout，在统一混合组内经规则 reward 计算 mixed advantage 并以 KL 正则更新](assets/efficient_agents_2026/r4b-bpo.png)
 
-![CogRouter cognitive levels across progress and difficulty](assets/efficient_agents_2026/cogrouter-adaptation.png)
+推理阶段仅部署训练后的单模型，依据输入末尾附带的触发前缀即可灵活支持三种运行方式：附带 `<think>\n\n</think>` 强制快答，附带 `<think>\n` 强制慢想，而仅附带 `<think>` 时进入 auto-thinking 模式，由模型自己在下一 token 自主决定展开推导还是立刻闭合 `</think>` 直接作答。
 
-ALFWorld、ScienceWorld 的实验同时比较任务表现、token 数和层级分布。图中 CoPO 随任务进度及复杂度调整层级；标准 GRPO 更集中于最深层。四种思考是在固定参考动作上比较置信度，未分别重新执行为四条环境分支。
+## Dynamic Reasoning via Fast–Slow Routing — Event-Driven Cascade
 
-## Reasoning Reduction and Reuse
+### STEPWISE — Event-Driven Fast–Slow Cascade for Computer-Use Agents
 
-PUMA 处理单次生成中的语义冗余，RACE 检查已有思考对后续动作的持续支持。
-
-### PUMA — Stop When Reasoning Converges
+*2026 · [arXiv:2604.27151](https://arxiv.org/abs/2604.27151)*
 
 #### Abstract
 
-> 长推理模型经常在解法已经稳定后继续生成，增加 token 消耗与等待时间。已有早停方法主要依赖答案置信度或试答一致性；这些信号反映答案是否就绪，却可能在探索和自我修正完成前触发，损害最终正确性与保留推理链的语义完整性。
->
-> 我们将推理步骤的语义冗余作为补充信号：当连续步骤不再带来新进展，而是反复验证已有结论时，推理更可能已经收敛。基于这一观察，PUMA 用轻量冗余检测器寻找候选退出点，再用答案级核验确认停止条件。在五个推理模型和五个基准上的实验中，该方法平均减少 26.2% token，同时保持答案正确性与保留 CoT 的质量。代码生成和视觉语言推理实验进一步检验了这一信号的适用范围。
+> 在桌面和网页的长任务里，全程使用前沿大模型太慢也太贵，只用小模型又容易出两种毛病：在原地反复点击的进展停滞，以及漏掉条件却自信宣布完成的静默漂移。STEPWISE 让小模型默认推进，旁边挂两个轻量文本 monitor 扫描最近几步的推理与动作：发现卡死，就让大模型接管一步；发现到达子目标 milestone，就把 checkpoint 前后两张截图交给大模型审核。
 
-![PUMA answer readiness and reasoning convergence](assets/efficient_agents_2026/puma-readiness.png)
+#### Methodology
 
-#### Method and Training Recipe
-
-PUMA 用推理步骤的语义冗余定位候选退出点，再核验答案，截去收敛之后的重复生成。
-
-![PUMA redundancy detection and verified early exit](assets/efficient_agents_2026/puma-framework.png)
-
-**Redundancy Detector Training**
-
-PUMA 的主推理模型保持冻结，另行训练 Qwen3-Embedding-0.6B 冗余检测器。Appendix B.2 的数据与训练流程为：
-
-1. 从四个长推理模型收集 AMC23、GSM8K 推理轨迹，并加入 Open-Thoughts-114K，覆盖约 5,098 道不同问题。
-2. 切分推理步骤，用 GPT-5-mini 标注当前步骤相对前文是否带来新信息，得到 40,844 条种子样例。
-3. 用 GPT-4o-mini 将新颖步骤改写为语义冗余版本，扩充重复、重述和无进展验证等模式。
-4. 整理为 anchor、冗余正样本、新颖负样本，去重后得到 701,641 条对比训练数据。
-5. 用 InfoNCE 训练检测器：LoRA rank 32、学习率 $10^{-4}$、5 epochs。冗余步骤被拉近，有新进展的步骤被拉远。
-
-**Inference-Time Exit**
-
-在线流程是：
-
-1. 按自然段或步骤边界切分当前 CoT。
-2. 检测器比较当前步骤与最近的历史步骤，标出可能冗余的位置。
-3. 仅在这些候选位置，从当前前缀诱导一个试答，取得答案及其 token 置信度。
-4. 在后续候选位置继续试答，检查答案一致、置信度足够且没有明显下降。
-5. 检查通过就结束思考；否则继续生成。晚期持续重复时，另有带最低置信度门槛的 Loop Breaker。
-
-将当前推理步骤记为 $r_t$，检测器记为 $f$，回看窗口为 $k$：
-
-$$
-s_t=\max_{\max(1,t-k)\le j<t}
-\cos\!\left(f(r_j),f(r_t)\right).
-$$
-
-$s_t$ 超过相似度阈值时，只产生候选退出点。原文默认 $k=1$。试答的置信度来自其 token 概率的几何平均；连续候选之间还要比较答案一致性。这个二阶段结构把较便宜的检测放在前面，减少试答调用。
-
-![PUMA measured latency and runtime breakdown](assets/efficient_agents_2026/puma-latency.png)
-
-原文同时统计检测、试答和总耗时。在 DS-7B、DS-14B 上，平均加速分别约为 1.40×、1.28×。部分对照因频繁试答而更慢，说明检测触发频率直接影响时间收益。
-
-![PUMA exit reasons and accuracy changes](assets/efficient_agents_2026/puma-exit-behavior.png)
-
-退出行为进一步分为核验通过、Loop Breaker 和完整生成。上图同时比较各分组的答案正确性，检查早停是否打断自我修正。
-
-**Model Internalization**
-
-§6.2 与 Appendix F 使用 12K 道数学训练题，让底座生成完整 CoT，再运行 PUMA 记录候选退出点与通过核验的停止点。随后分别构造：
-
-- **SFT：** 保留提前退出后仍正确、且前缀长度低于完整 CoT 的 60% 的样例，约 6.5K 条；训练目标是截断推理与答案。
-- **DPO：** 长短版本都正确时，以 PUMA 截断链为 chosen、完整链为 rejected，约 5.8K 对。
-- **GRPO：** 将问题、候选位置前缀和结束思考标记拼成输入，约 15K 条；每个输入采样 4 个答案 completion。
-
-三种训练均在 DS-R1-Distill-Qwen-7B 上使用 LoRA rank 64。GRPO 的 rollout 从给定前缀后的答案阶段开始，奖励为：
-
-$$
-R_i=c_i\!\left[1+0.5\!\left(1-\frac{\ell_i}{4096}\right)\right]
-+b_i^{\mathrm{rank}}.
-$$
-
-$c_i$ 表示答案正确性，$\ell_i$ 是该前缀之后的 completion 长度，$b_i^{\mathrm{rank}}$ 是组内排序奖励，取值为 $\{0.5,0.25,0,-0.25\}$，偏好更短的正确 completion。原文用 GRPO 更新，比较相同 recipe 下的固定位置前缀。
-
-GRPO 训练最多 1,500 个更新，学习率 $10^{-6}$，completion 上限为 4,096 token。训练后的变体直接用 vLLM 推理，不调用冗余检测器和答案核验模块。训练中的长度项统计给定前缀之后的答案阶段。
-
-### RACE — Preserve Cross-Turn Reasoning Support
-
-#### Abstract
-
-> LLM agent 通常在每次行动前推理，但较早轮次的思考能够继续支持后续动作，因此每轮重新思考并非总有必要。关键在于判断已有思考何时仍然充分、何时需要补充，同时避免逐次生成动作进行验证所带来的高开销。
->
-> 在这篇文章中，我们观察到，删除额外思考后，后续参考动作的似然下降与这些动作能否被恢复密切相关。基于这一轻量信号，我们提出 RACE：先用 LoGiC 渐进识别对当前及后续参考动作影响较小的可删除思考，再将删除信号用于 SFT 和 agentic RL，使策略学会选择思考或直接行动。四个 agent 基准上的实验显示，该方法能够显著降低推理 token 开销，同时保持或改善任务表现。
-
-#### Method and RL Recipe
-
-原文先删除部分思考，检查后续参考动作是否仍能生成，再比较动作恢复率与似然下降的关系。
-
-![RACE cross-turn support and action likelihood](assets/efficient_agents_2026/race-support.png)
-
-似然下降较小时，参考动作通常仍可恢复。RACE 用这个关系构造跨轮推理删减信号。
-
-LoGiC 从已有轨迹出发，保留第一轮思考，从第二轮起依次尝试删除。一次删除需要同时通过当前及后续参考动作的检查；已接受的删除会进入下一次评估的上下文。
-
-![RACE progressive reasoning-cover detection](assets/efficient_agents_2026/race-logic.png)
-
-先对固定参考动作做 teacher-forced scoring：
-
-$$
-\ell(a_j^*\mid h)
-=\frac1{M_j}\sum_{k=1}^{M_j}
-\log\pi_\theta(a_{j,k}^*\mid h,a_{j,<k}^*).
-$$
-
-$a_j^*$ 是原轨迹第 $j$ 轮动作，$M_j$ 是其 token 数。这个量来自已有动作的前向打分，无需重新生成多个候选动作。
-
-在当前已经压缩的轨迹上，尝试删除第 $t$ 轮思考。定义：
+按固定周期切换大模型效率不高，因为小模型的失败有两种截然不同的样子。一种是外显的，轨迹变长，局部动作反复重复；另一种是隐蔽的，既不报错也不打转，只是漏掉关键条件后提前发出 `done`。两种失败需要两种探测方式。STEPWISE 把最近 $K$ 步的推理 $r$ 与动作 $a$ 压成纯文本窗口 $w_t$，省掉监控端的图像编码，在上面并行运行两个轻量的 ModernBERT 分类器：
 
 $$
 \begin{aligned}
-d_j^{(t)}&=
-\ell_{j,\mathrm{before}}^{(t)}
--\ell_{j,\mathrm{after}}^{(t)},\\
-\mathrm{SKIP}_t=1
-&\iff \max_{j\ge t}d_j^{(t)}\le\varepsilon_{\mathrm{del}}.
+w_t &= \bigl\{(r_{t-K+1}, a_{t-K+1}),\, \dots,\, (r_t, a_t)\bigr\}, \\[6pt]
+p_t^{\mathrm{stuck}} &= S_\phi(w_t), \qquad p_t^{\mathrm{mile}} = M_\psi(u,\, w_t)
 \end{aligned}
 $$
 
-before、after 分别表示本次删除前后的上下文，后续参考动作和观察保持原样。阈值 $\varepsilon_{\mathrm{del}}$ 控制允许的似然下降。已接受的删除会保留在下一次检查的上下文中。
+Stuck Monitor $S_\phi$ 故意不看用户指令 $u$，只盯与任务无关的局部死循环，比如反复点击同一个无效坐标；Milestone Monitor $M_\psi$ 结合 $u$ 识别阶段边界，比如提交表单、保存文件或宣布完成。
 
-![RACE supervised and reinforcement-learning stages](assets/efficient_agents_2026/race-training.png)
+![STEPWISE 事件驱动级联：轻量文本 monitor 分流局部卡死与阶段 milestone，只在接管和双截图审核时唤醒大模型](assets/efficient_agents_2026/stepwise-overview.png)
 
-**Supervised Fine-Tuning**
-
-1. 使用 DeepSeek-V4-Pro-0813 标注的成功轨迹。
-2. 由 Qwen3.5-9B 运行 LoGiC，似然下降阈值设为 $0.001$。
-3. 删除通过检查的思考，保留动作和观察，构成 THINK／SKIP 混合轨迹。
-4. 对模型生成的思考与动作 token 计算交叉熵，得到 RACE-SFT checkpoint。
-
-**Agentic Reinforcement Learning**
-
-1. 从 RACE-SFT 初始化，在同一任务上采样多条完整轨迹。每批 16 个任务、每个任务 8 条，共 128 条轨迹。
-2. 计算任务回报和组相对优势。对成功轨迹运行 LoGiC，得到 SKIP 轮次；失败轨迹沿用普通 GRPO。
-3. **Reasoning masking：** SKIP 轮次的思考 token 不进入 GRPO 策略损失，动作 token 继续参与。归一化分母保留原始 token 数。
-4. **Reasoning closure：** 在 SKIP 轮次的压缩上下文上，将结束思考 token 作为监督目标，提高立即结束当前思考段的概率，随后继续生成动作。
-5. 联合计算 masked GRPO 与 closure 损失，更新同一策略模型。
-
-mask 移除 SKIP 思考 token 的策略梯度项；closure 在同一压缩上下文上监督结束思考的 token，使模型学会直接进入动作生成：
+milestone 概率越过阈值 $\theta_m$ 时，系统把用户指令、上一个 checkpoint $\tau_t$ 以来的推理动作片段和首尾两张截图 $(I_{\tau_t}, I_t)$ 交给大模型 Verifier $V_{\mathrm{large}}$。审核通过，checkpoint 更新为当前步，小模型继续；审核不通过，或者卡死概率越过 $\theta_s$，就由大模型亲自生成下一步动作，再交还控制权：
 
 $$
 \begin{aligned}
-\mathcal L_{\mathrm{close}}
-&=-\frac1{\sum_iT_i}
-\sum_{i\in\mathcal I_{\mathrm{succ}}}
-\sum_{t\in\mathcal S_i}
-\log\pi_\theta(e\mid\widetilde h_{i,t}),\\
-\mathcal L_{\mathrm{actor}}
-&=\mathcal L_{\mathrm{GRPO,masked}}
-+\lambda_{\mathrm{close}}\mathcal L_{\mathrm{close}}.
+v_t &= V_{\mathrm{large}}\!\bigl(u,\, \{(r_k, a_k)\}_{k=\tau_t+1}^{t},\, I_{\tau_t},\, I_t\bigr) \in \{0, 1\}, \\[6pt]
+E_{t+1} &= \mathbb{I}\!\Bigl[p_t^{\mathrm{stuck}} \ge \theta_s \;\lor\; \bigl(p_t^{\mathrm{mile}} \ge \theta_m \land v_t = 0\bigr)\Bigr], \\[6pt]
+m_{t+1} &= \begin{cases} \pi_{\mathrm{large}}, & E_{t+1} = 1, \\
+\pi_{\mathrm{small}}, & E_{t+1} = 0 \end{cases}
 \end{aligned}
 $$
 
-$T_i$ 是轨迹轮数，$\mathcal I_{\mathrm{succ}}$ 是成功轨迹集合，$\mathcal S_i$ 是 LoGiC 判为 SKIP 的轮次；$e$ 是思考终止 token，$\widetilde h_{i,t}$ 是对应压缩上下文。closure 使用目标 token 的交叉熵。其权重在 ScienceWorld、WebShop、AppWorld 中设为 0.02，在 DeepSearch 中设为 0.01。RL 学习率为 $10^{-6}$，每批 rollout 更新 1 epoch。
+两路信号各管一类失败：Stuck Monitor 拦不住语义跑偏，Milestone Verifier 管不住局部死循环，并联起来才能同时堵住两个口子，而大模型只在这些事件发生时才被调用。
 
-![RACE success and reasoning-token ablation](assets/efficient_agents_2026/race-ablation.png)
+## Model Merging for Hybrid Reasoning — Weight Fusion and Bi-Level DPO
 
-与标准 SFT＋GRPO 相比，RACE-SFT-RL 在四个基准上的任务表现差距均不超过 1.40 个百分点，推理 token 分别减少 32.3%、80.2%、46.4% 和 62.0%。这里统计的是整条轨迹的推理 token，不能直接换算为机器人任务的时间收益。
+### Ada-R1 — Hybrid-CoT via Bi-Level Adaptive Reasoning Optimization
 
-在相同底座的消融中，RACE 相对普通 SFT＋GRPO 减少约 32%–80% 的推理 token，四个基准上的成功率变化不超过 1.4 个百分点。效率指标是推理 token 数。
-
-## Model Collaboration and Execution
-
-这一类调整大小模型的执行分工。STEPWISE 用事件触发升级和核验，SpecAgent 用片段核验减少强模型串行生成。
-
-### STEPWISE — Escalate at Events
+*NeurIPS 2025 · [arXiv:2504.21659](https://arxiv.org/abs/2504.21659) · [GitHub](https://github.com/StarDewXXX/AdaR1)*
 
 #### Abstract
 
-> computer-use agent 可以直接操作 GUI，但强模型几乎参与每一步，使实际部署仍然昂贵且缓慢。长程 GUI 轨迹包含大量常规步骤，错误则往往集中在少数高风险时刻，主要表现为进展停滞，以及动作局部合理却已偏离任务目标的语义漂移。统一分配计算难以适应这种步骤间差异。
->
-> 我们提出事件驱动的步骤级级联框架：默认由小策略执行，轻量学习式监测器发现风险后，再调用强模型。Stuck Monitor 检测进展恶化并触发恢复，Milestone Monitor 选择适合稀疏核验的语义检查点。框架可以叠加在现有 agent 上，无需重新训练大型策略模型。OSWorld 与 WebArena 的实验显示，它能恢复始终使用强模型的大部分任务表现，并减少强模型调用、延迟与费用。
+> Long-CoT 模型面对简单题目也会习惯性展开冗长的反思与验算，可如果只在长推理模型自身内部做长度惩罚或剪枝，模型依然困在“先绕一大圈再作答”的分布里，很难真正切回简洁短链路。Ada-R1 改用“先融合、再 bi-level 对齐”的两阶段路线：先将同源的 Long-CoT 模型与 Short-CoT 模型做线性 weight merging，得到同时覆盖两种思维风格的单模型底座；再用 group-level 偏好教它按题目难度决定走长链还是短链，用 instance-level 偏好在选定风格内压缩多余步骤，把快慢双模收进同一组参数里。
 
-![STEPWISE stalls and silent semantic drift](assets/efficient_agents_2026/stepwise-failures.png)
+#### Methodology
 
-#### Method and Training Recipe
+从单分布 Long-CoT 模型出发做压缩，探索空间天然偏向长链。Ada-R1 的第一阶段先用最直接的线性 weight merging，把 Long-CoT 模型 $\theta_L$ 和 Short-CoT 模型 $\theta_S$ 合成一个混合底座 $\theta_H$：
 
-小模型默认执行，两个 ModernBERT 监测器分析最近的推理与动作记录：
+$$
+\theta_H = \alpha\,\theta_L + (1 - \alpha)\,\theta_S, \qquad \alpha \in [0, 1]
+$$
 
-- **Stuck Monitor** 读局部历史，检测循环、重复与停滞。
-- **Milestone Monitor** 额外读任务要求，选择有意义的进展检查点。
+融合后的策略 $\pi_{\theta_H}$ 同时保留了长链深度探索与短链直答的能力，让后续对齐不必从零塑造另一种输出风格，也不依赖外部 router。下图概括了融合与 bi-level DPO 训练的完整流程。
 
-![STEPWISE event-driven cascade](assets/efficient_agents_2026/stepwise-overview.png)
+![Ada-R1 两阶段框架：第一阶段线性融合 Long-CoT 与 Short-CoT 权重得到混合模型，第二阶段构造 group-level 与 instance-level 偏好完成 bi-level DPO](assets/efficient_agents_2026/adar1-pipeline.png)
 
-Stuck 超阈值后，下一步交给强策略恢复。Milestone 超阈值后，先让强验证器检查“上次核验到现在”的任务进展：输入包括任务、分段动作记录，以及当前和上次检查点的截图；检查通过就继续使用小模型，失败才升级。
+但单纯融合后的模型并不知道哪道题该长想、哪道题该短答。第二阶段构造两类互补的偏好数据。对训练集中的每道题 $x$，先分别从原长模型 $\theta_L$ 和短模型 $\theta_S$ 各采样 $K$ 条解答 $\{y_i^L\}_{i=1}^K$ 与 $\{y_j^S\}_{j=1}^K$，用 Monte Carlo 估计两组风格在这道题上的期望正确率 $\hat{\mathbb{E}}[C^L(x)]$ 与 $\hat{\mathbb{E}}[C^S(x)]$。只有当长链的正确率优势超过边界阈值 $\epsilon$ 时，才把长风格组 $g_L$ 选为更优组（$g_L \succ g_S$），否则偏爱更省算力的短风格组 $g_S$（$g_S \succ g_L$），并从两组的笛卡尔积中抽取跨组偏好对构成数据集 $\mathcal{D}_{\mathrm{group}}$：
 
-checkpoint 用于选择核验位置。监测器的训练目标是事件分类。
+$$
+\begin{aligned}
+\hat{\mathbb{E}}\bigl[C^m(x)\bigr] &= \frac{1}{K}\sum_{i=1}^{K}\mathbb{I}\bigl[\mathrm{Correct}(y_i^m)\bigr], \qquad m \in \{L, S\}, \\[4pt]
+g^*(x) &= \begin{cases} g_L, & \hat{\mathbb{E}}[C^L(x)] - \hat{\mathbb{E}}[C^S(x)] > \epsilon, \\
+g_S, & \text{otherwise} \end{cases}
+\end{aligned}
+$$
 
-Appendix B 使用 300 条 GUI 执行轨迹训练两个 ModernBERT-base 分类器：
+选出最优风格组 $g^*(x)$ 之后，组内样本的长度仍然参差不齐。因此在 $g^*$ 组内继续构造 instance-level 偏好 $\mathcal{D}_{\mathrm{instance}}$，挑出最短的正确解答作为正样本 $y_w$，与该组内最长的 $M_2$ 条解答配对，把两种风格各自内部的冗余展开再拧干一层。最后把两份数据合并，以融合模型为参考策略 $\pi_{\theta_{\mathrm{ref}}}$，通过最大化统一的 DPO 目标一步优化：
 
-1. 每条轨迹由 GPT-5.2 独立标注 5 次，分别识别 stuck 和 milestone。
-2. 至少 3 次标为正例的步骤保留为正例；5 次都未标中的保留为负例；只出现 1–2 次的样例丢弃。
-3. 输入包含当前步骤及最多 5 个前序步骤；milestone 输入额外包含任务描述。
-4. 在 `[CLS]` 表征上接二分类头，用逆类别频率加权的交叉熵训练。
-5. 两个分类器各训练 5 epochs，AdamW 学习率为 $5\times10^{-5}$，最大序列长度为 2,048。
+$$
+\begin{aligned}
+y_w &= \operatorname*{arg\,min}_{y \in \{y_i\}_{g=g^*}^{\mathrm{correct}}} \, \lvert y \rvert, \qquad y_l \in \operatorname*{arg\,max}_{y \in \{y_i\}_{g=g^*}}{}^{\!(M_2)} \, \lvert y \rvert, \\[6pt]
+\mathcal{J}_{\mathrm{Ada\text{-}R1}}(\theta_H) &= \mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}_{\mathrm{group}} \cup \mathcal{D}_{\mathrm{instance}}} \\[4pt]
+&\quad \Biggl[\log \sigma\!\Biggl(\beta\log\frac{\pi_{\theta_H}(y_w \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_w \mid x)} - \beta\log\frac{\pi_{\theta_H}(y_l \mid x)}{\pi_{\theta_{\mathrm{ref}}}(y_l \mid x)}\Biggr)\Biggr]
+\end{aligned}
+$$
 
-运行时，两个监测器读取文本推理与动作记录；只有触发 milestone 后的强核验才读取截图。
+group-level 偏好负责“跨风格选档位”，instance-level 偏好负责“同风格去冗余”。两者合在同一套 offline DPO 里，使单个模型就能根据输入复杂度内生切换长短推理。
 
-![STEPWISE monitor ablation](assets/efficient_agents_2026/stepwise-ablation.png)
+## Dual-Reference Offline Alignment — Boltzmann Projection for Fast–Slow VLMs
 
-OSWorld 与 WebArena 的消融分别启用 stuck、milestone 和两种监测器，完整配置取得最高成功率。原文还比较固定间隔核验；成本表中的延迟按单次请求统计。
+### DR-BOLT — Dual-Reference Offline Optimization for Adaptive VLM Reasoning
 
-### SpecAgent — Draft, Verify, and Repair
+*NeurIPS 2026 · [arXiv:2611.09154](https://arxiv.org/abs/2611.09154) · [GitHub](https://github.com/HongbinLin3589/DR-BOLT)*
 
 #### Abstract
 
-> 工具 agent 的长交互通常由单个强模型逐步生成，尽管大量常规步骤可以由小模型处理。已有路由和协作方法仍按查询或步骤分配生成工作；推测方法通常逐步核验草稿，并以强模型自身的动作为参照，强模型仍承担较多串行生成。
->
-> 我们提出 SpecAgent，让小模型起草、强模型审核多步片段。小模型可以执行只读调用，取得真实观察，遇到会修改环境的动作时暂停；强模型一次读入整段，接受语义上有效的最长前缀，并修复首个错误。并行 prefill 因而替代了一部分自回归解码，强模型只需生成短判定与必要修复。在 τ²-Bench 上，成功率与强模型相差不到一个百分点，内存流量和耗时约减半；其他基准则在降低开销的同时恢复了部分大小模型间的质量差距。
+> VLM 学会长链推理之后，面对简单的视觉识别也会惯性展开冗长反思。想用 offline 数据教单模型该快就快、该慢就慢，难点在于快直答和慢推理分别采自不同的 behavior policy，只拿其中一个当参考，模型就会整体坍缩到全快或全慢。DR-BOLT 把 offline 快慢对齐写成双参考 Boltzmann 投影问题：以快慢两策略的混合分布作为目标参考，在样本权重里补入仅取决于样本来源的校正常数，并让两种模式的 partition function 自然竞争，从而在无需外挂 router 与在线 rollout 的前提下让单个 VLM 内生习得快慢切换。
 
-#### Execution Protocol
+#### Methodology
 
-SpecAgent 让小模型起草多步片段，由强模型一次读入并核验。强模型只生成短判定与必要修复，以并行 prefill 替代一部分自回归解码。
+先看单参考 offline 对齐为何会坍缩。面对图文输入 $x$，快策略 $\pi_{\mathrm{f}}$ 直接输出简短答案 $y_{\mathrm{f}}$，慢策略 $\pi_{\mathrm{s}}$ 先写 `<think>` 推理链再作答 $y_{\mathrm{s}}$。下图展示了两个 behavior policy 互相打分的 cross log-likelihood 热力图：慢策略在回答开头强烈偏置 `<think>`，导致快答案在首个 token 即遭遇 prefix 格式壁垒；反过来，快策略对长推理链每个 token 略低的似然在数百个 token 上累乘，使单参考权重比在常见低精度格式下直接下溢归零。只要沿用单一参考策略，另一侧模态就会被指数级压制。
 
-![SpecAgent draft verify and repair protocol](assets/efficient_agents_2026/specagent-protocol.png)
+![快慢 behavior policy 的 cross log-likelihood 热力图：慢策略对快答的首个 token 格式壁垒，以及快策略对长推理链的长度累积衰减](assets/efficient_agents_2026/drbolt-separation.png)
 
-两个模型保持冻结，按以下协议交互：
-
-1. **Draft：** 小模型连续起草；只读工具调用可以执行并取得真实结果，后续步骤依赖这些实际观察。
-2. **Hold：** 遇到第一个会修改环境的动作，将其暂存，并结束当前草稿段。
-3. **Verify：** 强模型读历史和整段草稿，返回语义上可接受的最长前缀，以及首个错误的解释和可选替换动作。
-4. **Commit or repair：** 全部通过才执行暂存动作；被拒绝的后缀丢弃，必要时由强模型补一个修复步骤，再从已提交历史重新起草。
-
-纯只读片段达到长度上限时，原文允许不经强核验直接提交。核验标准是动作能否合理推进任务，允许接受与强模型自身选择不同的有效动作。
-
-原文用强模型的权重读取次数近似解码成本。设一段有 $n$ 步、每步被接受的概率约为 $p$，强模型完整生成一步需 $d$ 次权重读取，而短核验需 $v$ 次。若拒绝后额外调用强模型修复的概率为 $q$，强模型成本相对值为：
+DR-BOLT 的解法是用先验权重 $\alpha(x) \in (0, 1)$ 构造目标混合参考分布 $\rho(y \mid x) = \alpha(x)\pi_{\mathrm{f}}(y \mid x) + (1 - \alpha(x))\pi_{\mathrm{s}}(y \mid x)$，配合兼顾正确性 $r_{\mathrm{acc}}$、格式合法性 $r_{\mathrm{fmt}}$ 与归一化长度 $\ell(y)$ 的标量 reward $r(x, y) = r_{\mathrm{acc}}(x, y) + \gamma r_{\mathrm{fmt}}(y) - \lambda \ell(y)$。在温度 $\beta > 0$ 的 KL 正则目标下，最优策略是 $\rho$ 上的 Boltzmann 重加权闭式解 $\pi_{\mathrm{DR}}^\star(y \mid x) \propto \rho(y \mid x)\exp(r(x, y)/\beta)$。把总 partition function 按两种模式拆为 $Z_{\mathrm{f}}(x)$ 与 $Z_{\mathrm{s}}(x)$ 并对快模态求边缘概率，便自然导出免外挂 router 的配分竞争切换律：
 
 $$
-\mathcal R=
-\frac{1-p}{1-p^n}\frac{v}{d}
-+q(1-p).
+\begin{aligned}
+Z_m(x) &= \mathbb{E}_{y \sim \pi_m(\cdot \mid x)}\!\Bigl[\exp\!\bigl(r(x, y)/\beta\bigr)\Bigr], \qquad m \in \{\mathrm{f}, \mathrm{s}\}, \\[6pt]
+P^\star(z = \mathrm{f} \mid x) &= \frac{\alpha(x)\,Z_{\mathrm{f}}(x)}{\alpha(x)\,Z_{\mathrm{f}}(x) + \bigl(1 - \alpha(x)\bigr)\,Z_{\mathrm{s}}(x)}
+\end{aligned}
 $$
 
-在同一近似下，若小模型起草一步的耗时是强模型生成一步的 $\kappa$ 倍，总延迟相对值为：
+当题目简单、快慢两路都能答对时，快答更小的长度惩罚令 $Z_{\mathrm{f}}(x)$ 胜出；当视觉关系复杂、快答容易出错时，正确率回报差距令 $Z_{\mathrm{s}}(x)$ 占优。实际 offline 训练时，候选池按经验采样比例 $q(x)$ 采自行为混合分布 $\mu(y \mid x) = q(x)\pi_{\mathrm{f}}(y \mid x) + (1 - q(x))\pi_{\mathrm{s}}(y \mid x)$。对 forward KL 做测度变换会引入行为-参考密度比 $\kappa(x, y) = \rho(y \mid x)/\mu(y \mid x)$；得益于快慢格式在支撑集上几乎分离（跨模式交叉似然比极小），$\kappa(x, y)$ 无需再跑双模型前向打分，直接简化为仅取决于样本来源的模态常数近似 $\widehat{\kappa}(x, y)$。结合 Monte Carlo 混合配分估计 $\widehat{Z}_\rho(x)$，模型只需在离线池 $\mathcal{D}_{\mathrm{DR}}$ 上最小化 weighted NLL：
 
 $$
-\mathcal L=
-\mathcal R+
-\kappa\frac{n(1-p)}{1-p^n}.
+\begin{aligned}
+\widehat{\kappa}(x, y) &= \begin{cases} \dfrac{\alpha(x)}{q(x)}, & y \text{ sampled from } \pi_{\mathrm{f}}, \\[8pt]
+\dfrac{1 - \alpha(x)}{1 - q(x)}, & y \text{ sampled from } \pi_{\mathrm{s}}, \end{cases} \\[6pt]
+\mathcal{L}_{\mathrm{DR\text{-}BOLT}}(\theta) &= -\mathbb{E}_{(x, y) \sim \mathcal{D}_{\mathrm{DR}}}\!\left[\frac{\widehat{\kappa}(x, y)\exp\!\bigl(r(x, y)/\beta\bigr)}{\widehat{Z}_\rho(x)}\log\pi_\theta(y \mid x)\right]
+\end{aligned}
 $$
 
-$q$ 表示额外修复调用的概率。成本模型假设强模型处于 decode-bound 的服务区间、片段内接受近似独立，并忽略工具时间。较短判定、较高接受率和更快的小模型都会降低相对延迟。
+这样既把单模型快慢分配收束为纯 offline weighted SFT，又从分布层面根除了单参考失配引发的模式坍缩。
 
-![SpecAgent task quality against memory traffic and time](assets/efficient_agents_2026/specagent-frontier.png)
+## Synthesis — Composing the Five Hybrid-Reasoning Paradigms
 
-![SpecAgent compute memory and wall-time decomposition](assets/efficient_agents_2026/specagent-cost.png)
-
-原文用相同大小模型部署和相同并发比较不同协议，并计入草稿、拒绝片段、核验、修复与重试。其 Table 2 中，Airline 的成功率均为 86.0%，平均任务时间从 305.2 秒降至 126.2 秒；其他任务的质量恢复程度不一致。
-
-FLOPs 和 HBM-read 按请求 token 与模型架构估算，耗时实际计量。SpecAgent 的估算 FLOPs 可以上升：强模型对草稿做较大的并行 prefill，同时减少反复读取权重的逐 token 解码。下图进一步改变核验边界、修复方式和语义接受标准：额外核验每个片段会增加开销，取消融合修复或语义核验也会降低成功率。
-
-![SpecAgent verification and repair ablation](assets/efficient_agents_2026/specagent-ablation.png)
-
-## Transfer to Robot Use
-
-这些工作分别改变历史表示、每轮计算、思考保留和模型分工。我们希望迁移的是这些控制计算的机制，而迁移后的收益需要在图像、本体状态、执行反馈与实际动作构成的闭环中重新验证。
-
-首先，上下文压缩需要保留任务约束、已完成步骤和最新物体状态。我们应检查压缩后能否继续完成任务，以及摘要本身花费的时间。Context Management 中的结果主要支持有限窗口下的任务质量，部署时还需要单独测量总耗时。
-
-其次，预算分配、早停与跨轮复用都依赖对当前信息是否充分的判断。我们需要把这类判断与执行结果联系起来：停止思考后，动作是否仍正确；复用过去的推理时，环境变化是否使其中的依据失效。原论文中的动作似然与语义冗余是可借鉴的信号，其在机器人闭环中的可靠性仍需实验验证。
-
-最后，模型协作受到动作可执行性的约束。机械臂动作会改变环境，后续观察依赖真实执行；因此，SpecAgent 中连续执行只读调用的条件不能直接套用于连续物理操作。我们可以比较事件触发的强模型介入与固定频率介入，检验恢复能力和额外核验开销。
-
-如果后续采用 PPO，我们需要先明确更新的是推理调度策略、动作策略，还是二者。调度动作、可见反馈、任务回报和计算成本确定后，再设计对应的优势估计与更新。评测在相同动作接口和环境预算下进行，同时报告完整任务成功率、异常恢复率和总耗时，并计入摘要、调度、核验、重试及失败轨迹的成本。
+上述六项工作从五个正交层次切入闭环 agent 的快慢混合推理，在介入时机、训练成本与多模态扩展性上形成清晰互补。在多轮在线 RL 层面，RACE 通过跨轮动作 log-likelihood 覆盖实现二元思考剪枝，CogRouter 则借由四级认知深度与置信度重加权 CoPO 实现更细粒度的步级思考分配；在通用多模态双模训练层面，R-4B 通过 Bi-Mode Annealing 统一双模底座并以强制等量 rollout 的 BPO 仅凭数学规则 reward 激发跨领域 auto-thinking；在外置 routing 层面，STEPWISE 面向桌面长视界任务以轻量事件 monitor 级联大小模型，无需微调底座权重即可按事件唤醒强模型；在单模型 offline 后训练层面，Ada-R1 经由长短参数线性 weight merging 与 bi-level DPO、DR-BOLT 经由双参考 Boltzmann 投影分别从权重空间与分布空间赋予单模型内生的快慢切换能力。五类机制分别作用于步级策略学习、退火与双模采样、外置级联调度、参数融合与分布对齐，共同构成了面向闭环 agent 的高效混合推理技术栈。
 
 ## References
 
-- Yujiang Li et al. **CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents.** First released 2026-07-06; version 2607.05378v2, 2026-10-01. [Paper](https://arxiv.org/html/2607.05378v2). §3.1–3.2, Table 2, §4.3, Appendix A.2.
-- Yong Wu et al. **ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents.** 2604.01664v1, 2026-04-02. [Paper](https://arxiv.org/html/2604.01664v1). §3.1–3.3, §4.4–4.5, Appendix A.5.
-- Neharika Jali et al. **Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents.** First released 2026-04-06; version 2604.05164v4, 2026-11-15. [Paper](https://arxiv.org/html/2604.05164v4). §3.3, §4.3, Appendix A.
-- Ruihan Yang et al. **Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents.** First released 2026-02-13; reviewed ICML 2026 proceedings, PMLR 306. [Proceedings](https://proceedings.mlr.press/v306/yang26cz.html). §3.3–3.4, Algorithm 1, Figure 5, Table 5.
-- Dehai Min et al. **Stop When Reasoning Converges: Semantic-Preserving Early Exit for Reasoning Models.** 2605.17672v1, 2026-05-17. [Paper](https://arxiv.org/html/2605.17672v1). §3, §5.2, §6.2, Appendix F.
-- Yiruo Cheng et al. **When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation.** 2610.12061v1, 2026-10-08. [Paper](https://arxiv.org/html/2610.12061v1). §3.1–3.3, Table 2, Figure 4.
-- Jinbiao Wei et al. **Step-level Optimization for Efficient Computer-use Agents.** 2604.27151v1, 2026-04-29. [Paper](https://arxiv.org/html/2604.27151v1). §4, §6, Appendix B.
-- Zilin Wang et al. **Trajectory-Level Speculation with Semantic Verification for Tool-Using Agents.** 2610.21463v1, 2026-10-15. [Paper](https://arxiv.org/html/2610.21463v1). §3.2–3.3, Table 2, §5.
+*When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation*. 2026. [arXiv:2610.12061](https://arxiv.org/abs/2610.12061)
 
-Taxonomy reference: Yunuo Hu et al. **How to Make Tool-Using LLM Agents Efficient? A Survey.** Preprints.org v1, posted 2026-08-06. [Survey](https://www.preprints.org/manuscript/202608.0365). §3: tool context, calling, reasoning, and execution.
+*Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents*. ICML 2026. [arXiv:2602.12662](https://arxiv.org/abs/2602.12662)
+
+*R-4B: Incentivizing General-Purpose Auto-Thinking Capability in MLLMs via Bi-Mode Annealing and Reinforce Learning*. 2025. [arXiv:2508.21113](https://arxiv.org/abs/2508.21113)
+
+*Step-level Optimization for Efficient Computer-use Agents*. 2026. [arXiv:2604.27151](https://arxiv.org/abs/2604.27151)
+
+*Ada-R1: Hybrid-CoT via Bi-Level Adaptive Reasoning Optimization*. NeurIPS 2025. [arXiv:2504.21659](https://arxiv.org/abs/2504.21659)
+
+*Learning When to Think: Dual-Reference Offline Optimization for Adaptive VLM Reasoning*. NeurIPS 2026. [arXiv:2611.09154](https://arxiv.org/abs/2611.09154)

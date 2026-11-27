@@ -1,895 +1,146 @@
 [
   {
-    "asset": "rpo-overview.png",
-    "source_pdf": "RPO_ACL2026_816.pdf",
-    "page": 1,
-    "figure": 1,
-    "crop_points": [
-      305,
-      222,
-      526,
-      454
-    ],
-    "sha256": "f9898f8fc1cb4b00d08e2ed3be05dd6181dee59f1958abeb40967ebe20fec400",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
-    "title": "Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking",
-    "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
-    "version": "ACL 2026 proceedings",
-    "url": "https://aclanthology.org/2026.acl-long.816.pdf",
-    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
-    "active_in_blog": false
-  },
-  {
-    "asset": "rpo-recipe.png",
-    "source_pdf": "RPO_ACL2026_816.pdf",
-    "page": 2,
-    "figure": 2,
-    "crop_points": [
-      70,
-      72,
-      526,
-      216
-    ],
-    "sha256": "a9c9340c0e380a59790b93148564c9e5f6a2d764e5025c15fea466e4682ac08d",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
-    "title": "Efficiently Learning To Reason or Not to Reason: Root-token Policy Optimization for Adaptive Thinking",
-    "authors": "Taehyeon Kim; Hyunsoo Lee; Youngsoo Jang; Moontae Lee",
-    "version": "ACL 2026 proceedings",
-    "url": "https://aclanthology.org/2026.acl-long.816.pdf",
-    "license": "ACL Anthology publication terms; original paper artwork reproduced for research commentary",
-    "active_in_blog": false
-  },
-  {
-    "asset": "more-overview.png",
-    "source_pdf": "MORE_2610.33684v2.pdf",
-    "page": 3,
-    "figure": 2,
-    "crop_points": [
-      108,
-      83,
-      504,
-      269
-    ],
-    "sha256": "7f6b8432b47cc1d20f5f5c35669c3f7815761ac283a002fb1f9d276eaebfc66c",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
-    "title": "MORE: Mode-Optimized Reasoning with Self-Adaptive Effort for Self-Evolving Agents",
-    "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
-    "version": "2610.33684v2",
-    "url": "https://arxiv.org/pdf/2610.33684v2",
-    "license": "CC BY 4.0",
-    "active_in_blog": false
-  },
-  {
-    "asset": "more-training.png",
-    "source_pdf": "MORE_2610.33684v2.pdf",
-    "page": 8,
-    "figure": 5,
-    "crop_points": [
-      108,
-      81,
-      504,
-      213
-    ],
-    "sha256": "47a875da0d2ead8b0e4f186499959ec3d6c9cbd597125ac1c89973152cee6a15",
-    "modification": "Original figure region rendered from PDF; no labels or overlays added.",
-    "title": "MORE: Mode-Optimized Reasoning with Self-Adaptive Effort for Self-Evolving Agents",
-    "authors": "Dianxing Shi; Dingjie Fu; Tianyu Lei; Wangjie Qiu",
-    "version": "2610.33684v2",
-    "url": "https://arxiv.org/pdf/2610.33684v2",
-    "license": "CC BY 4.0",
-    "active_in_blog": false
-  },
-  {
-    "asset": "tab-overview.png",
-    "source_pdf": "TAB_2604.05164v4.pdf",
-    "page": 1,
-    "figure": 1,
-    "crop_points": [
-      108,
-      500,
-      506,
-      684
-    ],
-    "sha256": "2cdcff3776150895398ee9b60aa1c25b0488ad13e1497ad7391244ec8db831d5",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
-    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
-    "version": "2604.05164v4",
-    "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      11,
-      52,
-      1577,
-      700
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "tab-transfer.png",
-    "source_pdf": "TAB_2604.05164v4.pdf",
-    "page": 9,
-    "figure": 5,
-    "crop_points": [
-      108,
-      79,
-      506,
-      203
-    ],
-    "sha256": "dd757fc863f9cce77ee34c472c78dfce37bbfea9adf0db6d52c08c4536bb91f5",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
-    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
-    "version": "2604.05164v4",
-    "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      40,
-      18,
-      1533,
-      482
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "tab-latency.png",
-    "source_pdf": "TAB_2604.05164v4.pdf",
-    "page": 9,
-    "figure": 6,
-    "crop_points": [
-      108,
-      254,
-      506,
-      381
-    ],
-    "sha256": "d30b7b8c2eac80be776daece9b4d22f3328be93daedc1f99b0d7026445e0fba7",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
-    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
-    "version": "2604.05164v4",
-    "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      40,
-      22,
-      1534,
-      498
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
     "asset": "race-logic.png",
-    "source_pdf": "RACE_2610.12061v1.pdf",
+    "paper": "RACE",
+    "arxiv_id": "2610.12061v1",
+    "source_pdf": "2610.12061v1.pdf",
     "page": 5,
     "figure": 2,
-    "crop_points": [
-      108,
-      80,
-      504,
-      246
-    ],
+    "width": 1592,
+    "height": 659,
     "sha256": "694fa53ef0978d10f52ecf9cad7224605175f2858b63f488f1171ba67ff2e187",
+    "description": "LoGiC progressive cross-turn reasoning-cover estimation testing whether removing turn t thinking keeps downstream reference-action log-likelihood drops within threshold epsilon.",
     "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
-    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      14,
-      11,
-      1558,
-      622
-    ],
-    "outer_padding_pixels": 24
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
   },
   {
     "asset": "race-training.png",
-    "source_pdf": "RACE_2610.12061v1.pdf",
+    "paper": "RACE",
+    "arxiv_id": "2610.12061v1",
+    "source_pdf": "2610.12061v1.pdf",
     "page": 6,
     "figure": 3,
-    "crop_points": [
-      108,
-      78,
-      504,
-      203
-    ],
+    "width": 1583,
+    "height": 478,
     "sha256": "8f5aed41761793556cdd0b2dad72819969a4c2f23ea669ef98c35fbfec040773",
+    "description": "Two-stage SFT and Reasoning-Cover-Aware Masked GRPO pipeline augmented with explicit </think> closure loss L_close.",
     "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
-    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
     "version": "2610.12061v1",
     "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      18,
-      25,
-      1553,
-      455
-    ],
-    "outer_padding_pixels": 24
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
   },
   {
-    "asset": "race-ablation.png",
-    "source_pdf": "RACE_2610.12061v1.pdf",
-    "page": 8,
-    "figure": 4,
-    "crop_points": [
-      108,
-      223,
-      504,
-      364
-    ],
-    "sha256": "33f2e61b5543932ae635d416f8bbe16d2c1c8d24af56f46e40720cfb890e73b4",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
-    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
-    "version": "2610.12061v1",
-    "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      16,
-      16,
-      1561,
-      523
-    ],
-    "outer_padding_pixels": 24
+    "asset": "cogrouter-overview.png",
+    "paper": "CogRouter",
+    "arxiv_id": "2602.12662v1",
+    "source_pdf": "2602.12662v1.pdf",
+    "page": 4,
+    "figure": 2,
+    "width": 1953,
+    "height": 922,
+    "sha256": "84135110375b7e9144142484cea865c27c9476ea35be3c83e3d8490513dd5bab",
+    "description": "Overview of CogRouter: four ACT-R-grounded cognitive levels (L1-L4), balanced Cognition-Aware SFT cold start, and Cognition-Aware Policy Optimization (CoPO) with counterfactual cognitive-group expansion and confidence-aware advantage reweighting.",
+    "modification": "High-DPI crop of original PDF Figure 2 region at 320 DPI with clean white margins; no overlays or edits.",
+    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
+    "version": "2602.12662v1 (ICML 2026)",
+    "url": "https://arxiv.org/pdf/2602.12662v1",
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
+  },
+  {
+    "asset": "r4b-curation.png",
+    "paper": "R-4B",
+    "arxiv_id": "2508.21113v2",
+    "source_pdf": "2508.21113v2.pdf",
+    "page": 3,
+    "figure": 3,
+    "width": 2032,
+    "height": 475,
+    "sha256": "6c273a4e46800abb582e4892e8857d37109e527bb08132dff9b199a713af422f",
+    "description": "Heuristic-driven bi-mode data curation pipeline for R-4B: offline hard mining for objective queries and prompt engineering for subjective queries formatted into unified reasoning and non-reasoning templates.",
+    "modification": "High-DPI crop of original PDF Figure 3 region at 360 DPI with clean white margins; no overlays or edits.",
+    "title": "R-4B: Incentivizing General-Purpose Auto-Thinking Capability in MLLMs via Bi-Mode Annealing and Reinforce Learning",
+    "version": "2508.21113v2",
+    "url": "https://arxiv.org/pdf/2508.21113v2",
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
+  },
+  {
+    "asset": "r4b-bpo.png",
+    "paper": "R-4B",
+    "arxiv_id": "2508.21113v2",
+    "source_pdf": "2508.21113v2.pdf",
+    "page": 6,
+    "figure": 6,
+    "width": 1913,
+    "height": 655,
+    "sha256": "09a21c89a13d2e2ae74a2096f55d53820c9466d73670737d46d1a40605577f22",
+    "description": "Bi-mode Policy Optimization (BPO) framework using special tokens to force equal-sized thinking and non-thinking rollouts per query for mixed-group GRPO advantage computation.",
+    "modification": "High-DPI crop of original PDF Figure 6 region at 340 DPI with clean white margins; no overlays or edits.",
+    "title": "R-4B: Incentivizing General-Purpose Auto-Thinking Capability in MLLMs via Bi-Mode Annealing and Reinforce Learning",
+    "version": "2508.21113v2",
+    "url": "https://arxiv.org/pdf/2508.21113v2",
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
   },
   {
     "asset": "stepwise-overview.png",
-    "source_pdf": "STEPWISE_2604.27151v1.pdf",
+    "paper": "STEPWISE",
+    "arxiv_id": "2604.27151v1",
+    "source_pdf": "2604.27151v1.pdf",
     "page": 1,
     "figure": 1,
-    "crop_points": [
-      70.9,
-      480.9,
-      524.4,
-      645.4
-    ],
+    "width": 1815,
+    "height": 650,
     "sha256": "40b3fa4a5d2a27d741585ec817cff699b2ed038cff825de36bd840c042f59704",
+    "description": "Event-driven small–large GUI VLM cascade controlled by lightweight ModernBERT Stuck Monitor (direct escalation) and Milestone Monitor (dual-screenshot strong-model verification).",
     "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
     "title": "Step-level Optimization for Efficient Computer-use Agents",
-    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
     "version": "2604.27151v1",
     "url": "https://arxiv.org/pdf/2604.27151v1",
     "license": "CC BY 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      17,
-      36,
-      1784,
-      638
-    ],
-    "outer_padding_pixels": 24
+    "active_in_blog": true
   },
   {
-    "asset": "stepwise-failures.png",
-    "source_pdf": "STEPWISE_2604.27151v1.pdf",
-    "page": 3,
-    "figure": 2,
-    "crop_points": [
-      70,
-      67,
-      526,
-      232
-    ],
-    "sha256": "d6ec9472770b3c4e0f017301e68a79386940f37efb3e04350bc02905afee25cf",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Step-level Optimization for Efficient Computer-use Agents",
-    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
-    "version": "2604.27151v1",
-    "url": "https://arxiv.org/pdf/2604.27151v1",
-    "license": "CC BY 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      38,
-      5,
-      1792,
-      631
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "stepwise-ablation.png",
-    "source_pdf": "STEPWISE_2604.27151v1.pdf",
-    "page": 7,
-    "figure": 3,
-    "crop_points": [
-      94,
-      373,
-      517,
-      540
-    ],
-    "sha256": "c35555dc603db1030e2b09514877f100300a05bdece0d02665f9d6acf799c081",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Step-level Optimization for Efficient Computer-use Agents",
-    "authors": "Jinbiao Wei; Kangqi Ni; Yilun Zhao; Guo Gan; Arman Cohan",
-    "version": "2604.27151v1",
-    "url": "https://arxiv.org/pdf/2604.27151v1",
-    "license": "CC BY 4.0",
-    "active_in_blog": true,
-    "render_scale": 4,
-    "trim_pixels": [
-      26,
-      54,
-      1606,
-      665
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "sar-results.png",
-    "source_pdf": "SAR_ICLR2026.pdf",
-    "page": 1,
-    "figure": 1,
-    "crop_points": [
-      108,
-      485,
-      504,
-      591
-    ],
-    "sha256": "e1f41157d5c30a2eb4d3edfb11754c4bb6ee85fa635ff9f876449e6a1c59713a",
-    "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": false,
-    "version": "ICLR 2026 proceedings",
-    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
-    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
-    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
-    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
-    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
-  },
-  {
-    "asset": "sar-token-signal.png",
-    "source_pdf": "SAR_ICLR2026.pdf",
+    "asset": "adar1-pipeline.png",
+    "paper": "Ada-R1",
+    "arxiv_id": "2504.21659v2",
+    "source_pdf": "2504.21659v2.pdf",
     "page": 5,
     "figure": 2,
-    "crop_points": [
-      108,
-      322,
-      504,
-      404
-    ],
-    "sha256": "089f66199208ef860dbcf330b53832dff2915efef0d0c1bbd8eccb385861e0d5",
-    "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": false,
-    "version": "ICLR 2026 proceedings",
-    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
-    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
-    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
-    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
-    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
-  },
-  {
-    "asset": "sar-pareto.png",
-    "source_pdf": "SAR_ICLR2026.pdf",
-    "page": 7,
-    "figure": 3,
-    "crop_points": [
-      108,
-      205,
-      504,
-      438
-    ],
-    "sha256": "b7e84a5f4a505ea36eb2ab42d481f5484113749c1046671d2575e3d4b748b80c",
-    "modification": "Original PDF figure region; no annotations or overlays.",
-    "active_in_blog": false,
-    "version": "ICLR 2026 proceedings",
-    "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/fc30caeb45721bab13507c50199e6403-Paper-Conference.pdf",
-    "acceptance_evidence": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/fc30caeb45721bab13507c50199e6403-Abstract-Conference.html",
-    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
-    "authors": "Peixuan Han; Adit Krishnan; Gerald Friedland; Jiaxuan You; Chris Kong",
-    "title": "Self-Aligned Reward: Towards Effective and Efficient Reasoners"
-  },
-  {
-    "asset": "cogrouter-framework.png",
-    "source_pdf": "CogRouter_ICML2026.pdf",
-    "page": 4,
-    "figure": 2,
-    "crop_points": [
-      55,
-      67,
-      543,
-      284
-    ],
-    "sha256": "f74ec14c5685c53bc31de798f1ff0a6ee0ef72b1b1c8d6f8144b97e6993f1461",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "active_in_blog": true,
-    "version": "ICML 2026 proceedings",
-    "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
-    "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
-    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
-    "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
-    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
-    "render_scale": 4,
-    "trim_pixels": [
-      67,
-      2,
-      1905,
-      856
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "cogrouter-adaptation.png",
-    "source_pdf": "CogRouter_ICML2026.pdf",
-    "page": 7,
-    "figure": 5,
-    "crop_points": [
-      307,
-      60,
-      543,
-      251
-    ],
-    "sha256": "3317896ad5f6ab079582fc153da94f570e2269220052754650d9dcb53af942bb",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "active_in_blog": true,
-    "version": "ICML 2026 proceedings",
-    "url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/yang26cz/yang26cz.pdf",
-    "acceptance_evidence": "https://proceedings.mlr.press/v306/yang26cz.html",
-    "license": "Original research figure reproduced for commentary; authors and conference proceedings retain rights.",
-    "authors": "Ruihan Yang; Fanghua Ye; Xiang Wei; Ruoqing Zhao; Kang Luo; Xinbo Xu; Bo Zhao; Ruotian Ma; Shanyi Wang; Zhaopeng Tu; Xiaolong Li; Deqing Yang; Liefeng Bo",
-    "title": "Think Fast and Slow: Step-Level Cognitive Depth Adaptation for LLM Agents",
-    "render_scale": 4,
-    "trim_pixels": [
-      49,
-      28,
-      890,
-      749
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "puma-framework.png",
-    "source_pdf": "PUMA_2605.17672v1.pdf",
-    "page": 3,
-    "figure": 2,
-    "crop_points": [
-      108,
-      60,
-      504,
-      273
-    ],
-    "version": "2605.17672v1",
-    "url": "https://arxiv.org/pdf/2605.17672v1",
-    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "sha256": "a2acbcc51fe25ef4865e088ad8b3222243405951e60fc08bccbe98ac83bb40f6",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "render_scale": 4,
-    "trim_pixels": [
-      42,
-      25,
-      1542,
-      832
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "puma-latency.png",
-    "source_pdf": "PUMA_2605.17672v1.pdf",
-    "page": 7,
-    "figure": 3,
-    "crop_points": [
-      108,
-      72,
-      506,
-      229
-    ],
-    "version": "2605.17672v1",
-    "url": "https://arxiv.org/pdf/2605.17672v1",
-    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "sha256": "2c32a87a5319d473c6f2763ef1f8e7f0394b519960ab9fcda1e42ff7028ff6bf",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "render_scale": 4,
-    "trim_pixels": [
-      24,
-      8,
-      1560,
-      609
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "specagent-protocol.png",
-    "source_pdf": "SpecAgent_2610.21463v1.pdf",
-    "page": 3,
-    "figure": 1,
-    "crop_points": [
-      62,
-      88,
-      534,
-      309
-    ],
-    "version": "2610.21463v1",
-    "url": "https://arxiv.org/pdf/2610.21463v1",
-    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "fb6c90658776b7d416afb42bbc714422aa72314be7d73ad129883a5269dcfae7",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
+    "width": 1559,
+    "height": 499,
+    "sha256": "86fe48f941128231bc28c55cf7572d72fce47788f722a68a8faf963a173b615e",
+    "description": "Two-stage Ada-R1 pipeline: Stage I linearly merges Long-CoT and Short-CoT weights into a hybrid model, and Stage II applies bi-level (group-level and instance-level) preference training.",
+    "modification": "Unmodified original PNG from official arXiv HTML source.",
+    "title": "Ada-R1: Hybrid-CoT via Bi-Level Adaptive Reasoning Optimization",
+    "version": "2504.21659v2 (NeurIPS 2025)",
+    "url": "https://arxiv.org/html/2504.21659v2/pipeline.png",
     "license": "CC BY 4.0",
-    "render_scale": 4,
-    "trim_pixels": [
-      21,
-      18,
-      1864,
-      836
-    ],
-    "outer_padding_pixels": 24
+    "active_in_blog": true
   },
   {
-    "asset": "specagent-frontier.png",
-    "source_pdf": "SpecAgent_2610.21463v1.pdf",
-    "page": 8,
-    "figure": 2,
-    "crop_points": [
-      62,
-      72,
-      534,
-      271
-    ],
-    "version": "2610.21463v1",
-    "url": "https://arxiv.org/pdf/2610.21463v1",
-    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "60bea29280491ba0b3a55ce233025a15c8f00315277eddd4f6fdf657328d03ef",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "CC BY 4.0",
-    "render_scale": 4,
-    "trim_pixels": [
-      230,
-      56,
-      1642,
-      763
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "specagent-cost.png",
-    "source_pdf": "SpecAgent_2610.21463v1.pdf",
-    "page": 10,
-    "figure": 3,
-    "crop_points": [
-      60,
-      74,
-      536,
-      240
-    ],
-    "version": "2610.21463v1",
-    "url": "https://arxiv.org/pdf/2610.21463v1",
-    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "sha256": "2e50258aaddec25de8dbdacdca381fd49afdf14eefc66014ff4072970ac1f8c0",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "CC BY 4.0",
-    "render_scale": 4,
-    "trim_pixels": [
-      15,
-      49,
-      1888,
-      629
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "source_pdf": "TAB_2604.05164v4.pdf",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "Not All Turns Are Equally Hard: Adaptive Thinking Budgets For Efficient Multi-Turn Reasoning in Agents",
-    "authors": "Neharika Jali; Anupam Nayak; Gauri Joshi",
-    "version": "2604.05164v4",
-    "url": "https://arxiv.org/pdf/2604.05164v4",
-    "license": "CC BY-NC-ND 4.0",
-    "active_in_blog": true,
-    "asset": "tab-allocation.png",
-    "page": 8,
+    "asset": "drbolt-separation.png",
+    "paper": "DR-BOLT",
+    "arxiv_id": "2611.09154v2",
+    "source_pdf": "2611.09154v2.pdf",
+    "page": 19,
     "figure": 4,
-    "crop_points": [
-      108,
-      78,
-      506,
-      264
-    ],
-    "sha256": "3aaccefb629a6055a21a51e65fd0cde1d0bf62999072cc216ad0108ad9560540",
-    "render_scale": 4,
-    "trim_pixels": [
-      5,
-      21,
-      1580,
-      721
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "source_pdf": "PUMA_2605.17672v1.pdf",
-    "version": "2605.17672v1",
-    "url": "https://arxiv.org/pdf/2605.17672v1",
-    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "asset": "puma-readiness.png",
-    "page": 2,
-    "figure": 1,
-    "crop_points": [
-      108,
-      64,
-      505,
-      243
-    ],
-    "sha256": "9190c5afb135837a766ac762508d0c70daef19b716fe9b495121948762877577",
-    "render_scale": 4,
-    "trim_pixels": [
-      49,
-      25,
-      1535,
-      694
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "source_pdf": "PUMA_2605.17672v1.pdf",
-    "version": "2605.17672v1",
-    "url": "https://arxiv.org/pdf/2605.17672v1",
-    "authors": "Dehai Min; Giovanni Vaccarino; Huiyi Chen; Yongliang Wu; Gal Yona; Lu Cheng",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "asset": "puma-exit-behavior.png",
-    "page": 8,
-    "figure": 4,
-    "crop_points": [
-      108,
-      237,
-      506,
-      362
-    ],
-    "sha256": "a383c34d7fce8a4b1d487e01876bd64804a0448e558aa30e3bf569cd687f64f8",
-    "render_scale": 4,
-    "trim_pixels": [
-      43,
-      12,
-      1539,
-      482
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "source_pdf": "RACE_2610.12061v1.pdf",
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "title": "When Should Agents Think? Adaptive Reasoning via Cross-Turn Estimation",
-    "authors": "Yiruo Cheng; Shen Huang; Xiaoshuai Song; Jiejun Tan; Guanting Dong; Pengjun Xie; Ji-Rong Wen; Zhicheng Dou",
-    "version": "2610.12061v1",
-    "url": "https://arxiv.org/pdf/2610.12061v1",
-    "license": "arXiv perpetual non-exclusive license; original artwork reproduced for research commentary",
-    "active_in_blog": true,
-    "asset": "race-support.png",
-    "page": 2,
-    "figure": 1,
-    "crop_points": [
-      108,
-      82,
-      504,
-      265
-    ],
-    "sha256": "52b3d95213c68bee218f0d7c7e709a708aaca85ea02dfb8ab83b25fe66b9a008",
-    "render_scale": 4,
-    "trim_pixels": [
-      24,
-      4,
-      1560,
-      690
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "source_pdf": "SpecAgent_2610.21463v1.pdf",
-    "version": "2610.21463v1",
-    "url": "https://arxiv.org/pdf/2610.21463v1",
-    "authors": "Zilin Wang; Yinhong Liu; Chao Chen; Qun Liu; Zhijiang Guo",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "license": "CC BY 4.0",
-    "asset": "specagent-ablation.png",
-    "page": 11,
-    "figure": 4,
-    "crop_points": [
-      62,
-      78,
-      534,
-      198
-    ],
-    "sha256": "7bdb8c608d0def7348d1ce983bf788e206180538a5baa016407e40bc3b455de7",
-    "render_scale": 4,
-    "trim_pixels": [
-      6,
-      32,
-      1880,
-      461
-    ],
-    "outer_padding_pixels": 24
-  },
-  {
-    "asset": "compactionrl-overview.png",
-    "source_pdf": "CompactionRL_2607.05378v2.pdf",
-    "page": 2,
-    "figure": 1,
-    "crop_points": [
-      108,
-      78,
-      506,
-      237
-    ],
-    "version": "2607.05378v2",
-    "render_scale": 4,
-    "trim_pixels": [
-      38,
-      15,
-      1550,
-      598
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "fe97c3e17cd83e6a250cbfc518f2ad08da90464d686d62a27db6324cbddd3081",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2607.05378v2",
-    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
-    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
-    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
-  },
-  {
-    "asset": "compactionrl-training.png",
-    "source_pdf": "CompactionRL_2607.05378v2.pdf",
-    "page": 4,
-    "figure": 2,
-    "crop_points": [
-      108,
-      78,
-      506,
-      246
-    ],
-    "version": "2607.05378v2",
-    "render_scale": 4,
-    "trim_pixels": [
-      2,
-      22,
-      1575,
-      627
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "37a60e799c674351fba6d41783fd39ffcd7ce737e9c705580afd8da9b05b2bdc",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2607.05378v2",
-    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
-    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
-    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
-  },
-  {
-    "asset": "compactionrl-dynamics.png",
-    "source_pdf": "CompactionRL_2607.05378v2.pdf",
-    "page": 9,
-    "figure": 4,
-    "crop_points": [
-      108,
-      276,
-      506,
-      399
-    ],
-    "version": "2607.05378v2",
-    "render_scale": 4,
-    "trim_pixels": [
-      25,
-      29,
-      1573,
-      471
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "7776d7f83b58c71f8be9697f8fb735e77ff2da9bced9f5d6580871dec27346ee",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2607.05378v2",
-    "license": "arXiv perpetual non-exclusive license; original figure reproduced for research commentary",
-    "title": "CompactionRL: Reinforcement Learning with Context Compaction for Long-Horizon Agents",
-    "authors": "Yujiang Li; Zhenyu Hou; Yi Jing; Jie Tang; Yuxiao Dong"
-  },
-  {
-    "asset": "contextbudget-framework.png",
-    "source_pdf": "ContextBudget_2604.01664v1.pdf",
-    "page": 3,
-    "figure": 1,
-    "crop_points": [
-      108,
-      76,
-      506,
-      329
-    ],
-    "version": "2604.01664v1",
-    "render_scale": 4,
-    "trim_pixels": [
-      0,
-      31,
-      1581,
-      927
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "a2569dafed656c9049d9a079b83e0004b9dc89c3f4a004ec6797061ca4db69cc",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2604.01664v1",
-    "license": "CC BY 4.0",
-    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
-    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
-  },
-  {
-    "asset": "contextbudget-budgets.png",
-    "source_pdf": "ContextBudget_2604.01664v1.pdf",
-    "page": 8,
-    "figure": 2,
-    "crop_points": [
-      108,
-      78,
-      506,
-      208
-    ],
-    "version": "2604.01664v1",
-    "render_scale": 4,
-    "trim_pixels": [
-      20,
-      24,
-      1583,
-      496
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "e1757296679a782fad22586a51bdc3c6387052034ee1db9a67ee5027de5a692c",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2604.01664v1",
-    "license": "CC BY 4.0",
-    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
-    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
-  },
-  {
-    "asset": "contextbudget-compressions.png",
-    "source_pdf": "ContextBudget_2604.01664v1.pdf",
-    "page": 8,
-    "figure": 3,
-    "crop_points": [
-      345,
-      418,
-      506,
-      533
-    ],
-    "version": "2604.01664v1",
-    "render_scale": 6,
-    "trim_pixels": [
-      19,
-      29,
-      939,
-      667
-    ],
-    "outer_padding_pixels": 24,
-    "sha256": "6016a64648f1f31f570f36dd893c01c41d89f5e53898a4cb58afd52a8e684b2f",
-    "active_in_blog": true,
-    "modification": "Original PDF figure region; whitespace trimmed and uniform white padding added. No annotations or overlays.",
-    "url": "https://arxiv.org/pdf/2604.01664v1",
-    "license": "CC BY 4.0",
-    "title": "ContextBudget: Budget-Aware Context Management for Long-Horizon Search Agents",
-    "authors": "Yong Wu; YanZhao Zheng; TianZe Xu; ZhenTao Zhang; YuanQiang Yu; JiHuai Zhu; Chao Ma; BinBin Lin; BaoHua Dong; HangCheng Zhu; RuoHui Huang; Gang Yu"
+    "width": 1500,
+    "height": 600,
+    "sha256": "4711456e1c84c618f3f227b905655ab394164dd177674dc4861708697e6a0765",
+    "description": "Cross-likelihood heatmaps between fast and slow behavior policies illustrating the per-token prefix bottleneck on fast responses and length-compounded sequence log-likelihood decay on slow trajectories.",
+    "modification": "Unmodified original PNG fetched from official arXiv HTML source.",
+    "title": "Learning When to Think: Dual-Reference Offline Optimization for Adaptive VLM Reasoning",
+    "version": "2611.09154v2 (NeurIPS 2026)",
+    "url": "https://arxiv.org/html/2611.09154v2/fig/heatmap_1.png",
+    "license": "arXiv perpetual non-exclusive license 1.0",
+    "active_in_blog": true
   }
 ]
