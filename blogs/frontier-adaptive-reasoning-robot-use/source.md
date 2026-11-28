@@ -16,6 +16,10 @@ Hybrid reasoning 将推理深度视为随观测历史变化的决策变量。在
 
 ## Claude and GPT — Allocating Inference Compute
 
+同一个机器人任务可以有三种计算分配方式：切换模型、对同一个模型改变 effort，或让模型在固定 effort 下决定思考多久。下图把三种选择放在请求到输出的顺序里。外部系统控制前两层，生成长度则取决于模型看到的输入与本次设置。
+
+![三层推理计算分配。从模型分流、请求档位到模型实际生成深度。](assets/reasoning-control-levels.png)
+
 Claude Opus 4.6 的 system card 描述了一种模型内的 adaptive thinking。API 调用方开启 adaptive 模式并传入 effort，模型根据请求内容决定是否使用 extended thinking、以及思考多久。降低 effort 会改变模型调用长思考的倾向。这个接口把产品要承担的延迟和成本交给调用方设定，同时允许不同输入在同一个 effort 下花费不同的 token 数。Opus 5.5 的公开结果仍标明所用的 adaptive thinking 与 effort 设置，复现实验时这两项也应与模型版本一起记录。公开材料解释了接口和可观察行为，足以作为运行时参考。其具体 gating 训练信号仍是未知量。 [Opus 4.6 System Card][claude46] · [Opus 5.5 Model Notes][claude55]
 
 **关于 Claude 训练的假设。** 一条可复现的路线是在同一 decoder 中联合训练两类决策：输出开始时选择进入 thinking 或直接回答，进入 thinking 后决定何时结束。对同一输入及 effort 采样短答与长答，用可验证的结果监督质量，再在低 effort 下施加更强的长度代价。SFT 可以先让两个分支都能完成任务，随后用配对结果训练选择。另一种实现是由独立 router 在 decode 前选路径。两者都能解释同一 effort 下思考触发率与深度随输入变化的公开行为。公开资料不足以辨别它们，也未披露 Claude 使用了这样的损失或架构。
@@ -46,7 +50,15 @@ Kimi k1.5 的 long2short 提供了低成本行为的数据来源。Shortest reje
 
 R-4B 展示了双模训练之后怎样继续训练自主选档。它先经 bi-mode annealing 获得 thinking 和 direct answer 两套行为，再通过 Bi-mode Policy Optimization 对同一输入强制两种模式等量采样，避免早期偏向某一模式导致另一分支缺少探索。Qwen3 的双模 SFT、DeepSeek 的同档位预算约束和 R-4B 的跨模式对照分别提供了行为覆盖、深度控制和模式选择的训练依据。 [R-4B, sections 2–3][r4b]
 
+下图把可分开验证的训练目标放在一起。训练出能用的 Fast 和 Think 之后，还要检验模型能否在它们之间选对。比如在挪动目标后继续沿用原抓取计划的状态里，短轨迹即使格式正确，也可能因为没有重新定位而失败。配对 rollout 能让这种差异进入监督信号。
+
+![四种互补的训练目标：双模融合、从长轨迹学习短推理、档位条件化长度约束，以及双模对照。](assets/training-mechanisms.png)
+
 ## Gemini Robotics and PEAR — Where Thinking Pays Off
+
+两套具身系统都根据执行反馈更新下一步，但把思考放在了不同接口。图的上半部分把任务规划与动作生成拆开，下半部分由同一个 robot-use LLM 直接生成位姿增量。选择在哪一层调节 effort，决定了要冻结哪些组件，以及一次试验要测量哪段延迟。
+
+![Gemini Robotics 1.5 的 ER 与 VLA 分工，以及 PEAR 的单模型位姿决策与 controller。](assets/robotics-architectures.png)
 
 Gemini Robotics 1.5 将 embodied reasoning 和 action generation 放在两处。ER 模型读场景、规划子任务并根据反馈更新计划，Thinking VLA 可以在生成动作前用语言把当前子任务拆成短动作。报告的 ER budget sweep 显示，相同的 budget 下，指点任务平均用掉的 thinking tokens 少于视频问答，指点的得分也更早趋于平缓。VLA 的独立 thinking on/off 实验则在多步操作中观察到 task progress 改善。这两组观测对应不同决策粒度，ER benchmark 的预算曲线无法直接给出 pose-level 控制的阈值。Gemini Robotics 2.5 的公开实例继续由 ER 跟踪任务进展、VLA 执行动作，提供了另一种闭环分工的实例。 [Gemini Robotics 1.5 Technical Report, thinking VLA and ER scaling experiments][gemini15] · [Gemini Robotics 2.5 Release][gemini25]
 
@@ -83,6 +95,10 @@ $\lambda$ 表示愿意用每秒额外时间换取多少成功概率。因为多�
 以一组假设数字说明标签如何产生。同一状态下，各做十次 rollout。Fast 成功四次，平均剩余耗时 12 秒。Think 成功七次，平均剩余耗时 16 秒。若每秒时间代价折合 0.05 的成功概率，则 0.30 的成功概率增量超过 0.20 的时间代价。十次 rollout 得到的区间可能仍跨零，此时可补采配对种子，或将状态留作不确定样本。
 
 ### Train and Evaluate the Switch
+
+配对采样和闭环评估各有用途。配对采样估计当前状态升档的收益，训练后的策略则会访问一批新的状态。下图把两者连起来：先从配对结果学习何时升档，再到独立任务里运行整个策略，观察这些局部判断能否转化为更好的任务结果。
+
+![从配对 rollout 到闭环验证。估计收益、训练选档与比较基线是三个独立环节。](assets/training-evaluation-flow.png)
 
 第一轮实验可以冻结 Qwen，只训练 router。若同一个 checkpoint 在两档都能生成有效动作，而且 learned router 在独立验证任务上超过匹配 Think 比例的随机策略，再把选择蒸馏进模型。SFT 数据包含同一接口下成功的 Fast 直接动作与 Think 轨迹；筛选依据来自 simulator outcome 和动作有效性，轨迹长度用于衡量成本。对接着做的 simulator RL，可以用 matched states 对 mode 选择提供分叉后效用差，用完整 episode 的 success 评估后续行为。若借用 DeepSeek 的 effort-conditioned 长度项，只给 reasoning tokens 计长度成本，并报告各档位的成功率和实际使用比例。只对 switch token 计算一项 loss 时，共享参数仍可能改变动作生成，需要保留固定档位评测来检查退化。
 
