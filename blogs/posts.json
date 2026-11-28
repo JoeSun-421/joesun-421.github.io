@@ -5,7 +5,7 @@
     "date": "2026-11-29",
     "published": "2026-11-29",
     "updated": "2026-11-29",
-    "summary": "从 Claude、GPT、Qwen、GLM 和 DeepSeek 的公开资料出发，结合 Gemini Robotics 与 PEAR，设计一套用 LIBERO 状态分叉测量每轮 reasoning 收益的实验与训练方案。"
+    "summary": "比较前沿模型的模式选择、推理预算与跨轮机制，结合 Gemini Robotics 和 PEAR，提出通过 LIBERO 配对分叉刻画 robot-use LLM 的推理收益边界。"
   },
   {
     "slug": "dynamic-reasoning-robot-use",
