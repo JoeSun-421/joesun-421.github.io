@@ -1,5 +1,13 @@
 [
   {
+    "slug": "frontier-adaptive-reasoning-robot-use",
+    "title": "Adaptive Reasoning for Robot-Use LLMs: From Frontier Models to a Training Recipe",
+    "date": "2026-11-29",
+    "published": "2026-11-29",
+    "updated": "2026-11-29",
+    "summary": "从 Claude、GPT、Qwen、GLM 和 DeepSeek 的公开资料出发，结合 Gemini Robotics 与 PEAR，设计一套用 LIBERO 状态分叉测量每轮 reasoning 收益的实验与训练方案。"
+  },
+  {
     "slug": "dynamic-reasoning-robot-use",
     "title": "Towards Efficient Closed-Loop Agents via Hybrid Reasoning",
     "date": "2026-11-27",
